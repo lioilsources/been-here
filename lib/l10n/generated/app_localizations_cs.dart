@@ -379,4 +379,40 @@ class AppLocalizationsCs extends AppLocalizations {
   String placesSummary(String age, String photos) {
     return '$age · $photos';
   }
+
+  @override
+  String get notificationTitle => 'Tady jsi už byl';
+
+  @override
+  String notificationBody(String age, String photos) {
+    return '$age · $photos';
+  }
+
+  @override
+  String get alwaysLocationTitle => 'Ať si toho Been Here všimne za tebe';
+
+  @override
+  String get alwaysLocationBody =>
+      'S polohou na pozadí ti telefon umí říct, že jsi dorazil někam, kde jsi kdysi fotil — a appka se ozve sama, jednou, aniž bys ji otevíral.\n\nNesleduje tě. Telefon hlídá pár kroužků na mapě a probudí appku jen když do některého vejdeš. Nic o tom, kde jsi, neopustí tenhle telefon.';
+
+  @override
+  String get alwaysLocationAction => 'Zapnout příjezdy';
+
+  @override
+  String get alwaysLocationLater => 'Teď ne';
+
+  @override
+  String get alwaysLocationDeniedBody =>
+      'Poloha na pozadí je vypnutá, takže se appka sama neozve. Všechno ostatní funguje dál; zapnout ji jde kdykoliv v nastavení systému.';
+
+  @override
+  String get settingsArrivalsTitle => 'Příjezdy';
+
+  @override
+  String get settingsArrivalsOn =>
+      'Been Here se ozve, když dorazíš někam, kde jsi dlouho nefotil.';
+
+  @override
+  String get settingsArrivalsOff =>
+      'Been Here mlčí. Zapnutí si řekne o polohu na pozadí.';
 }

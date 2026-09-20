@@ -619,6 +619,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{age} · {photos}'**
   String placesSummary(String age, String photos);
+
+  /// No description provided for @notificationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve been here before'**
+  String get notificationTitle;
+
+  /// No description provided for @notificationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{age} · {photos}'**
+  String notificationBody(String age, String photos);
+
+  /// No description provided for @alwaysLocationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Let Been Here notice for you'**
+  String get alwaysLocationTitle;
+
+  /// No description provided for @alwaysLocationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'With background location, your phone can tell Been Here when you arrive somewhere you\'ve photographed before — and it can say so, once, without you opening anything.\n\nThe app never follows you. Your phone watches a handful of circles and wakes the app only when you enter one. Nothing about where you are leaves this device.'**
+  String get alwaysLocationBody;
+
+  /// No description provided for @alwaysLocationAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on arrivals'**
+  String get alwaysLocationAction;
+
+  /// No description provided for @alwaysLocationLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get alwaysLocationLater;
+
+  /// No description provided for @alwaysLocationDeniedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Background location is off, so arrivals stay quiet. Everything else works as before; you can turn it on in the system settings whenever you like.'**
+  String get alwaysLocationDeniedBody;
+
+  /// No description provided for @settingsArrivalsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrivals'**
+  String get settingsArrivalsTitle;
+
+  /// No description provided for @settingsArrivalsOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Been Here will tell you when you arrive somewhere you have not photographed in a while.'**
+  String get settingsArrivalsOn;
+
+  /// No description provided for @settingsArrivalsOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Been Here stays quiet. Turning this on asks for background location.'**
+  String get settingsArrivalsOff;
 }
 
 class _AppLocalizationsDelegate

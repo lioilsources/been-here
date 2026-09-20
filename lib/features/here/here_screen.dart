@@ -6,6 +6,7 @@ import 'package:been_here/data/photos/photo_library.dart';
 import 'package:been_here/domain/indexing/index_progress.dart';
 import 'package:been_here/features/common/empty_state.dart';
 import 'package:been_here/features/common/format.dart';
+import 'package:been_here/features/here/arrivals_sheet.dart';
 import 'package:been_here/features/here/debug_location_sheet.dart';
 import 'package:been_here/features/here/widgets/radius_slider.dart';
 import 'package:been_here/features/here/widgets/visit_section.dart';
@@ -15,11 +16,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// The screen that matters: what did I photograph right here, and when.
 class HereScreen extends ConsumerStatefulWidget {
-  const HereScreen({super.key, this.placeId});
-
-  /// When set, show memories for this place instead of the current location
-  /// (a notification tap lands here). Wired up in phase 4.
-  final int? placeId;
+  const HereScreen({super.key});
 
   @override
   ConsumerState<HereScreen> createState() => _HereScreenState();
@@ -83,7 +80,7 @@ class _HereScreenState extends ConsumerState<HereScreen> {
           child: Text(l10n.hereTabLabel),
         ),
         actions: [
-          if (ref.watch(debugLocationProvider) != null)
+          if (ref.watch(viewpointProvider) != null)
             IconButton(
               tooltip: l10n.debugLocationActive,
               icon: const Icon(Icons.bug_report_outlined),
@@ -231,6 +228,14 @@ class _HereScreenState extends ConsumerState<HereScreen> {
   Widget _timeline(AppLocalizations l10n) {
     final here = ref.watch(memoriesHereProvider);
     final radius = ref.watch(searchRadiusProvider);
+
+    // Seeing memories is what earns the right to ask for background
+    // location. Recorded here because this is the moment it happens.
+    if ((here.value?.visits.length ?? 0) > 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) unawaited(markMemoriesSeen(ref));
+      });
+    }
     // Keep the previous result on screen while a wider radius is counted;
     // blanking the list on every drag makes the slider feel broken.
     final memories = here.value;
@@ -241,6 +246,7 @@ class _HereScreenState extends ConsumerState<HereScreen> {
         SliverToBoxAdapter(
           child: RadiusSlider(photoCount: memories?.photoCount),
         ),
+        const SliverToBoxAdapter(child: ArrivalsCard()),
         if (memories == null)
           const SliverFillRemaining(
             hasScrollBody: false,

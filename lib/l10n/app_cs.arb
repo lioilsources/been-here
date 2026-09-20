@@ -207,5 +207,25 @@
         "type": "String"
       }
     }
-  }
+  },
+  "notificationTitle": "Tady jsi už byl",
+  "notificationBody": "{age} · {photos}",
+  "@notificationBody": {
+    "placeholders": {
+      "age": {
+        "type": "String"
+      },
+      "photos": {
+        "type": "String"
+      }
+    }
+  },
+  "alwaysLocationTitle": "Ať si toho Been Here všimne za tebe",
+  "alwaysLocationBody": "S polohou na pozadí ti telefon umí říct, že jsi dorazil někam, kde jsi kdysi fotil — a appka se ozve sama, jednou, aniž bys ji otevíral.\n\nNesleduje tě. Telefon hlídá pár kroužků na mapě a probudí appku jen když do některého vejdeš. Nic o tom, kde jsi, neopustí tenhle telefon.",
+  "alwaysLocationAction": "Zapnout příjezdy",
+  "alwaysLocationLater": "Teď ne",
+  "alwaysLocationDeniedBody": "Poloha na pozadí je vypnutá, takže se appka sama neozve. Všechno ostatní funguje dál; zapnout ji jde kdykoliv v nastavení systému.",
+  "settingsArrivalsTitle": "Příjezdy",
+  "settingsArrivalsOn": "Been Here se ozve, když dorazíš někam, kde jsi dlouho nefotil.",
+  "settingsArrivalsOff": "Been Here mlčí. Zapnutí si řekne o polohu na pozadí."
 }

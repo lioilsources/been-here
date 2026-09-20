@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:been_here/app/providers.dart';
 import 'package:been_here/domain/settings/app_settings.dart';
+import 'package:been_here/features/here/arrivals_sheet.dart';
 import 'package:been_here/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -59,6 +60,10 @@ class SettingsScreen extends ConsumerWidget {
           _AutoMuteSlider(days: settings.autoMuteDays),
 
           const Divider(height: 32),
+          _Section(title: l10n.settingsArrivalsTitle),
+          const _ArrivalsRow(),
+
+          const Divider(height: 32),
           _Section(title: l10n.settingsIndexTitle),
           if (stats != null)
             Padding(
@@ -100,6 +105,30 @@ class _Section extends StatelessWidget {
       ),
     ),
   );
+}
+
+class _ArrivalsRow extends ConsumerWidget {
+  const _ArrivalsRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final on = ref.watch(arrivalsAvailableProvider).value ?? false;
+
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+      leading: Icon(
+        on
+            ? Icons.notifications_active_outlined
+            : Icons.notifications_off_outlined,
+      ),
+      title: Text(
+        on ? l10n.settingsArrivalsOn : l10n.settingsArrivalsOff,
+      ),
+      onTap: on ? null : () => unawaited(ArrivalsSheet.show(context)),
+      trailing: on ? null : const Icon(Icons.chevron_right),
+    );
+  }
 }
 
 class _AutoMuteSlider extends ConsumerStatefulWidget {

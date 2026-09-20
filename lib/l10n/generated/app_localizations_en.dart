@@ -373,4 +373,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String placesSummary(String age, String photos) {
     return '$age · $photos';
   }
+
+  @override
+  String get notificationTitle => 'You\'ve been here before';
+
+  @override
+  String notificationBody(String age, String photos) {
+    return '$age · $photos';
+  }
+
+  @override
+  String get alwaysLocationTitle => 'Let Been Here notice for you';
+
+  @override
+  String get alwaysLocationBody =>
+      'With background location, your phone can tell Been Here when you arrive somewhere you\'ve photographed before — and it can say so, once, without you opening anything.\n\nThe app never follows you. Your phone watches a handful of circles and wakes the app only when you enter one. Nothing about where you are leaves this device.';
+
+  @override
+  String get alwaysLocationAction => 'Turn on arrivals';
+
+  @override
+  String get alwaysLocationLater => 'Not now';
+
+  @override
+  String get alwaysLocationDeniedBody =>
+      'Background location is off, so arrivals stay quiet. Everything else works as before; you can turn it on in the system settings whenever you like.';
+
+  @override
+  String get settingsArrivalsTitle => 'Arrivals';
+
+  @override
+  String get settingsArrivalsOn =>
+      'Been Here will tell you when you arrive somewhere you have not photographed in a while.';
+
+  @override
+  String get settingsArrivalsOff =>
+      'Been Here stays quiet. Turning this on asks for background location.';
 }

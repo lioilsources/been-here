@@ -31,6 +31,11 @@ class FakeLocationService implements LocationService {
   /// Simulates being indoors: permission is fine, no fix arrives.
   bool failsToFix;
 
+  /// What [requestAlways] grants. Null means the prompt changes nothing.
+  LocationPermissionState? permissionAfterAlwaysRequest;
+
+  int alwaysRequests = 0;
+
   int currentLocationCalls = 0;
 
   @override
@@ -39,6 +44,12 @@ class FakeLocationService implements LocationService {
   @override
   Future<LocationPermissionState> requestWhileInUse() async =>
       permission = permissionAfterRequest ?? permission;
+
+  @override
+  Future<LocationPermissionState> requestAlways() async {
+    alwaysRequests++;
+    return permission = permissionAfterAlwaysRequest ?? permission;
+  }
 
   @override
   Future<LocationFix?> currentLocation() async {

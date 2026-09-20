@@ -1,5 +1,7 @@
+import 'package:been_here/core/geo/geo_point.dart';
 import 'package:been_here/data/db/database.dart';
 import 'package:been_here/data/db/tables.dart';
+import 'package:been_here/domain/memories/notification_rules.dart';
 import 'package:been_here/domain/places/mute_state.dart';
 import 'package:been_here/domain/places/place_cluster.dart';
 import 'package:drift/drift.dart';
@@ -125,6 +127,57 @@ class PlacesDao extends DatabaseAccessor<AppDatabase> with _$PlacesDaoMixin {
         ),
       ),
     );
+  }
+
+  /// Every place, reduced to what the notification rules need.
+  Future<List<NotifiablePlace>> notifiable() async {
+    final rows = await select(places).get();
+    return [for (final row in rows) _toNotifiable(row)];
+  }
+
+  Future<NotifiablePlace?> notifiableById(int id) async {
+    final row = await byId(id);
+    return row == null ? null : _toNotifiable(row);
+  }
+
+  NotifiablePlace _toNotifiable(PlaceRow row) => NotifiablePlace(
+    placeId: row.id,
+    center: GeoPoint(row.centerLat, row.centerLng),
+    radiusMeters: row.radiusM,
+    photoCount: row.photoCount,
+    lastPhotoAt: DateTime.fromMillisecondsSinceEpoch(
+      row.lastAt * 1000,
+      isUtc: true,
+    ),
+    mute: row.mute,
+    lastNotifiedAt: row.lastNotifiedAt == null
+        ? null
+        : DateTime.fromMillisecondsSinceEpoch(
+            row.lastNotifiedAt! * 1000,
+            isUtc: true,
+          ),
+    name: row.userLabel ?? row.label,
+  );
+
+  Future<void> markNotified(int placeId, DateTime at) => updatePlace(
+    placeId,
+    PlacesCompanion(
+      lastNotifiedAt: Value(at.toUtc().millisecondsSinceEpoch ~/ 1000),
+    ),
+  );
+
+  /// When any place last notified.
+  ///
+  /// Derived rather than stored: the newest stamp across places is exactly
+  /// the answer, and one fewer thing that can fall out of step.
+  Future<DateTime?> lastNotifiedAnywhere() async {
+    final newest = places.lastNotifiedAt.max();
+    final value = await (selectOnly(
+      places,
+    )..addColumns([newest])).map((row) => row.read(newest)).getSingle();
+    return value == null
+        ? null
+        : DateTime.fromMillisecondsSinceEpoch(value * 1000, isUtc: true);
   }
 
   Future<int> count() {

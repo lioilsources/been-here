@@ -191,3 +191,55 @@ A place row leads with *when you were last there*, not with its name. Most
 places have no name, and a list whose every headline reads "Unnamed place"
 puts a placeholder where the information should be. A name, when there is
 one, replaces that headline.
+
+## Arrivals
+
+The app never watches location itself. It hands the system a handful of
+circles and the system wakes it when one is entered — that is the whole
+mechanism, and it is why the feature costs no battery.
+
+**iOS monitors twenty regions per app.** A library holds hundreds of places,
+so the app keeps choosing which twenty are worth a slot and swaps them as the
+user moves. `selectRegions` is a pure function for that reason: it decides
+what the app is able to notice at all, has to behave identically on both
+platforms, and cannot reasonably be tested by walking around.
+
+Two predicates, deliberately different:
+
+- `monitoringVeto` — is this place worth a slot? Muted, too few photos, too
+  recent, still in its cooldown.
+- `decideNotification` — should arriving here interrupt someone *now*? All of
+  the above, plus the one-a-day cap.
+
+The daily cap is missing from the first on purpose. It is a fact about this
+moment, not about the place, and applying it to the selection would
+unregister every region for a day after a single notification.
+
+An arrival re-checks every rule rather than trusting the registration: a
+place can be muted, or photographed again, between being registered and being
+entered.
+
+### The background isolate
+
+The arrival callback runs in an isolate the system starts, with none of the
+running app around it — no providers, no open database, no widget tree and so
+no localisations. `lib/app/geofence_callback.dart` opens what it needs and
+closes it again, and `ArrivalService` was split from `RegionSyncService` so
+that the arrival path does not drag the geofence plugin in with it.
+
+The callback must be top-level and marked `@pragma('vm:entry-point')`, and
+iOS needs `setPluginRegistrantCallback` in the AppDelegate. Without either,
+arrivals fail silently in release builds.
+
+### Permissions
+
+Background location is asked for only after memories have actually been shown
+(`seen_memories`, written the first time the timeline renders a visit), and
+always behind our own explanation. Declining is a first-class outcome: the
+app keeps working and stops asking.
+
+`permission_handler` appears here alongside geolocator because geolocator
+cannot escalate to Always on iOS — its `requestPermission` returns
+immediately once the status is anything but not-determined, so it can never
+turn a while-in-use grant into an always grant. `native_geofence` points at
+the same package for the same reason.

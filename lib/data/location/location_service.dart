@@ -65,6 +65,12 @@ abstract interface class LocationService {
   /// Prompts for foreground access.
   Future<LocationPermissionState> requestWhileInUse();
 
+  /// Prompts to upgrade to background access, which is what arrivals need.
+  ///
+  /// Only ever called after the user has seen the app do something useful
+  /// and has asked for arrivals — never on the way in.
+  Future<LocationPermissionState> requestAlways();
+
   /// A fresh fix. Null if permission is missing or the fix times out.
   Future<LocationFix?> currentLocation();
 

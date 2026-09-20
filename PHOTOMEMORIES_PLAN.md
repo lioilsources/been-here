@@ -125,7 +125,7 @@ indexace. Logika výběru = čistá funkce v `domain/`, testovaná.
       navíc)
 - [x] Appka naběhne na iOS simulátoru s prázdnou Here obrazovkou, testy běží
 
-### Fáze 1: Indexace — hotovo (kromě běhu na reálném telefonu)
+### Fáze 1: Indexace — hotovo
 
 - [x] `PhotoLibrary` nad `photo_manager`: stránkovaný průchod, čtení lat/lng
 - [x] `IndexerService`: full scan v dávkách (neblokuje UI, průběžný progress
@@ -137,10 +137,11 @@ indexace. Logika výběru = čistá funkce v `domain/`, testovaná.
       neduplikuje; smazaná fotka zmizí z indexu
 - [x] Na simulátoru se zaindexuje reálná knihovna přes PhotoKit
       (`integration_test/`, 12 fotek, 83 % s polohou)
-- [ ] **Zbývá tobě:** běh na reálném telefonu s velkou knihovnou — progress,
-      resume po backgroundu, iCloud offload. Viz `docs/QA.md`.
+- [x] Ověřeno na iPhonu 12 mini (2026-09-20): indexace velké knihovny běží
+      s viditelným progressem a neblokuje UI. Zbývají dílčí body (resume po
+      backgroundu, mazání fotky, limited access, Android) — viz `docs/QA.md`.
 
-### Fáze 2: Obrazovka Tady — hotovo (kromě běhu na reálném telefonu)
+### Fáze 2: Obrazovka Tady — hotovo
 
 - [x] Aktuální poloha (when-in-use), dotaz near, radius slider (100 m → 50 km,
       logaritmicky), živý počet fotek
@@ -152,14 +153,12 @@ indexace. Logika výběru = čistá funkce v `domain/`, testovaná.
 - [x] Debug poloha: dlouhý stisk na nadpisu „Tady"
 - [x] Benchmark na 100k fotkách: časová osa < 50 ms, počet pod sliderem
       < 25 ms
-- [ ] **Zbývá tobě:** ověřit na telefonu, že se reálné fotky z okolí seskupí
-      správně a slider je plynulý. Simulátor to neumí — PhotoKit na iOS 26
-      neuznává `simctl privacy grant photos` a systémový dialog nejde
-      odklepnout skriptem. Viz `docs/QA.md`.
+- [x] Ověřeno na iPhonu 12 mini (2026-09-20): reálné fotky z okolí se
+      seskupí správně, slider je plynulý. Zbytek viz `docs/QA.md`.
 
 Nejbližší *místo* nahradí nejbližší fotku ve fázi 3.
 
-### Fáze 3: Místa a mute — hotovo (kromě ověření na reálných datech)
+### Fáze 3: Místa a mute — hotovo
 
 - [x] Clustering (geohash-7, connected components) + auto-mute, přepočet
       navázaný na doběhnutí indexace
@@ -175,19 +174,26 @@ Nejbližší *místo* nahradí nejbližší fotku ve fázi 3.
       indexu (fáze 6 ho rozšíří)
 - [x] Fixtures test: domov i práce auto-mute, 40 výletových míst ne, ztlumená
       jsou přesně dvě
-- [ ] **Zbývá tobě:** na reálných datech ověřit, že místa dávají smysl. Viz
-      `docs/QA.md`.
+- [x] Ověřeno na iPhonu 12 mini (2026-09-20): místa na reálných datech
+      dávají smysl, domov i práce vyšly auto-mute.
 
-### Fáze 4: Geofence notifikace
+### Fáze 4: Geofence notifikace — kód hotový, chybí ověření na trase
 
-- Eskalace oprávnění: when-in-use → always, až po prvním úspěšném zobrazení
-  vzpomínek, s vlastní vysvětlující obrazovkou
-- `GeofenceService`: registrace nejbližších míst, přeregistrace, handler na
-  enter → pravidla → lokální notifikace → deep link
-- Bez always oprávnění appka funguje dál, jen bez notifikací
-- Info.plist / manifest texty oprávnění srozumitelně, kvůli App Review
-- **Hotovo když:** simulace polohy (GPX v Xcode) vyvolá notifikaci u
-  neztlumeného místa, u ztlumeného ne; cooldowny drží; tap otevře správné místo
+- [x] Eskalace oprávnění: až po prvním zobrazení vzpomínek, s vlastní
+      vysvětlující obrazovkou před systémovým dialogem
+- [x] `RegionSyncService`: výběr nejbližších míst (čistá funkce, iOS limit
+      20 regionů), přeregistrace jen když se výběr změní
+- [x] `ArrivalService`: enter → pravidla → lokální notifikace → deep link,
+      běží v isolate na pozadí
+- [x] Bez always oprávnění appka funguje dál a přestane se ptát
+- [x] Info.plist / manifest texty oprávnění napsané pro App Review
+- [ ] **Zbývá tobě:** simulace polohy (GPX v Xcode) — notifikace u
+      neztlumeného místa ano, u ztlumeného ne, cooldowny drží, tap otevře
+      správné místo. Viz `docs/QA.md`.
+
+Znění notifikace je zatím „{stáří} · {počet fotek}" místo věty z plánu —
+skládat větu kolem lokalizovaného údaje o stáří naráží na velká písmena
+a skloňování ve dvou jazycích. Patří to do polishe ve fázi 6.
 
 ### Fáze 5: Rephoto
 

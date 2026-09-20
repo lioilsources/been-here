@@ -33,7 +33,7 @@ code is laid out. The device-only checks are tracked in `docs/QA.md`.
 | 1 | Library indexing | done |
 | 2 | The "Here" screen | done |
 | 3 | Places, clustering, auto-mute | done |
-| 4 | Geofence notifications | todo |
+| 4 | Geofence notifications | code done, needs a drive |
 | 5 | Rephoto (then & now) | todo |
 | 6 | Onboarding, settings, polish | todo |
 

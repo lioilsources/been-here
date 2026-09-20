@@ -2,6 +2,7 @@ import 'package:been_here/core/geo/geo_point.dart';
 import 'package:been_here/core/logger.dart';
 import 'package:been_here/data/location/location_service.dart';
 import 'package:geolocator/geolocator.dart' as geo;
+import 'package:permission_handler/permission_handler.dart' as ph;
 
 class GeolocatorLocationService implements LocationService {
   GeolocatorLocationService();
@@ -29,6 +30,29 @@ class GeolocatorLocationService implements LocationService {
       return LocationPermissionState.servicesDisabled;
     }
     return _map(await geo.Geolocator.requestPermission());
+  }
+
+  /// Escalates to background access.
+  ///
+  /// Through `permission_handler` rather than geolocator, which cannot do
+  /// it: its iOS `requestPermission` returns immediately once the status is
+  /// anything but not-determined, so it can never turn a while-in-use grant
+  /// into an always grant. `native_geofence` points at the same package for
+  /// the same reason.
+  @override
+  Future<LocationPermissionState> requestAlways() async {
+    if (!await geo.Geolocator.isLocationServiceEnabled()) {
+      return LocationPermissionState.servicesDisabled;
+    }
+    // Android needs foreground access before background can even be asked.
+    final foreground = await requestWhileInUse();
+    if (!foreground.canLocate) return foreground;
+
+    final status = await ph.Permission.locationAlways.request();
+    if (status.isPermanentlyDenied) {
+      return LocationPermissionState.deniedForever;
+    }
+    return currentPermission();
   }
 
   @override

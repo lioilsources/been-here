@@ -1,14 +1,20 @@
+import 'package:been_here/app/geofence_callback.dart';
 import 'package:been_here/core/geo/geo_point.dart';
 import 'package:been_here/core/geo/haversine.dart';
 import 'package:been_here/data/db/database.dart';
 import 'package:been_here/data/geocoding/geocoding_service.dart';
+import 'package:been_here/data/location/geofence_service.dart';
 import 'package:been_here/data/location/geolocator_location_service.dart';
 import 'package:been_here/data/location/location_service.dart';
+import 'package:been_here/data/location/native_geofence_service.dart';
+import 'package:been_here/data/notifications/local_notification_service.dart';
+import 'package:been_here/data/notifications/notification_service.dart';
 import 'package:been_here/data/photos/photo_library.dart';
 import 'package:been_here/data/photos/photo_manager_library.dart';
 import 'package:been_here/domain/indexing/index_progress.dart';
 import 'package:been_here/domain/indexing/indexer_service.dart';
 import 'package:been_here/domain/indexing/library_sync.dart';
+import 'package:been_here/domain/memories/arrival_service.dart';
 import 'package:been_here/domain/memories/memories_service.dart';
 import 'package:been_here/domain/memories/memory.dart';
 import 'package:been_here/domain/memories/visit.dart';
@@ -90,6 +96,10 @@ final librarySyncProvider = Provider<LibrarySync>((ref) {
     afterPass: () async {
       await ref.read(placesServiceProvider).recompute();
       ref.invalidate(placesProvider);
+
+      // The places changed, so what is worth watching may have too.
+      final here = await ref.read(currentLocationProvider.future);
+      if (here != null) await ref.read(regionSyncProvider).syncRegions(here);
     },
   );
   ref.onDispose(sync.dispose);
@@ -106,11 +116,13 @@ final locationPermissionProvider = FutureProvider<LocationPermissionState>(
   (ref) => ref.watch(locationServiceProvider).currentPermission(),
 );
 
-/// A pretend position, set from the debug sheet.
+/// Somewhere other than where the phone is.
 ///
-/// The plan calls for it so the Here screen can be tested from the sofa, and
-/// it is the only way to see a memory from a place you are not standing in.
-class DebugLocation extends Notifier<GeoPoint?> {
+/// Two things set it: the debug sheet, so the Here screen can be tested from
+/// the sofa, and a notification tap, which opens the screen at the place the
+/// notification was about. Both are the same idea — look over there instead
+/// of here — so they are the same switch.
+class Viewpoint extends Notifier<GeoPoint?> {
   @override
   GeoPoint? build() => null;
 
@@ -120,14 +132,14 @@ class DebugLocation extends Notifier<GeoPoint?> {
   set point(GeoPoint? value) => state = value;
 }
 
-final debugLocationProvider = NotifierProvider<DebugLocation, GeoPoint?>(
-  DebugLocation.new,
+final viewpointProvider = NotifierProvider<Viewpoint, GeoPoint?>(
+  Viewpoint.new,
 );
 
-/// Where the Here screen is looking: the debug override if there is one,
-/// otherwise the device's own fix.
+/// Where the Here screen is looking: the override if there is one, otherwise
+/// the device's own fix.
 final currentLocationProvider = FutureProvider<GeoPoint?>((ref) async {
-  final override = ref.watch(debugLocationProvider);
+  final override = ref.watch(viewpointProvider);
   if (override != null) return override;
 
   final permission = await ref.watch(locationPermissionProvider.future);
@@ -359,4 +371,113 @@ final placeLabelProvider = FutureProvider.family<String?, int>((
   return ref
       .watch(placeLabellerProvider)
       .labelFor(place, enabled: settings.placeNamesEnabled);
+});
+
+// --- Arrivals ---------------------------------------------------------------
+
+final notificationServiceProvider = Provider<NotificationService>((ref) {
+  final service = LocalNotificationService();
+  ref.onDispose(service.dispose);
+  return service;
+});
+
+final geofenceServiceProvider = Provider<GeofenceService>(
+  (ref) => NativeGeofenceService(
+    location: ref.watch(locationServiceProvider),
+    onArrival: onGeofenceArrival,
+  ),
+);
+
+final regionSyncProvider = Provider<RegionSyncService>(
+  (ref) => RegionSyncService(
+    places: ref.watch(databaseProvider).placesDao,
+    geofence: ref.watch(geofenceServiceProvider),
+  ),
+);
+
+/// Whether the app can be woken on arrival at all.
+final arrivalsAvailableProvider = FutureProvider<bool>((ref) {
+  // Re-read after any permission prompt.
+  ref.watch(locationPermissionProvider);
+  return ref.watch(geofenceServiceProvider).isAvailable();
+});
+
+/// True once the user has actually seen memories.
+///
+/// The gate on asking for background location: the plan is explicit that the
+/// bigger permission is only worth asking for after the app has shown what
+/// it is for, and App Review will ask the same question.
+final hasSeenMemoriesProvider = FutureProvider<bool>((ref) async {
+  ref.watch(seenMemoriesTickProvider);
+  final values = await ref.watch(databaseProvider).preferencesDao.readAll();
+  return values['seen_memories'] == 'true';
+});
+
+/// Bumped when the flag is written, so the provider above re-reads.
+class SeenMemoriesTick extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void bump() => state = state + 1;
+}
+
+final seenMemoriesTickProvider = NotifierProvider<SeenMemoriesTick, int>(
+  SeenMemoriesTick.new,
+);
+
+/// Records that memories have been shown. Idempotent and cheap.
+Future<void> markMemoriesSeen(WidgetRef ref) async {
+  if (ref.read(hasSeenMemoriesProvider).value ?? false) return;
+  await ref
+      .read(databaseProvider)
+      .preferencesDao
+      .write('seen_memories', 'true');
+  ref.read(seenMemoriesTickProvider.notifier).bump();
+}
+
+/// Whether to offer background location right now.
+final shouldOfferArrivalsProvider = FutureProvider<bool>((ref) async {
+  if (!(await ref.watch(hasSeenMemoriesProvider.future))) return false;
+  if (await ref.watch(arrivalsAvailableProvider.future)) return false;
+
+  final values = await ref.watch(databaseProvider).preferencesDao.readAll();
+  // "Not now" means not now, not never — but it does mean stop asking until
+  // the user brings it up themselves in settings.
+  return values['arrivals_declined'] != 'true';
+});
+
+Future<void> declineArrivals(WidgetRef ref) async {
+  await ref
+      .read(databaseProvider)
+      .preferencesDao
+      .write('arrivals_declined', 'true');
+  ref.invalidate(shouldOfferArrivalsProvider);
+}
+
+/// Opens the Here screen at [placeId], as a notification tap should.
+///
+/// Reuses the viewpoint override rather than inventing a second way to look
+/// somewhere else, and widens the radius to the place so its photos are
+/// actually in view.
+Future<bool> openPlace(WidgetRef ref, int placeId) async {
+  final place = await ref.read(databaseProvider).placesDao.byId(placeId);
+  if (place == null) return false;
+
+  ref.read(viewpointProvider.notifier).point = GeoPoint(
+    place.centerLat,
+    place.centerLng,
+  );
+  ref.read(searchRadiusProvider.notifier).meters = place.radiusM * 2;
+  return true;
+}
+
+/// Notification taps, including the one that launched the app.
+final notificationTapsProvider = StreamProvider<int>((ref) async* {
+  final notifications = ref.watch(notificationServiceProvider);
+  await notifications.initialize();
+
+  final launch = await notifications.launchPlaceId();
+  if (launch != null) yield launch;
+
+  yield* notifications.taps;
 });
