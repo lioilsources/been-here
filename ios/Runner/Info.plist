@@ -70,6 +70,10 @@
 	<string>Been Here compares where you are with where your photos were taken, so it can show you your own pictures of the place you just arrived at. Your location is used on this device and is never sent anywhere.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>With background location, Been Here can notice when you arrive somewhere you photographed years ago and say so once, without you opening the app. Your phone monitors a small number of places you have been and wakes the app only when you enter one — nothing about your location is ever sent anywhere.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Been Here shows an old photo over the viewfinder so you can line the same shot up again years later. The camera is used only while you are taking that photo.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>A photo you take in Been Here is saved to your own photo library, next to the picture it answers.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Been Here reads where and when your photos were taken so it can show you your own pictures of a place when you come back to it. Your photos and their locations stay on this device.</string>
 </dict>

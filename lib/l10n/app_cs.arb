@@ -272,5 +272,16 @@
   "settingsMapBody": "Dlaždice mapy se při posouvání a přibližování stahují z OpenStreetMap, takže ten server průběžně vidí, kam se díváš. Na rozdíl od názvu místa, na který se appka zeptá jednou, tohle pokračuje celou dobu, co je mapa otevřená. Výchozí stav vypnuto.",
   "placesShowMap": "Mapa",
   "placesShowList": "Seznam",
-  "placesMapAttribution": "© přispěvatelé OpenStreetMap"
+  "placesMapAttribution": "© přispěvatelé OpenStreetMap",
+  "rephotoOverlay": "Prolnutí",
+  "rephotoEdges": "Obrys",
+  "rephotoCapture": "Vyfotit",
+  "rephotoSaved": "Uloženo mezi tvoje fotky",
+  "rephotoNotSaved": "Nepovedlo se uložit. Přidávání fotek může být zakázané.",
+  "rephotoNoCamera": "Fotoaparát není k dispozici. Been Here ho potřebuje, aby mohl vyfotit odpověď na starou fotku.",
+  "rephotoThenAndNow": "Tehdy a teď",
+  "rephotoShare": "Sdílet",
+  "rephotoThen": "Tehdy",
+  "rephotoNow": "Teď",
+  "rephotoShareFailed": "Nepovedlo se složit obrázek ke sdílení."
 }

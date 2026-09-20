@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:been_here/app/providers.dart';
@@ -6,6 +7,8 @@ import 'package:been_here/domain/memories/memory.dart';
 import 'package:been_here/domain/memories/visit.dart';
 import 'package:been_here/features/common/format.dart';
 import 'package:been_here/features/here/widgets/photo_thumbnail.dart';
+import 'package:been_here/features/rephoto/rephoto_screen.dart';
+import 'package:been_here/features/rephoto/then_and_now_screen.dart';
 import 'package:been_here/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -192,14 +195,15 @@ class _Placeholder extends StatelessWidget {
   );
 }
 
-class _Footer extends StatelessWidget {
+class _Footer extends ConsumerWidget {
   const _Footer({required this.memory});
 
   final Memory memory;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    final existing = ref.watch(latestRephotoProvider(memory.assetId)).value;
 
     return SafeArea(
       top: false,
@@ -213,10 +217,24 @@ class _Footer extends StatelessWidget {
                 style: const TextStyle(color: Colors.white70, fontSize: 13),
               ),
             ),
+            if (existing != null)
+              TextButton.icon(
+                onPressed: () => unawaited(
+                  ThenAndNowScreen.open(
+                    context,
+                    thenAssetId: memory.assetId,
+                    nowAssetId: existing.newAssetId,
+                  ),
+                ),
+                icon: const Icon(Icons.compare, size: 18),
+                label: Text(l10n.rephotoThenAndNow),
+              ),
             TextButton.icon(
-              // Phase 5. Disabled rather than hidden, so the feature is
-              // discoverable before it exists.
-              onPressed: null,
+              onPressed: () => unawaited(
+                RephotoScreen.open(context, memory).then(
+                  (_) => ref.invalidate(latestRephotoProvider(memory.assetId)),
+                ),
+              ),
               icon: const Icon(Icons.camera_alt_outlined, size: 18),
               label: Text(l10n.photoDetailRephoto),
             ),

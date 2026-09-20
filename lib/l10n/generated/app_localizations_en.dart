@@ -512,4 +512,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get placesMapAttribution => '© OpenStreetMap contributors';
+
+  @override
+  String get rephotoOverlay => 'Fade';
+
+  @override
+  String get rephotoEdges => 'Outline';
+
+  @override
+  String get rephotoCapture => 'Take it';
+
+  @override
+  String get rephotoSaved => 'Saved to your photos';
+
+  @override
+  String get rephotoNotSaved =>
+      'Could not save it. Adding photos may be turned off.';
+
+  @override
+  String get rephotoNoCamera =>
+      'No camera available. Been Here needs the camera to take a photo that answers an old one.';
+
+  @override
+  String get rephotoThenAndNow => 'Then & now';
+
+  @override
+  String get rephotoShare => 'Share';
+
+  @override
+  String get rephotoThen => 'Then';
+
+  @override
+  String get rephotoNow => 'Now';
+
+  @override
+  String get rephotoShareFailed => 'Could not build the image to share.';
 }

@@ -520,4 +520,39 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get placesMapAttribution => '© přispěvatelé OpenStreetMap';
+
+  @override
+  String get rephotoOverlay => 'Prolnutí';
+
+  @override
+  String get rephotoEdges => 'Obrys';
+
+  @override
+  String get rephotoCapture => 'Vyfotit';
+
+  @override
+  String get rephotoSaved => 'Uloženo mezi tvoje fotky';
+
+  @override
+  String get rephotoNotSaved =>
+      'Nepovedlo se uložit. Přidávání fotek může být zakázané.';
+
+  @override
+  String get rephotoNoCamera =>
+      'Fotoaparát není k dispozici. Been Here ho potřebuje, aby mohl vyfotit odpověď na starou fotku.';
+
+  @override
+  String get rephotoThenAndNow => 'Tehdy a teď';
+
+  @override
+  String get rephotoShare => 'Sdílet';
+
+  @override
+  String get rephotoThen => 'Tehdy';
+
+  @override
+  String get rephotoNow => 'Teď';
+
+  @override
+  String get rephotoShareFailed => 'Nepovedlo se složit obrázek ke sdílení.';
 }

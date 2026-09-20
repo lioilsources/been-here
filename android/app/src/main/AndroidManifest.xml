@@ -16,6 +16,9 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
+    <!-- Taking the new half of a then &amp; now pair. -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+
     <!-- Arrivals. The system watches the regions and wakes the app; the app
          never follows the user itself. Background location is also what
          Android requires to register a geofence at all from API 29. -->

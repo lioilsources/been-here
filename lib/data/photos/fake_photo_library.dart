@@ -139,6 +139,36 @@ class FakePhotoLibrary implements PhotoLibrary {
   @override
   Future<File?> originalFile(String assetId) async => null;
 
+  /// Everything handed to [saveImage], so a test can check what was written.
+  final List<({Uint8List bytes, String filename, GeoPoint? at})> saved = [];
+
+  /// Stands in for a library that won't take new photos — on iOS, "add only"
+  /// access refused.
+  bool refuseSaves = false;
+
+  @override
+  Future<String?> saveImage(
+    Uint8List bytes, {
+    required String filename,
+    GeoPoint? at,
+    DateTime? takenAt,
+  }) async {
+    if (refuseSaves) return null;
+    saved.add((bytes: bytes, filename: filename, at: at));
+    final id = 'saved-${saved.length}';
+    addAll([
+      PhotoAsset(
+        id: id,
+        lat: at?.lat,
+        lng: at?.lng,
+        takenAt: takenAt ?? DateTime.now().toUtc(),
+        width: 1000,
+        height: 1000,
+      ),
+    ]);
+    return id;
+  }
+
   Future<void> dispose() => _changes.close();
 }
 

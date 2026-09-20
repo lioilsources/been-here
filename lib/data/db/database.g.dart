@@ -2730,6 +2730,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final PreferencesDao preferencesDao = PreferencesDao(
     this as AppDatabase,
   );
+  late final RephotosDao rephotosDao = RephotosDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();

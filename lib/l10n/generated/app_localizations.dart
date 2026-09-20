@@ -823,6 +823,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'© OpenStreetMap contributors'**
   String get placesMapAttribution;
+
+  /// No description provided for @rephotoOverlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Fade'**
+  String get rephotoOverlay;
+
+  /// No description provided for @rephotoEdges.
+  ///
+  /// In en, this message translates to:
+  /// **'Outline'**
+  String get rephotoEdges;
+
+  /// No description provided for @rephotoCapture.
+  ///
+  /// In en, this message translates to:
+  /// **'Take it'**
+  String get rephotoCapture;
+
+  /// No description provided for @rephotoSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to your photos'**
+  String get rephotoSaved;
+
+  /// No description provided for @rephotoNotSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save it. Adding photos may be turned off.'**
+  String get rephotoNotSaved;
+
+  /// No description provided for @rephotoNoCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'No camera available. Been Here needs the camera to take a photo that answers an old one.'**
+  String get rephotoNoCamera;
+
+  /// No description provided for @rephotoThenAndNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Then & now'**
+  String get rephotoThenAndNow;
+
+  /// No description provided for @rephotoShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get rephotoShare;
+
+  /// No description provided for @rephotoThen.
+  ///
+  /// In en, this message translates to:
+  /// **'Then'**
+  String get rephotoThen;
+
+  /// No description provided for @rephotoNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Now'**
+  String get rephotoNow;
+
+  /// No description provided for @rephotoShareFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not build the image to share.'**
+  String get rephotoShareFailed;
 }
 
 class _AppLocalizationsDelegate

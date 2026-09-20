@@ -301,5 +301,16 @@
   "settingsMapBody": "Map tiles are downloaded from OpenStreetMap as you pan and zoom, so that server sees a running account of where you are looking. Unlike a place name, which is asked once, this continues for as long as the map is open. Off by default.",
   "placesShowMap": "Map",
   "placesShowList": "List",
-  "placesMapAttribution": "© OpenStreetMap contributors"
+  "placesMapAttribution": "© OpenStreetMap contributors",
+  "rephotoOverlay": "Fade",
+  "rephotoEdges": "Outline",
+  "rephotoCapture": "Take it",
+  "rephotoSaved": "Saved to your photos",
+  "rephotoNotSaved": "Could not save it. Adding photos may be turned off.",
+  "rephotoNoCamera": "No camera available. Been Here needs the camera to take a photo that answers an old one.",
+  "rephotoThenAndNow": "Then & now",
+  "rephotoShare": "Share",
+  "rephotoThen": "Then",
+  "rephotoNow": "Now",
+  "rephotoShareFailed": "Could not build the image to share."
 }

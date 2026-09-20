@@ -148,11 +148,23 @@ needs a simulated drive:
 
 ## Phase 5 — Rephoto
 
+Covered by tests: the Sobel edge pass on known pixels, the service against a
+fake library (what it saves, where it saves it, a library that refuses, the
+newest of several answers, and a pair outliving the place it was taken at),
+the composed share image, and the detail screen's footer — the Rephoto button
+being live, and Then & now appearing only once the photo has been answered.
+
+The camera itself has no test double, so these need a phone:
+
 - [ ] Overlay aligns with the old photo; opacity slider and edge mode both
       work.
 - [ ] Aspect ratio is locked to the original.
-- [ ] The new photo lands in the system library.
+- [ ] The new photo lands in the system library, with the old photo's
+      coordinates, so it is itself indexed at that place next pass.
 - [ ] Then & now export shares a correct side-by-side image.
+- [ ] Refusing the camera permission explains itself instead of a black
+      rectangle.
+- [ ] Refusing add-to-library says the photo could not be saved.
 
 ## Phase 6 — Polish
 

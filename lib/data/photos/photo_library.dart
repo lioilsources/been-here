@@ -117,4 +117,16 @@ abstract interface class PhotoLibrary {
   /// Full-resolution file. May need an iCloud download, so it can be slow and
   /// can fail offline.
   Future<File?> originalFile(String assetId);
+
+  /// Adds a photo to the system library and returns its new asset id.
+  ///
+  /// The one write this app makes. A rephoto belongs in the user's library
+  /// next to the photo it answers, not in a private folder only this app can
+  /// open.
+  Future<String?> saveImage(
+    Uint8List bytes, {
+    required String filename,
+    GeoPoint? at,
+    DateTime? takenAt,
+  });
 }

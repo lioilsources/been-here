@@ -123,6 +123,29 @@ class PhotoManagerLibrary implements PhotoLibrary {
     return entity?.file;
   }
 
+  @override
+  Future<String?> saveImage(
+    Uint8List bytes, {
+    required String filename,
+    GeoPoint? at,
+    DateTime? takenAt,
+  }) async {
+    try {
+      final entity = await PhotoManager.editor.saveImage(
+        bytes,
+        filename: filename,
+        title: filename,
+        creationDate: takenAt,
+      );
+      return entity.id;
+    } on PlatformException catch (e) {
+      // Usually a refused add-to-library permission. The caller shows the
+      // result; losing the photo silently would be worse.
+      _log.warning('could not save image to the library', e);
+      return null;
+    }
+  }
+
   Future<void> dispose() async {
     final callback = _changeCallback;
     if (callback != null) {

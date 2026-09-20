@@ -262,3 +262,45 @@ tile usage policy](https://operations.osmfoundation.org/policies/tiles/)
 rules it out for a released app, so shipping the map means either a paid
 tile provider or self-hosting — a decision that can wait until there is
 something to ship.
+
+## Rephoto
+
+The new photo goes into the system photo library, not into a folder only this
+app can read. It is a photo the user took; it belongs next to their other
+photos, and it should survive the app being deleted. All the app keeps is a
+row saying which old photo it answers.
+
+It is saved with the *old* photo's coordinates rather than a fresh fix. The
+phone is standing in the same place, so the two agree to within metres — but
+going through the library means a fix, a permission and a wait, and getting
+it slightly wrong would scatter the pair across two places at the next
+clustering pass. The old photo's own coordinates are the ones that put the
+rephoto exactly where its ancestor is.
+
+`rephotos.place_id` is `ON DELETE SET NULL`. Clustering rebuilds places from
+scratch, so the place a rephoto was taken at can disappear; the pair itself
+must not go with it.
+
+### Outlines
+
+Two ways to see the old photo over the viewfinder: faded, or reduced to its
+outlines. Outlines exist because a faded photo of a building that is no
+longer there is worse than nothing — you end up matching a ghost instead of
+what is in front of you. Sobel over a downscaled copy is enough to line up
+edges of roofs and horizons, which is what the eye actually uses.
+
+The pass is pure Dart on RGBA bytes (`core/image/edge_detect.dart`, no
+Flutter) and runs through `compute()`. A megapixel of Sobel is not
+frame-sized work, and doing it on the UI thread stalls the camera preview.
+
+### The shared image
+
+`composeThenAndNow` draws both photos onto a canvas rather than
+screenshotting the comparison widget. A screenshot carries the phone's pixel
+density, the theme, and whatever else was on screen, and is capped at the
+screen's resolution. What people share is the pair of photographs, so the
+pair of photographs is what gets drawn — both at the same height, whatever
+shape they were framed in, so they read as a pair.
+
+The share sheet is handed a file in the temporary directory rather than raw
+bytes: that is what other apps expect, and the system clears it up.

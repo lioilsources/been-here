@@ -195,15 +195,20 @@ Znění notifikace je zatím „{stáří} · {počet fotek}" místo věty z pl�
 skládat větu kolem lokalizovaného údaje o stáří naráží na velká písmena
 a skloňování ve dvou jazycích. Patří to do polishe ve fázi 6.
 
-### Fáze 5: Rephoto
+### Fáze 5: Rephoto — kód hotový, chybí ověření s kamerou
 
-- Kamera s overlayem původní fotky: slider průhlednosti, přepínač
-  overlay/obrys hran, zamknutý poměr stran podle originálu
-- Po vyfocení: uložit novou fotku do systémové knihovny, záznam do `rephotos`
-- Výstup then & now: side-by-side obrázek a interaktivní slider v appce;
-  export přes share sheet
-- **Hotovo když:** jde udělat rephoto z detailu fotky, výsledek se uloží a jde
-  sdílet
+- [x] Kamera s overlayem původní fotky: slider průhlednosti, přepínač
+      overlay/obrys hran, zamknutý poměr stran podle originálu
+- [x] Sobel detekce hran v čistém Dartu, běží v isolate přes `compute()`
+- [x] Po vyfocení: uložit novou fotku do systémové knihovny (se souřadnicemi
+      té staré, ne novým fixem), záznam do `rephotos`
+- [x] Výstup then & now: interaktivní slider v appce, složený side-by-side
+      obrázek do share sheetu
+- [x] Tlačítko v detailu fotky funguje; „Tehdy a teď" se objeví, až když
+      odpověď existuje
+- [x] Info.plist / manifest texty pro kameru a zápis do knihovny
+- [ ] **Zbývá tobě:** vyfotit něco znovu na telefonu — sedí overlay, uloží se
+      to do Fotek, sdílení dá rozumný obrázek. Viz `docs/QA.md`.
 
 ### Fáze 6: Onboarding a polish
 

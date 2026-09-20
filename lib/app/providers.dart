@@ -21,6 +21,7 @@ import 'package:been_here/domain/memories/notification_rules.dart';
 import 'package:been_here/domain/memories/visit.dart';
 import 'package:been_here/domain/places/place_labels.dart';
 import 'package:been_here/domain/places/places_service.dart';
+import 'package:been_here/domain/rephoto/rephoto_service.dart';
 import 'package:been_here/domain/settings/app_settings.dart';
 import 'package:been_here/features/notifications/arrival_text.dart';
 import 'package:been_here/l10n/generated/app_localizations.dart';
@@ -586,3 +587,21 @@ final notificationTapsProvider = StreamProvider<int>((ref) async* {
 
   yield* notifications.taps;
 });
+
+// --- Rephoto ----------------------------------------------------------------
+
+final rephotoServiceProvider = Provider<RephotoService>(
+  (ref) => RephotoService(
+    library: ref.watch(photoLibraryProvider),
+    rephotos: ref.watch(databaseProvider).rephotosDao,
+  ),
+);
+
+/// The newest answer to a photo, if there is one.
+// ignore: specify_nonobvious_property_types — Riverpod's family type.
+final latestRephotoProvider = FutureProvider.family<RephotoRow?, String>(
+  (
+    ref,
+    assetId,
+  ) => ref.watch(rephotoServiceProvider).latestFor(assetId),
+);

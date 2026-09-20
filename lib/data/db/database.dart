@@ -5,6 +5,7 @@ import 'package:been_here/data/db/daos/memories_dao.dart';
 import 'package:been_here/data/db/daos/photos_dao.dart';
 import 'package:been_here/data/db/daos/places_dao.dart';
 import 'package:been_here/data/db/daos/preferences_dao.dart';
+import 'package:been_here/data/db/daos/rephotos_dao.dart';
 import 'package:been_here/data/db/tables.dart';
 // Used by the generated part file for the `mute` text enum column.
 import 'package:been_here/domain/places/mute_state.dart';
@@ -30,6 +31,7 @@ part 'database.g.dart';
     MemoriesDao,
     PlacesDao,
     PreferencesDao,
+    RephotosDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
