@@ -74,6 +74,13 @@ class PlacesService {
   Future<void> unmute(int placeId) =>
       dao.setMute(placeId, MuteState.userUnmuted);
 
+  /// Names a place, or clears the name when given null or blank.
+  ///
+  /// Kept separate from the geocoded label so that turning place naming off
+  /// never throws away something the user typed.
+  Future<void> rename(int placeId, String? name) =>
+      dao.setUserLabel(placeId, name);
+
   /// Hands the place back to the auto rule.
   Future<void> clearUserDecision(int placeId) async {
     final place = await dao.byId(placeId);

@@ -304,9 +304,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get placesUserUnmutedNote => 'Kept visible by you';
 
   @override
-  String get placesUnnamed => 'Unnamed place';
-
-  @override
   String placesDayCount(int days) {
     String _temp0 = intl.Intl.pluralLogic(
       days,
@@ -353,4 +350,27 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsPrivacyBody =>
       'Your photos, where they were taken, and everything this app works out from them. There is no account, no server and no analytics.';
+
+  @override
+  String get placesName => 'Name this place';
+
+  @override
+  String get placesRename => 'Rename';
+
+  @override
+  String get placesNameDialogTitle => 'Place name';
+
+  @override
+  String get placesNameHint => 'Grandma\'s, the lake, the office…';
+
+  @override
+  String get placesNameSave => 'Save';
+
+  @override
+  String get placesNameClear => 'Remove name';
+
+  @override
+  String placesSummary(String age, String photos) {
+    return '$age · $photos';
+  }
 }

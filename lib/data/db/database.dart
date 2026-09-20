@@ -42,7 +42,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.withExecutor(super.e);
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -62,9 +62,13 @@ class AppDatabase extends _$AppDatabase {
         );
         await backfillUnitVectors();
       }
+      if (from < 4 && from >= 3) {
+        await m.addColumn(places, places.userLabel);
+      }
       if (from < 3) {
         await m.createTable(placeCells);
         await m.createTable(preferences);
+        await m.addColumn(places, places.userLabel);
         await m.createIndex(
           Index(
             'place_cells_place',

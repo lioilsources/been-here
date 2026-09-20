@@ -518,12 +518,6 @@ abstract class AppLocalizations {
   /// **'Kept visible by you'**
   String get placesUserUnmutedNote;
 
-  /// No description provided for @placesUnnamed.
-  ///
-  /// In en, this message translates to:
-  /// **'Unnamed place'**
-  String get placesUnnamed;
-
   /// No description provided for @placesDayCount.
   ///
   /// In en, this message translates to:
@@ -583,6 +577,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your photos, where they were taken, and everything this app works out from them. There is no account, no server and no analytics.'**
   String get settingsPrivacyBody;
+
+  /// No description provided for @placesName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name this place'**
+  String get placesName;
+
+  /// No description provided for @placesRename.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get placesRename;
+
+  /// No description provided for @placesNameDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Place name'**
+  String get placesNameDialogTitle;
+
+  /// No description provided for @placesNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Grandma\'s, the lake, the office…'**
+  String get placesNameHint;
+
+  /// No description provided for @placesNameSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get placesNameSave;
+
+  /// No description provided for @placesNameClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove name'**
+  String get placesNameClear;
+
+  /// Headline of a place row when it has no name
+  ///
+  /// In en, this message translates to:
+  /// **'{age} · {photos}'**
+  String placesSummary(String age, String photos);
 }
 
 class _AppLocalizationsDelegate

@@ -308,9 +308,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get placesUserUnmutedNote => 'Necháváš viditelné';
 
   @override
-  String get placesUnnamed => 'Místo bez názvu';
-
-  @override
   String placesDayCount(int days) {
     String _temp0 = intl.Intl.pluralLogic(
       days,
@@ -359,4 +356,27 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get settingsPrivacyBody =>
       'Tvoje fotky, kde vznikly, a všechno, co si z toho appka odvodí. Žádný účet, žádný server, žádná analytika.';
+
+  @override
+  String get placesName => 'Pojmenovat místo';
+
+  @override
+  String get placesRename => 'Přejmenovat';
+
+  @override
+  String get placesNameDialogTitle => 'Název místa';
+
+  @override
+  String get placesNameHint => 'U babičky, na chatě, práce…';
+
+  @override
+  String get placesNameSave => 'Uložit';
+
+  @override
+  String get placesNameClear => 'Smazat název';
+
+  @override
+  String placesSummary(String age, String photos) {
+    return '$age · $photos';
+  }
 }

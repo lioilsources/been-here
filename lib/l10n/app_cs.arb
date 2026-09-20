@@ -167,7 +167,6 @@
   "placesAutoMutedNote": "Automaticky ztlumeno — jsi tu skoro pořád",
   "placesUserMutedNote": "Ztlumeno tebou",
   "placesUserUnmutedNote": "Necháváš viditelné",
-  "placesUnnamed": "Místo bez názvu",
   "placesDayCount": "{days, plural, =1{1 den} few{{days} dny} other{{days} dní}}",
   "@placesDayCount": {
     "placeholders": {
@@ -191,5 +190,22 @@
   "settingsIndexTitle": "Index fotek",
   "settingsReindex": "Projít fotky znovu od začátku",
   "settingsPrivacyTitle": "Co zůstává v telefonu",
-  "settingsPrivacyBody": "Tvoje fotky, kde vznikly, a všechno, co si z toho appka odvodí. Žádný účet, žádný server, žádná analytika."
+  "settingsPrivacyBody": "Tvoje fotky, kde vznikly, a všechno, co si z toho appka odvodí. Žádný účet, žádný server, žádná analytika.",
+  "placesName": "Pojmenovat místo",
+  "placesRename": "Přejmenovat",
+  "placesNameDialogTitle": "Název místa",
+  "placesNameHint": "U babičky, na chatě, práce…",
+  "placesNameSave": "Uložit",
+  "placesNameClear": "Smazat název",
+  "placesSummary": "{age} · {photos}",
+  "@placesSummary": {
+    "placeholders": {
+      "age": {
+        "type": "String"
+      },
+      "photos": {
+        "type": "String"
+      }
+    }
+  }
 }

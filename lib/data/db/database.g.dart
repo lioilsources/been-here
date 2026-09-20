@@ -107,6 +107,17 @@ class $PlacesTable extends Places with TableInfo<$PlacesTable, PlaceRow> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _userLabelMeta = const VerificationMeta(
+    'userLabel',
+  );
+  @override
+  late final GeneratedColumn<String> userLabel = GeneratedColumn<String>(
+    'user_label',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   late final GeneratedColumnWithTypeConverter<MuteState, String> mute =
       GeneratedColumn<String>(
@@ -139,6 +150,7 @@ class $PlacesTable extends Places with TableInfo<$PlacesTable, PlaceRow> {
     firstAt,
     lastAt,
     label,
+    userLabel,
     mute,
     lastNotifiedAt,
   ];
@@ -218,6 +230,12 @@ class $PlacesTable extends Places with TableInfo<$PlacesTable, PlaceRow> {
         label.isAcceptableOrUnknown(data['label']!, _labelMeta),
       );
     }
+    if (data.containsKey('user_label')) {
+      context.handle(
+        _userLabelMeta,
+        userLabel.isAcceptableOrUnknown(data['user_label']!, _userLabelMeta),
+      );
+    }
     if (data.containsKey('last_notified_at')) {
       context.handle(
         _lastNotifiedAtMeta,
@@ -272,6 +290,10 @@ class $PlacesTable extends Places with TableInfo<$PlacesTable, PlaceRow> {
         DriftSqlType.string,
         data['${effectivePrefix}label'],
       ),
+      userLabel: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}user_label'],
+      ),
       mute: $PlacesTable.$convertermute.fromSql(
         attachedDatabase.typeMapping.read(
           DriftSqlType.string,
@@ -308,7 +330,15 @@ class PlaceRow extends DataClass implements Insertable<PlaceRow> {
   final int lastAt;
 
   /// Reverse-geocoded name, filled in lazily and only if the user allows it.
+  ///
+  /// Wiped when the user turns place naming off — it came from a service,
+  /// and turning the service off should forget its answers.
   final String? label;
+
+  /// A name the user typed. Takes precedence over [label], and survives
+  /// everything: recomputes, and turning geocoding off. It never came from
+  /// anywhere but this phone.
+  final String? userLabel;
   final MuteState mute;
   final int? lastNotifiedAt;
   const PlaceRow({
@@ -321,6 +351,7 @@ class PlaceRow extends DataClass implements Insertable<PlaceRow> {
     required this.firstAt,
     required this.lastAt,
     this.label,
+    this.userLabel,
     required this.mute,
     this.lastNotifiedAt,
   });
@@ -337,6 +368,9 @@ class PlaceRow extends DataClass implements Insertable<PlaceRow> {
     map['last_at'] = Variable<int>(lastAt);
     if (!nullToAbsent || label != null) {
       map['label'] = Variable<String>(label);
+    }
+    if (!nullToAbsent || userLabel != null) {
+      map['user_label'] = Variable<String>(userLabel);
     }
     {
       map['mute'] = Variable<String>($PlacesTable.$convertermute.toSql(mute));
@@ -360,6 +394,9 @@ class PlaceRow extends DataClass implements Insertable<PlaceRow> {
       label: label == null && nullToAbsent
           ? const Value.absent()
           : Value(label),
+      userLabel: userLabel == null && nullToAbsent
+          ? const Value.absent()
+          : Value(userLabel),
       mute: Value(mute),
       lastNotifiedAt: lastNotifiedAt == null && nullToAbsent
           ? const Value.absent()
@@ -382,6 +419,7 @@ class PlaceRow extends DataClass implements Insertable<PlaceRow> {
       firstAt: serializer.fromJson<int>(json['firstAt']),
       lastAt: serializer.fromJson<int>(json['lastAt']),
       label: serializer.fromJson<String?>(json['label']),
+      userLabel: serializer.fromJson<String?>(json['userLabel']),
       mute: $PlacesTable.$convertermute.fromJson(
         serializer.fromJson<String>(json['mute']),
       ),
@@ -401,6 +439,7 @@ class PlaceRow extends DataClass implements Insertable<PlaceRow> {
       'firstAt': serializer.toJson<int>(firstAt),
       'lastAt': serializer.toJson<int>(lastAt),
       'label': serializer.toJson<String?>(label),
+      'userLabel': serializer.toJson<String?>(userLabel),
       'mute': serializer.toJson<String>(
         $PlacesTable.$convertermute.toJson(mute),
       ),
@@ -418,6 +457,7 @@ class PlaceRow extends DataClass implements Insertable<PlaceRow> {
     int? firstAt,
     int? lastAt,
     Value<String?> label = const Value.absent(),
+    Value<String?> userLabel = const Value.absent(),
     MuteState? mute,
     Value<int?> lastNotifiedAt = const Value.absent(),
   }) => PlaceRow(
@@ -430,6 +470,7 @@ class PlaceRow extends DataClass implements Insertable<PlaceRow> {
     firstAt: firstAt ?? this.firstAt,
     lastAt: lastAt ?? this.lastAt,
     label: label.present ? label.value : this.label,
+    userLabel: userLabel.present ? userLabel.value : this.userLabel,
     mute: mute ?? this.mute,
     lastNotifiedAt: lastNotifiedAt.present
         ? lastNotifiedAt.value
@@ -450,6 +491,7 @@ class PlaceRow extends DataClass implements Insertable<PlaceRow> {
       firstAt: data.firstAt.present ? data.firstAt.value : this.firstAt,
       lastAt: data.lastAt.present ? data.lastAt.value : this.lastAt,
       label: data.label.present ? data.label.value : this.label,
+      userLabel: data.userLabel.present ? data.userLabel.value : this.userLabel,
       mute: data.mute.present ? data.mute.value : this.mute,
       lastNotifiedAt: data.lastNotifiedAt.present
           ? data.lastNotifiedAt.value
@@ -469,6 +511,7 @@ class PlaceRow extends DataClass implements Insertable<PlaceRow> {
           ..write('firstAt: $firstAt, ')
           ..write('lastAt: $lastAt, ')
           ..write('label: $label, ')
+          ..write('userLabel: $userLabel, ')
           ..write('mute: $mute, ')
           ..write('lastNotifiedAt: $lastNotifiedAt')
           ..write(')'))
@@ -486,6 +529,7 @@ class PlaceRow extends DataClass implements Insertable<PlaceRow> {
     firstAt,
     lastAt,
     label,
+    userLabel,
     mute,
     lastNotifiedAt,
   );
@@ -502,6 +546,7 @@ class PlaceRow extends DataClass implements Insertable<PlaceRow> {
           other.firstAt == this.firstAt &&
           other.lastAt == this.lastAt &&
           other.label == this.label &&
+          other.userLabel == this.userLabel &&
           other.mute == this.mute &&
           other.lastNotifiedAt == this.lastNotifiedAt);
 }
@@ -516,6 +561,7 @@ class PlacesCompanion extends UpdateCompanion<PlaceRow> {
   final Value<int> firstAt;
   final Value<int> lastAt;
   final Value<String?> label;
+  final Value<String?> userLabel;
   final Value<MuteState> mute;
   final Value<int?> lastNotifiedAt;
   const PlacesCompanion({
@@ -528,6 +574,7 @@ class PlacesCompanion extends UpdateCompanion<PlaceRow> {
     this.firstAt = const Value.absent(),
     this.lastAt = const Value.absent(),
     this.label = const Value.absent(),
+    this.userLabel = const Value.absent(),
     this.mute = const Value.absent(),
     this.lastNotifiedAt = const Value.absent(),
   });
@@ -541,6 +588,7 @@ class PlacesCompanion extends UpdateCompanion<PlaceRow> {
     required int firstAt,
     required int lastAt,
     this.label = const Value.absent(),
+    this.userLabel = const Value.absent(),
     this.mute = const Value.absent(),
     this.lastNotifiedAt = const Value.absent(),
   }) : centerLat = Value(centerLat),
@@ -558,6 +606,7 @@ class PlacesCompanion extends UpdateCompanion<PlaceRow> {
     Expression<int>? firstAt,
     Expression<int>? lastAt,
     Expression<String>? label,
+    Expression<String>? userLabel,
     Expression<String>? mute,
     Expression<int>? lastNotifiedAt,
   }) {
@@ -571,6 +620,7 @@ class PlacesCompanion extends UpdateCompanion<PlaceRow> {
       if (firstAt != null) 'first_at': firstAt,
       if (lastAt != null) 'last_at': lastAt,
       if (label != null) 'label': label,
+      if (userLabel != null) 'user_label': userLabel,
       if (mute != null) 'mute': mute,
       if (lastNotifiedAt != null) 'last_notified_at': lastNotifiedAt,
     });
@@ -586,6 +636,7 @@ class PlacesCompanion extends UpdateCompanion<PlaceRow> {
     Value<int>? firstAt,
     Value<int>? lastAt,
     Value<String?>? label,
+    Value<String?>? userLabel,
     Value<MuteState>? mute,
     Value<int?>? lastNotifiedAt,
   }) {
@@ -599,6 +650,7 @@ class PlacesCompanion extends UpdateCompanion<PlaceRow> {
       firstAt: firstAt ?? this.firstAt,
       lastAt: lastAt ?? this.lastAt,
       label: label ?? this.label,
+      userLabel: userLabel ?? this.userLabel,
       mute: mute ?? this.mute,
       lastNotifiedAt: lastNotifiedAt ?? this.lastNotifiedAt,
     );
@@ -634,6 +686,9 @@ class PlacesCompanion extends UpdateCompanion<PlaceRow> {
     if (label.present) {
       map['label'] = Variable<String>(label.value);
     }
+    if (userLabel.present) {
+      map['user_label'] = Variable<String>(userLabel.value);
+    }
     if (mute.present) {
       map['mute'] = Variable<String>(
         $PlacesTable.$convertermute.toSql(mute.value),
@@ -657,6 +712,7 @@ class PlacesCompanion extends UpdateCompanion<PlaceRow> {
           ..write('firstAt: $firstAt, ')
           ..write('lastAt: $lastAt, ')
           ..write('label: $label, ')
+          ..write('userLabel: $userLabel, ')
           ..write('mute: $mute, ')
           ..write('lastNotifiedAt: $lastNotifiedAt')
           ..write(')'))
@@ -2681,6 +2737,7 @@ typedef $$PlacesTableCreateCompanionBuilder =
       required int firstAt,
       required int lastAt,
       Value<String?> label,
+      Value<String?> userLabel,
       Value<MuteState> mute,
       Value<int?> lastNotifiedAt,
     });
@@ -2695,6 +2752,7 @@ typedef $$PlacesTableUpdateCompanionBuilder =
       Value<int> firstAt,
       Value<int> lastAt,
       Value<String?> label,
+      Value<String?> userLabel,
       Value<MuteState> mute,
       Value<int?> lastNotifiedAt,
     });
@@ -2810,6 +2868,11 @@ class $$PlacesTableFilterComposer
 
   ColumnFilters<String> get label => $composableBuilder(
     column: $table.label,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get userLabel => $composableBuilder(
+    column: $table.userLabel,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2954,6 +3017,11 @@ class $$PlacesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get userLabel => $composableBuilder(
+    column: $table.userLabel,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get mute => $composableBuilder(
     column: $table.mute,
     builder: (column) => ColumnOrderings(column),
@@ -3004,6 +3072,9 @@ class $$PlacesTableAnnotationComposer
 
   GeneratedColumn<String> get label =>
       $composableBuilder(column: $table.label, builder: (column) => column);
+
+  GeneratedColumn<String> get userLabel =>
+      $composableBuilder(column: $table.userLabel, builder: (column) => column);
 
   GeneratedColumnWithTypeConverter<MuteState, String> get mute =>
       $composableBuilder(column: $table.mute, builder: (column) => column);
@@ -3130,6 +3201,7 @@ class $$PlacesTableTableManager
                 Value<int> firstAt = const Value.absent(),
                 Value<int> lastAt = const Value.absent(),
                 Value<String?> label = const Value.absent(),
+                Value<String?> userLabel = const Value.absent(),
                 Value<MuteState> mute = const Value.absent(),
                 Value<int?> lastNotifiedAt = const Value.absent(),
               }) => PlacesCompanion(
@@ -3142,6 +3214,7 @@ class $$PlacesTableTableManager
                 firstAt: firstAt,
                 lastAt: lastAt,
                 label: label,
+                userLabel: userLabel,
                 mute: mute,
                 lastNotifiedAt: lastNotifiedAt,
               ),
@@ -3156,6 +3229,7 @@ class $$PlacesTableTableManager
                 required int firstAt,
                 required int lastAt,
                 Value<String?> label = const Value.absent(),
+                Value<String?> userLabel = const Value.absent(),
                 Value<MuteState> mute = const Value.absent(),
                 Value<int?> lastNotifiedAt = const Value.absent(),
               }) => PlacesCompanion.insert(
@@ -3168,6 +3242,7 @@ class $$PlacesTableTableManager
                 firstAt: firstAt,
                 lastAt: lastAt,
                 label: label,
+                userLabel: userLabel,
                 mute: mute,
                 lastNotifiedAt: lastNotifiedAt,
               ),

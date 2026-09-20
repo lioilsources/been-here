@@ -129,17 +129,67 @@ void main() {
     expect(find.text('Kept visible by you'), findsOneWidget);
   });
 
-  testWidgets('places have no names until the user asks for them', (
+  testWidgets('a nameless place leads with when you were there', (
     tester,
   ) async {
     await openPlaces(tester);
 
-    expect(find.text('Unnamed place'), findsNWidgets(2));
+    // The trip: four photos on one day in September 2022.
+    expect(find.textContaining('4 photos'), findsOneWidget);
+    expect(find.textContaining('years ago · 4 photos'), findsOneWidget);
     expect(
       geocoder.asked,
       isEmpty,
       reason: 'coordinates were sent to the geocoder without being asked',
     );
+  });
+
+  testWidgets('a place the user names leads with that name', (tester) async {
+    await openPlaces(tester);
+
+    await tester.tap(find.byIcon(Icons.more_vert).first);
+    await settle(tester);
+    await tester.tap(find.text('Name this place'));
+    await settle(tester);
+
+    await tester.enterText(find.byType(TextField), 'U babicky');
+    await tester.tap(find.text('Save'));
+    await settle(tester);
+
+    expect(find.text('U babicky'), findsOneWidget);
+    expect(
+      geocoder.asked,
+      isEmpty,
+      reason: 'a name typed by the user must not involve the geocoder',
+    );
+  });
+
+  testWidgets('a name the user typed survives geocoding being switched off', (
+    tester,
+  ) async {
+    await openPlaces(tester);
+
+    await tester.tap(find.byIcon(Icons.more_vert).first);
+    await settle(tester);
+    await tester.tap(find.text('Name this place'));
+    await settle(tester);
+    await tester.enterText(find.byType(TextField), 'U babicky');
+    await tester.tap(find.text('Save'));
+    await settle(tester);
+
+    // Turn naming on, then off again: the geocoder's answers go, this stays.
+    await tester.tap(find.byIcon(Icons.settings_outlined));
+    await settle(tester);
+    await tester.tap(find.byType(SwitchListTile));
+    await settle(tester);
+    await tester.tap(find.byType(SwitchListTile));
+    await settle(tester);
+
+    await tester.tap(find.byIcon(Icons.place_outlined));
+    await settle(tester);
+
+    expect(find.text('U babicky'), findsOneWidget);
+    expect(find.text('Somewhere nice'), findsNothing);
   });
 
   testWidgets('turning place names on names them, and off forgets them', (

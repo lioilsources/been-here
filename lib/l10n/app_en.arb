@@ -195,7 +195,6 @@
   "placesAutoMutedNote": "Muted automatically — you're here most days",
   "placesUserMutedNote": "Muted by you",
   "placesUserUnmutedNote": "Kept visible by you",
-  "placesUnnamed": "Unnamed place",
   "placesDayCount": "{days, plural, =1{1 day} other{{days} days}}",
   "@placesDayCount": {
     "placeholders": {
@@ -219,5 +218,23 @@
   "settingsIndexTitle": "Photo index",
   "settingsReindex": "Index again from scratch",
   "settingsPrivacyTitle": "What stays on this phone",
-  "settingsPrivacyBody": "Your photos, where they were taken, and everything this app works out from them. There is no account, no server and no analytics."
+  "settingsPrivacyBody": "Your photos, where they were taken, and everything this app works out from them. There is no account, no server and no analytics.",
+  "placesName": "Name this place",
+  "placesRename": "Rename",
+  "placesNameDialogTitle": "Place name",
+  "placesNameHint": "Grandma's, the lake, the office…",
+  "placesNameSave": "Save",
+  "placesNameClear": "Remove name",
+  "placesSummary": "{age} · {photos}",
+  "@placesSummary": {
+    "description": "Headline of a place row when it has no name",
+    "placeholders": {
+      "age": {
+        "type": "String"
+      },
+      "photos": {
+        "type": "String"
+      }
+    }
+  }
 }

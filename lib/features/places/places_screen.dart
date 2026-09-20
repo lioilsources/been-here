@@ -113,14 +113,32 @@ class _PlaceTile extends ConsumerWidget {
       place.lastAt * 1000,
       isUtc: true,
     );
-    final age = relativeAge(instant: lastVisit, now: DateTime.now());
+    final age = formatRelativeAge(
+      l10n,
+      relativeAge(instant: lastVisit, now: DateTime.now()),
+    );
+    final photos = l10n.herePhotoCount(place.photoCount);
 
     final here = ref.watch(currentLocationProvider).value;
     final distance = here == null
         ? null
-        : distanceMeters(here, GeoPoint(place.centerLat, place.centerLng));
+        : formatDistance(
+            l10n,
+            distanceMeters(here, GeoPoint(place.centerLat, place.centerLng)),
+          );
 
-    final label = ref.watch(placeLabelProvider(place.id)).value;
+    final name = ref.watch(placeLabelProvider(place.id)).value;
+
+    // A name is a bonus, not the point. When there isn't one, the row leads
+    // with what the app actually knows — when you were last here — instead
+    // of with the same placeholder on every line.
+    final title = name ?? l10n.placesSummary(age, photos);
+    final details = <String>[
+      // With a name in the title, the age and count move down here.
+      if (name != null) ...[age, photos],
+      l10n.placesDayCount(place.distinctDays),
+      ?distance,
+    ];
 
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
@@ -130,22 +148,11 @@ class _PlaceTile extends ConsumerWidget {
             ? theme.colorScheme.outline
             : theme.colorScheme.primary,
       ),
-      title: Text(
-        label ?? l10n.placesUnnamed,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
+      title: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            [
-              formatRelativeAge(l10n, age),
-              l10n.herePhotoCount(place.photoCount),
-              l10n.placesDayCount(place.distinctDays),
-              if (distance != null) formatDistance(l10n, distance),
-            ].join(' · '),
-          ),
+          Text(details.join(' · ')),
           if (_note(l10n) != null)
             Text(
               _note(l10n)!,
@@ -156,7 +163,7 @@ class _PlaceTile extends ConsumerWidget {
         ],
       ),
       isThreeLine: _note(l10n) != null,
-      trailing: _MuteButton(place: place),
+      trailing: _PlaceMenu(place: place, hasName: name != null),
     );
   }
 
@@ -168,26 +175,95 @@ class _PlaceTile extends ConsumerWidget {
   };
 }
 
-class _MuteButton extends ConsumerWidget {
-  const _MuteButton({required this.place});
+/// Asks for a name. Nothing here touches the network — the name the user
+/// types is theirs and stays on the phone.
+class _NameDialog extends StatefulWidget {
+  const _NameDialog({this.initial});
+
+  final String? initial;
+
+  @override
+  State<_NameDialog> createState() => _NameDialogState();
+}
+
+class _NameDialogState extends State<_NameDialog> {
+  late final _controller = TextEditingController(text: widget.initial ?? '');
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return AlertDialog(
+      title: Text(l10n.placesNameDialogTitle),
+      content: TextField(
+        controller: _controller,
+        autofocus: true,
+        textCapitalization: TextCapitalization.sentences,
+        decoration: InputDecoration(hintText: l10n.placesNameHint),
+        onSubmitted: (value) => Navigator.of(context).pop(value),
+      ),
+      actions: [
+        if (widget.initial != null)
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(''),
+            child: Text(l10n.placesNameClear),
+          ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.commonCancel),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(_controller.text),
+          child: Text(l10n.placesNameSave),
+        ),
+      ],
+    );
+  }
+}
+
+class _PlaceMenu extends ConsumerWidget {
+  const _PlaceMenu({required this.place, required this.hasName});
 
   final PlaceRow place;
+  final bool hasName;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    final service = ref.watch(placesServiceProvider);
 
     Future<void> run(Future<void> Function() action) async {
       await action();
-      ref.invalidate(placesProvider);
+      ref
+        ..invalidate(placesProvider)
+        ..invalidate(placeLabelProvider(place.id));
     }
 
-    final service = ref.watch(placesServiceProvider);
+    Future<void> rename() async {
+      final name = await showDialog<String>(
+        context: context,
+        builder: (_) => _NameDialog(initial: hasName ? place.userLabel : null),
+      );
+      if (name == null) return;
+      await run(() => service.rename(place.id, name));
+    }
 
     return PopupMenuButton<VoidCallback>(
       icon: const Icon(Icons.more_vert),
       onSelected: (action) => action(),
       itemBuilder: (context) => [
+        PopupMenuItem(
+          value: () => unawaited(rename()),
+          child: Text(
+            place.userLabel == null ? l10n.placesName : l10n.placesRename,
+          ),
+        ),
         if (!place.mute.isMuted)
           PopupMenuItem(
             value: () => unawaited(run(() => service.mute(place.id))),

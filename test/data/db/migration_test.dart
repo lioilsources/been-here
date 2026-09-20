@@ -166,6 +166,25 @@ void main() {
     expect(await db.preferencesDao.readAll(), {'auto_mute_days': '45'});
   });
 
+  test('the upgrade adds the user-given place name column', () async {
+    writeV1([('a', 50.0755, 14.4378)]);
+
+    final db = AppDatabase.withExecutor(NativeDatabase(file));
+    addTearDown(db.close);
+
+    final id = await db.placesDao.insertPlace(
+      PlacesCompanion.insert(
+        centerLat: 1,
+        centerLng: 2,
+        radiusM: 100,
+        firstAt: 0,
+        lastAt: 0,
+      ),
+    );
+    await db.placesDao.setUserLabel(id, 'U babicky');
+    expect((await db.placesDao.byId(id))!.userLabel, 'U babicky');
+  });
+
   test('a fresh database is created at the current version', () async {
     final db = AppDatabase.withExecutor(NativeDatabase(file));
     addTearDown(db.close);

@@ -181,3 +181,13 @@ Google's, so:
 `GeocodingService` is an interface with a fake, and the tests assert on *what
 was asked*, not just on what came back — the meaningful thing to check is
 that no coordinate leaves when the setting is off.
+
+A name the user types lives in a different column (`places.user_label`),
+wins over the geocoded one, and survives both a recompute and the geocoding
+switch going off. Forgetting a service's answers should not forget something
+you wrote yourself.
+
+A place row leads with *when you were last there*, not with its name. Most
+places have no name, and a list whose every headline reads "Unnamed place"
+puts a placeholder where the information should be. A name, when there is
+one, replaces that headline.

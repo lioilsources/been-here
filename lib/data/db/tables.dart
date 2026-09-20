@@ -86,7 +86,15 @@ class Places extends Table {
   IntColumn get lastAt => integer()();
 
   /// Reverse-geocoded name, filled in lazily and only if the user allows it.
+  ///
+  /// Wiped when the user turns place naming off — it came from a service,
+  /// and turning the service off should forget its answers.
   TextColumn get label => text().nullable()();
+
+  /// A name the user typed. Takes precedence over [label], and survives
+  /// everything: recomputes, and turning geocoding off. It never came from
+  /// anywhere but this phone.
+  TextColumn get userLabel => text().nullable()();
 
   TextColumn get mute =>
       textEnum<MuteState>().withDefault(const Constant('none'))();

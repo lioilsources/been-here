@@ -192,6 +192,24 @@ void main() {
       expect((await db.placesDao.byId(home.id))!.mute, MuteState.auto);
     });
 
+    test('keeps a name the user gave a place', () async {
+      final place = (await db.placesDao.all()).first;
+      await places.rename(place.id, '  U babicky  ');
+
+      await places.recompute();
+
+      final after = await db.placesDao.byId(place.id);
+      expect(after!.userLabel, 'U babicky', reason: 'should be trimmed');
+    });
+
+    test('clearing a name removes it', () async {
+      final place = (await db.placesDao.all()).first;
+      await places.rename(place.id, 'Somewhere');
+      await places.rename(place.id, '   ');
+
+      expect((await db.placesDao.byId(place.id))!.userLabel, isNull);
+    });
+
     test('picks up photos added later', () async {
       final before = await db.placesDao.count();
 

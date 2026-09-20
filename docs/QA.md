@@ -107,6 +107,8 @@ Needs a real library:
       muted, without undoing anything you decided by hand.
 - [ ] Place names appear only after the setting is on, read correctly, and
       turning the setting off removes them again.
+- [ ] A name you type sticks, survives a reindex, and is not removed when
+      geocoding is switched off.
 
 ## Phase 4 — Geofence notifications
 

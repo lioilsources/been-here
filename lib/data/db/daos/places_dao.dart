@@ -109,9 +109,23 @@ class PlacesDao extends DatabaseAccessor<AppDatabase> with _$PlacesDaoMixin {
   Future<void> setMute(int placeId, MuteState mute) =>
       updatePlace(placeId, PlacesCompanion(mute: Value(mute)));
 
-  /// Drops every reverse-geocoded name.
+  /// Drops every reverse-geocoded name. Names the user typed are left
+  /// alone — they never came from the geocoder.
   Future<void> clearLabels() =>
       update(places).write(const PlacesCompanion(label: Value(null)));
+
+  /// Sets or clears the name the user gave a place.
+  Future<void> setUserLabel(int placeId, String? name) {
+    final trimmed = name?.trim();
+    return updatePlace(
+      placeId,
+      PlacesCompanion(
+        userLabel: Value(
+          trimmed == null || trimmed.isEmpty ? null : trimmed,
+        ),
+      ),
+    );
+  }
 
   Future<int> count() {
     final total = places.id.count();

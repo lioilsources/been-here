@@ -49,6 +49,12 @@ Principy:
 Sdílení s přáteli, rodinná mapa, AR/kompas režim, automatický sestřih videa,
 ruční umístění fotek bez GPS, poznámky k místu, plánování cesty.
 
+**Změna oproti původnímu rozsahu (2026-09-20):** ruční *pojmenování* místa
+je dovnitř. Seznam míst bez názvů byl zeď stejných řádků a vlastní název
+(„U babičky") je lepší než geocodovaný („Nádražní 12") — a na rozdíl od něj
+neopouští telefon. Tagování a hvězdičkování zůstávají nápady na později;
+sloupec `places.user_label` jim nestojí v cestě.
+
 ## 2. Stack
 
 - Flutter (stable), Dart 3, **iOS first** (TestFlight), Android hned po něm
@@ -161,7 +167,10 @@ Nejbližší *místo* nahradí nejbližší fotku ve fázi 3.
 - [x] Ruční mute/unmute + „rozhodnout automaticky"; rozhodnutí uživatele
       přežije přepočet v obou směrech
 - [x] Reverse geocoding líně a s cache, **vypnutý default**, vypnutí zapomene
-      i uložené názvy
+      i uložené názvy — ale ne ty, které jsi zadal ty
+- [x] Řádek místa vede časem a vzdáleností, ne názvem; název ho nahradí,
+      když nějaký je
+- [x] Ruční pojmenování místa (mimo původní rozsah, viz sekce 1)
 - [x] Nastavení: práh auto-mute, pojmenovávání míst, reindex, statistika
       indexu (fáze 6 ho rozšíří)
 - [x] Fixtures test: domov i práce auto-mute, 40 výletových míst ne, ztlumená

@@ -351,6 +351,11 @@ final placeLabelProvider = FutureProvider.family<String?, int>((
   final settings = await ref.watch(settingsProvider.future);
   final place = await ref.watch(databaseProvider).placesDao.byId(placeId);
   if (place == null) return null;
+
+  // A name the user typed always wins, and skips the geocoder entirely.
+  final own = place.userLabel;
+  if (own != null && own.isNotEmpty) return own;
+
   return ref
       .watch(placeLabellerProvider)
       .labelFor(place, enabled: settings.placeNamesEnabled);
