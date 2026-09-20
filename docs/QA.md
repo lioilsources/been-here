@@ -6,15 +6,14 @@ the device and OS version you used.
 
 ## Phase 0 — scaffold
 
-- [ ] `make check` passes from a clean clone (`flutter pub get` only, no
+- [x] `make check` passes from a clean clone (`flutter pub get` only, no
       codegen step needed).
-- [ ] App launches on the iOS simulator and shows the Here screen's
+- [x] App launches on the iOS simulator and shows the Here screen's
       not-indexed empty state.
-- [ ] Switching the simulator to Czech (Settings → General → Language) shows
-      Czech strings, not English fallbacks.
-- [ ] Dark mode renders with readable contrast.
+- [x] Czech locale shows Czech strings, not English fallbacks.
+- [x] Dark mode renders with readable contrast.
 
-_Tested on: iPhone 17 Pro simulator, iOS 26._
+_Tested 2026-09-20 on: iPhone 17 Pro simulator, iOS 26, Flutter 3.44.4._
 
 ## Phase 1 — indexing
 
