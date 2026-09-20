@@ -196,13 +196,17 @@ class _HereScreenState extends ConsumerState<HereScreen> {
           child: Text(l10n.commonRetry),
         ),
       ),
-      LocationPermissionState.denied ||
+      // Only a permanent denial is a dead end. `denied` is not: on iOS it
+      // is also what "never asked" looks like, so it has to keep offering
+      // the button or the app can never ask at all.
       LocationPermissionState.deniedForever => EmptyState(
         icon: Icons.location_off_outlined,
         title: l10n.locationDeniedTitle,
         body: l10n.locationDeniedBody,
       ),
-      LocationPermissionState.notDetermined || null => EmptyState(
+      LocationPermissionState.notDetermined ||
+      LocationPermissionState.denied ||
+      null => EmptyState(
         icon: Icons.my_location_outlined,
         title: l10n.locationPermissionTitle,
         body: l10n.locationPermissionBody,

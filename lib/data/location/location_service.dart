@@ -12,6 +12,12 @@ enum LocationPermissionState {
   /// ever asked for after the user has seen what the app does.
   always,
 
+  /// Not allowed, but asking is still worth it.
+  ///
+  /// On iOS this is *also* what "never asked" looks like: CoreLocation's
+  /// not-determined and denied both arrive here, and the only way to tell
+  /// them apart is to ask. So never treat this as a dead end — that is
+  /// exactly the bug that stopped the app from ever requesting location.
   denied,
 
   /// Denied and the system will not ask again — only the settings app can

@@ -63,6 +63,10 @@ class GeolocatorLocationService implements LocationService {
     at: position.timestamp,
   );
 
+  /// Note what iOS collapses: CoreLocation's *not determined* and
+  /// *restricted* both reach Dart as `denied`, so a denied state there does
+  /// not mean the user said no — it usually means nobody has asked yet. The
+  /// UI has to keep offering to ask.
   static LocationPermissionState _map(geo.LocationPermission permission) =>
       switch (permission) {
         geo.LocationPermission.denied => LocationPermissionState.denied,

@@ -112,7 +112,34 @@ void main() {
       expect(find.text('Where are you?'), findsNothing);
     });
 
-    testWidgets('explains a location denial without a dead button', (
+    testWidgets('still offers to ask when the platform says denied', (
+      tester,
+    ) async {
+      // What iOS reports before anyone has been asked: CoreLocation's
+      // not-determined arrives as denied. Treating that as final is what
+      // stopped the app from ever requesting location on a real phone.
+      library = FakePhotoLibrary(
+        assets: _photosAt(_prague, count: 1, daysAgo: 10),
+      );
+      location = FakeLocationService(
+        at: _prague,
+        permission: LocationPermissionState.denied,
+        permissionAfterRequest: LocationPermissionState.whileInUse,
+      );
+
+      await tester.pumpWidget(app());
+      await settle(tester);
+
+      expect(find.text('Where are you?'), findsOneWidget);
+      expect(find.text('Use my location'), findsOneWidget);
+
+      await tester.tap(find.text('Use my location'));
+      await settle(tester, frames: 40);
+
+      expect(find.text('Use my location'), findsNothing);
+    });
+
+    testWidgets('explains a permanent denial without a dead button', (
       tester,
     ) async {
       library = FakePhotoLibrary(
