@@ -141,8 +141,7 @@ void main() {
     expect(
       names,
       containsAll([
-        'photos_lat',
-        'photos_lng',
+        'photos_lat_lng',
         'photos_geohash',
         'photos_place_taken',
         'photos_taken_at',

@@ -23,6 +23,7 @@ dependencies:
   # State management
   flutter_riverpod: ^3.4.3
 
+  geolocator: ^14.0.3
   intl: any
 
   # Used directly by core/, which must not import Flutter.
@@ -36,6 +37,8 @@ dev_dependencies:
     sdk: flutter
   integration_test:
     sdk: flutter
+  # Used directly by the migration test to write a version 1 database.
+  sqlite3: ^3.5.2
   # 11.x requires Dart >=3.13; this project targets the current stable (3.12.2).
   very_good_analysis: ^10.3.0
 

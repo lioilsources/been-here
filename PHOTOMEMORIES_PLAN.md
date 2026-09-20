@@ -134,17 +134,24 @@ indexace. Logika výběru = čistá funkce v `domain/`, testovaná.
 - [ ] **Zbývá tobě:** běh na reálném telefonu s velkou knihovnou — progress,
       resume po backgroundu, iCloud offload. Viz `docs/QA.md`.
 
-### Fáze 2: Obrazovka Tady
+### Fáze 2: Obrazovka Tady — hotovo (kromě běhu na reálném telefonu)
 
-- Aktuální poloha (when-in-use), dotaz near, radius slider (100 m → 50 km,
-  logaritmicky), živý počet fotek
-- Časová osa návštěv, v každé návštěvě grid náhledů
-- Detail fotky: fullscreen, swipe v rámci návštěvy, tlačítko Rephoto (disabled)
-- Prázdný stav: „Tady jsi ještě nefotil" + návrh rozšířit radius + nejbližší
-  místo se vzpomínkami a vzdálenost k němu
-- Debug: možnost podvrhnout polohu
-- **Hotovo když:** na zařízení vidím svoje reálné fotky z okolí správně
-  seskupené; slider je plynulý na 50k indexu
+- [x] Aktuální poloha (when-in-use), dotaz near, radius slider (100 m → 50 km,
+      logaritmicky), živý počet fotek
+- [x] Časová osa návštěv, v každé návštěvě lazy grid náhledů s cache
+- [x] Detail fotky: fullscreen, swipe v rámci návštěvy, tlačítko Rephoto
+      (disabled, patří do fáze 5)
+- [x] Prázdný stav: „Tady jsi ještě nefotil" + vzdálenost k nejbližší
+      vzpomínce + tlačítko, které na ni rozšíří radius
+- [x] Debug poloha: dlouhý stisk na nadpisu „Tady"
+- [x] Benchmark na 100k fotkách: časová osa < 50 ms, počet pod sliderem
+      < 25 ms
+- [ ] **Zbývá tobě:** ověřit na telefonu, že se reálné fotky z okolí seskupí
+      správně a slider je plynulý. Simulátor to neumí — PhotoKit na iOS 26
+      neuznává `simctl privacy grant photos` a systémový dialog nejde
+      odklepnout skriptem. Viz `docs/QA.md`.
+
+Nejbližší *místo* nahradí nejbližší fotku ve fázi 3.
 
 ### Fáze 3: Místa a mute
 

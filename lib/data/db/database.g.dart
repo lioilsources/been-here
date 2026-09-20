@@ -720,6 +720,33 @@ class $PhotosTable extends Photos with TableInfo<$PhotosTable, PhotoRow> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _xMeta = const VerificationMeta('x');
+  @override
+  late final GeneratedColumn<double> x = GeneratedColumn<double>(
+    'x',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _yMeta = const VerificationMeta('y');
+  @override
+  late final GeneratedColumn<double> y = GeneratedColumn<double>(
+    'y',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _zMeta = const VerificationMeta('z');
+  @override
+  late final GeneratedColumn<double> z = GeneratedColumn<double>(
+    'z',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _placeIdMeta = const VerificationMeta(
     'placeId',
   );
@@ -785,6 +812,9 @@ class $PhotosTable extends Photos with TableInfo<$PhotosTable, PhotoRow> {
     lng,
     takenAt,
     geohash,
+    x,
+    y,
+    z,
     placeId,
     isVideo,
     width,
@@ -836,6 +866,15 @@ class $PhotosTable extends Photos with TableInfo<$PhotosTable, PhotoRow> {
         _geohashMeta,
         geohash.isAcceptableOrUnknown(data['geohash']!, _geohashMeta),
       );
+    }
+    if (data.containsKey('x')) {
+      context.handle(_xMeta, x.isAcceptableOrUnknown(data['x']!, _xMeta));
+    }
+    if (data.containsKey('y')) {
+      context.handle(_yMeta, y.isAcceptableOrUnknown(data['y']!, _yMeta));
+    }
+    if (data.containsKey('z')) {
+      context.handle(_zMeta, z.isAcceptableOrUnknown(data['z']!, _zMeta));
     }
     if (data.containsKey('place_id')) {
       context.handle(
@@ -902,6 +941,18 @@ class $PhotosTable extends Photos with TableInfo<$PhotosTable, PhotoRow> {
         DriftSqlType.string,
         data['${effectivePrefix}geohash'],
       ),
+      x: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}x'],
+      ),
+      y: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}y'],
+      ),
+      z: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}z'],
+      ),
       placeId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}place_id'],
@@ -941,6 +992,15 @@ class PhotoRow extends DataClass implements Insertable<PhotoRow> {
 
   /// Precision-7 geohash of lat/lng (~150 m cell). Null without GPS.
   final String? geohash;
+
+  /// The same position as a point on the unit sphere. Null without GPS.
+  ///
+  /// Lets SQLite answer "within r metres" exactly, with arithmetic only —
+  /// see [UnitVector]. Denormalised on purpose: recomputing it per row per
+  /// query is what made the radius slider stutter.
+  final double? x;
+  final double? y;
+  final double? z;
   final int? placeId;
 
   /// Always false today: videos are not indexed (product decision). The
@@ -958,6 +1018,9 @@ class PhotoRow extends DataClass implements Insertable<PhotoRow> {
     this.lng,
     required this.takenAt,
     this.geohash,
+    this.x,
+    this.y,
+    this.z,
     this.placeId,
     required this.isVideo,
     required this.width,
@@ -978,6 +1041,15 @@ class PhotoRow extends DataClass implements Insertable<PhotoRow> {
     if (!nullToAbsent || geohash != null) {
       map['geohash'] = Variable<String>(geohash);
     }
+    if (!nullToAbsent || x != null) {
+      map['x'] = Variable<double>(x);
+    }
+    if (!nullToAbsent || y != null) {
+      map['y'] = Variable<double>(y);
+    }
+    if (!nullToAbsent || z != null) {
+      map['z'] = Variable<double>(z);
+    }
     if (!nullToAbsent || placeId != null) {
       map['place_id'] = Variable<int>(placeId);
     }
@@ -997,6 +1069,9 @@ class PhotoRow extends DataClass implements Insertable<PhotoRow> {
       geohash: geohash == null && nullToAbsent
           ? const Value.absent()
           : Value(geohash),
+      x: x == null && nullToAbsent ? const Value.absent() : Value(x),
+      y: y == null && nullToAbsent ? const Value.absent() : Value(y),
+      z: z == null && nullToAbsent ? const Value.absent() : Value(z),
       placeId: placeId == null && nullToAbsent
           ? const Value.absent()
           : Value(placeId),
@@ -1018,6 +1093,9 @@ class PhotoRow extends DataClass implements Insertable<PhotoRow> {
       lng: serializer.fromJson<double?>(json['lng']),
       takenAt: serializer.fromJson<int>(json['takenAt']),
       geohash: serializer.fromJson<String?>(json['geohash']),
+      x: serializer.fromJson<double?>(json['x']),
+      y: serializer.fromJson<double?>(json['y']),
+      z: serializer.fromJson<double?>(json['z']),
       placeId: serializer.fromJson<int?>(json['placeId']),
       isVideo: serializer.fromJson<bool>(json['isVideo']),
       width: serializer.fromJson<int>(json['width']),
@@ -1034,6 +1112,9 @@ class PhotoRow extends DataClass implements Insertable<PhotoRow> {
       'lng': serializer.toJson<double?>(lng),
       'takenAt': serializer.toJson<int>(takenAt),
       'geohash': serializer.toJson<String?>(geohash),
+      'x': serializer.toJson<double?>(x),
+      'y': serializer.toJson<double?>(y),
+      'z': serializer.toJson<double?>(z),
       'placeId': serializer.toJson<int?>(placeId),
       'isVideo': serializer.toJson<bool>(isVideo),
       'width': serializer.toJson<int>(width),
@@ -1048,6 +1129,9 @@ class PhotoRow extends DataClass implements Insertable<PhotoRow> {
     Value<double?> lng = const Value.absent(),
     int? takenAt,
     Value<String?> geohash = const Value.absent(),
+    Value<double?> x = const Value.absent(),
+    Value<double?> y = const Value.absent(),
+    Value<double?> z = const Value.absent(),
     Value<int?> placeId = const Value.absent(),
     bool? isVideo,
     int? width,
@@ -1059,6 +1143,9 @@ class PhotoRow extends DataClass implements Insertable<PhotoRow> {
     lng: lng.present ? lng.value : this.lng,
     takenAt: takenAt ?? this.takenAt,
     geohash: geohash.present ? geohash.value : this.geohash,
+    x: x.present ? x.value : this.x,
+    y: y.present ? y.value : this.y,
+    z: z.present ? z.value : this.z,
     placeId: placeId.present ? placeId.value : this.placeId,
     isVideo: isVideo ?? this.isVideo,
     width: width ?? this.width,
@@ -1072,6 +1159,9 @@ class PhotoRow extends DataClass implements Insertable<PhotoRow> {
       lng: data.lng.present ? data.lng.value : this.lng,
       takenAt: data.takenAt.present ? data.takenAt.value : this.takenAt,
       geohash: data.geohash.present ? data.geohash.value : this.geohash,
+      x: data.x.present ? data.x.value : this.x,
+      y: data.y.present ? data.y.value : this.y,
+      z: data.z.present ? data.z.value : this.z,
       placeId: data.placeId.present ? data.placeId.value : this.placeId,
       isVideo: data.isVideo.present ? data.isVideo.value : this.isVideo,
       width: data.width.present ? data.width.value : this.width,
@@ -1088,6 +1178,9 @@ class PhotoRow extends DataClass implements Insertable<PhotoRow> {
           ..write('lng: $lng, ')
           ..write('takenAt: $takenAt, ')
           ..write('geohash: $geohash, ')
+          ..write('x: $x, ')
+          ..write('y: $y, ')
+          ..write('z: $z, ')
           ..write('placeId: $placeId, ')
           ..write('isVideo: $isVideo, ')
           ..write('width: $width, ')
@@ -1104,6 +1197,9 @@ class PhotoRow extends DataClass implements Insertable<PhotoRow> {
     lng,
     takenAt,
     geohash,
+    x,
+    y,
+    z,
     placeId,
     isVideo,
     width,
@@ -1119,6 +1215,9 @@ class PhotoRow extends DataClass implements Insertable<PhotoRow> {
           other.lng == this.lng &&
           other.takenAt == this.takenAt &&
           other.geohash == this.geohash &&
+          other.x == this.x &&
+          other.y == this.y &&
+          other.z == this.z &&
           other.placeId == this.placeId &&
           other.isVideo == this.isVideo &&
           other.width == this.width &&
@@ -1132,6 +1231,9 @@ class PhotosCompanion extends UpdateCompanion<PhotoRow> {
   final Value<double?> lng;
   final Value<int> takenAt;
   final Value<String?> geohash;
+  final Value<double?> x;
+  final Value<double?> y;
+  final Value<double?> z;
   final Value<int?> placeId;
   final Value<bool> isVideo;
   final Value<int> width;
@@ -1144,6 +1246,9 @@ class PhotosCompanion extends UpdateCompanion<PhotoRow> {
     this.lng = const Value.absent(),
     this.takenAt = const Value.absent(),
     this.geohash = const Value.absent(),
+    this.x = const Value.absent(),
+    this.y = const Value.absent(),
+    this.z = const Value.absent(),
     this.placeId = const Value.absent(),
     this.isVideo = const Value.absent(),
     this.width = const Value.absent(),
@@ -1157,6 +1262,9 @@ class PhotosCompanion extends UpdateCompanion<PhotoRow> {
     this.lng = const Value.absent(),
     required int takenAt,
     this.geohash = const Value.absent(),
+    this.x = const Value.absent(),
+    this.y = const Value.absent(),
+    this.z = const Value.absent(),
     this.placeId = const Value.absent(),
     this.isVideo = const Value.absent(),
     required int width,
@@ -1174,6 +1282,9 @@ class PhotosCompanion extends UpdateCompanion<PhotoRow> {
     Expression<double>? lng,
     Expression<int>? takenAt,
     Expression<String>? geohash,
+    Expression<double>? x,
+    Expression<double>? y,
+    Expression<double>? z,
     Expression<int>? placeId,
     Expression<bool>? isVideo,
     Expression<int>? width,
@@ -1187,6 +1298,9 @@ class PhotosCompanion extends UpdateCompanion<PhotoRow> {
       if (lng != null) 'lng': lng,
       if (takenAt != null) 'taken_at': takenAt,
       if (geohash != null) 'geohash': geohash,
+      if (x != null) 'x': x,
+      if (y != null) 'y': y,
+      if (z != null) 'z': z,
       if (placeId != null) 'place_id': placeId,
       if (isVideo != null) 'is_video': isVideo,
       if (width != null) 'width': width,
@@ -1202,6 +1316,9 @@ class PhotosCompanion extends UpdateCompanion<PhotoRow> {
     Value<double?>? lng,
     Value<int>? takenAt,
     Value<String?>? geohash,
+    Value<double?>? x,
+    Value<double?>? y,
+    Value<double?>? z,
     Value<int?>? placeId,
     Value<bool>? isVideo,
     Value<int>? width,
@@ -1215,6 +1332,9 @@ class PhotosCompanion extends UpdateCompanion<PhotoRow> {
       lng: lng ?? this.lng,
       takenAt: takenAt ?? this.takenAt,
       geohash: geohash ?? this.geohash,
+      x: x ?? this.x,
+      y: y ?? this.y,
+      z: z ?? this.z,
       placeId: placeId ?? this.placeId,
       isVideo: isVideo ?? this.isVideo,
       width: width ?? this.width,
@@ -1241,6 +1361,15 @@ class PhotosCompanion extends UpdateCompanion<PhotoRow> {
     }
     if (geohash.present) {
       map['geohash'] = Variable<String>(geohash.value);
+    }
+    if (x.present) {
+      map['x'] = Variable<double>(x.value);
+    }
+    if (y.present) {
+      map['y'] = Variable<double>(y.value);
+    }
+    if (z.present) {
+      map['z'] = Variable<double>(z.value);
     }
     if (placeId.present) {
       map['place_id'] = Variable<int>(placeId.value);
@@ -1271,6 +1400,9 @@ class PhotosCompanion extends UpdateCompanion<PhotoRow> {
           ..write('lng: $lng, ')
           ..write('takenAt: $takenAt, ')
           ..write('geohash: $geohash, ')
+          ..write('x: $x, ')
+          ..write('y: $y, ')
+          ..write('z: $z, ')
           ..write('placeId: $placeId, ')
           ..write('isVideo: $isVideo, ')
           ..write('width: $width, ')
@@ -2027,13 +2159,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $RephotosTable rephotos = $RephotosTable(this);
   late final $IndexStateTable indexState = $IndexStateTable(this);
   late final $ScanSeenTable scanSeen = $ScanSeenTable(this);
-  late final Index photosLat = Index(
-    'photos_lat',
-    'CREATE INDEX photos_lat ON photos (lat)',
-  );
-  late final Index photosLng = Index(
-    'photos_lng',
-    'CREATE INDEX photos_lng ON photos (lng)',
+  late final Index photosLatLng = Index(
+    'photos_lat_lng',
+    'CREATE INDEX photos_lat_lng ON photos (lat, lng)',
   );
   late final Index photosGeohash = Index(
     'photos_geohash',
@@ -2057,6 +2185,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final PhotosDao photosDao = PhotosDao(this as AppDatabase);
   late final IndexStateDao indexStateDao = IndexStateDao(this as AppDatabase);
+  late final MemoriesDao memoriesDao = MemoriesDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2067,8 +2196,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     rephotos,
     indexState,
     scanSeen,
-    photosLat,
-    photosLng,
+    photosLatLng,
     photosGeohash,
     photosPlaceTaken,
     photosTakenAt,
@@ -2597,6 +2725,9 @@ typedef $$PhotosTableCreateCompanionBuilder =
       Value<double?> lng,
       required int takenAt,
       Value<String?> geohash,
+      Value<double?> x,
+      Value<double?> y,
+      Value<double?> z,
       Value<int?> placeId,
       Value<bool> isVideo,
       required int width,
@@ -2611,6 +2742,9 @@ typedef $$PhotosTableUpdateCompanionBuilder =
       Value<double?> lng,
       Value<int> takenAt,
       Value<String?> geohash,
+      Value<double?> x,
+      Value<double?> y,
+      Value<double?> z,
       Value<int?> placeId,
       Value<bool> isVideo,
       Value<int> width,
@@ -2672,6 +2806,21 @@ class $$PhotosTableFilterComposer
 
   ColumnFilters<String> get geohash => $composableBuilder(
     column: $table.geohash,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get x => $composableBuilder(
+    column: $table.x,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get y => $composableBuilder(
+    column: $table.y,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get z => $composableBuilder(
+    column: $table.z,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2753,6 +2902,21 @@ class $$PhotosTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<double> get x => $composableBuilder(
+    column: $table.x,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get y => $composableBuilder(
+    column: $table.y,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get z => $composableBuilder(
+    column: $table.z,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<bool> get isVideo => $composableBuilder(
     column: $table.isVideo,
     builder: (column) => ColumnOrderings(column),
@@ -2820,6 +2984,15 @@ class $$PhotosTableAnnotationComposer
 
   GeneratedColumn<String> get geohash =>
       $composableBuilder(column: $table.geohash, builder: (column) => column);
+
+  GeneratedColumn<double> get x =>
+      $composableBuilder(column: $table.x, builder: (column) => column);
+
+  GeneratedColumn<double> get y =>
+      $composableBuilder(column: $table.y, builder: (column) => column);
+
+  GeneratedColumn<double> get z =>
+      $composableBuilder(column: $table.z, builder: (column) => column);
 
   GeneratedColumn<bool> get isVideo =>
       $composableBuilder(column: $table.isVideo, builder: (column) => column);
@@ -2890,6 +3063,9 @@ class $$PhotosTableTableManager
                 Value<double?> lng = const Value.absent(),
                 Value<int> takenAt = const Value.absent(),
                 Value<String?> geohash = const Value.absent(),
+                Value<double?> x = const Value.absent(),
+                Value<double?> y = const Value.absent(),
+                Value<double?> z = const Value.absent(),
                 Value<int?> placeId = const Value.absent(),
                 Value<bool> isVideo = const Value.absent(),
                 Value<int> width = const Value.absent(),
@@ -2902,6 +3078,9 @@ class $$PhotosTableTableManager
                 lng: lng,
                 takenAt: takenAt,
                 geohash: geohash,
+                x: x,
+                y: y,
+                z: z,
                 placeId: placeId,
                 isVideo: isVideo,
                 width: width,
@@ -2916,6 +3095,9 @@ class $$PhotosTableTableManager
                 Value<double?> lng = const Value.absent(),
                 required int takenAt,
                 Value<String?> geohash = const Value.absent(),
+                Value<double?> x = const Value.absent(),
+                Value<double?> y = const Value.absent(),
+                Value<double?> z = const Value.absent(),
                 Value<int?> placeId = const Value.absent(),
                 Value<bool> isVideo = const Value.absent(),
                 required int width,
@@ -2928,6 +3110,9 @@ class $$PhotosTableTableManager
                 lng: lng,
                 takenAt: takenAt,
                 geohash: geohash,
+                x: x,
+                y: y,
+                z: z,
                 placeId: placeId,
                 isVideo: isVideo,
                 width: width,

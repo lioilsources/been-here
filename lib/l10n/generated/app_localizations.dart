@@ -241,6 +241,204 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cancel'**
   String get commonCancel;
+
+  /// Label above the radius slider
+  ///
+  /// In en, this message translates to:
+  /// **'Within {radius}'**
+  String hereRadiusLabel(String radius);
+
+  /// No description provided for @herePhotoCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No photos} =1{1 photo} other{{count} photos}}'**
+  String herePhotoCount(int count);
+
+  /// No description provided for @hereVisitCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 visit} other{{count} visits}}'**
+  String hereVisitCount(int count);
+
+  /// No description provided for @distanceMeters.
+  ///
+  /// In en, this message translates to:
+  /// **'{meters} m'**
+  String distanceMeters(int meters);
+
+  /// No description provided for @distanceKilometers.
+  ///
+  /// In en, this message translates to:
+  /// **'{km} km'**
+  String distanceKilometers(String km);
+
+  /// No description provided for @ageToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get ageToday;
+
+  /// No description provided for @ageYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get ageYesterday;
+
+  /// No description provided for @ageDaysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, other{{days} days ago}}'**
+  String ageDaysAgo(int days);
+
+  /// No description provided for @ageMonthsAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{months, plural, =1{A month ago} other{{months} months ago}}'**
+  String ageMonthsAgo(int months);
+
+  /// No description provided for @ageYearsAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{years, plural, =1{A year ago} other{{years} years ago}}'**
+  String ageYearsAgo(int years);
+
+  /// No description provided for @locationPermissionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Where are you?'**
+  String get locationPermissionTitle;
+
+  /// No description provided for @locationPermissionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Been Here compares your position with the places your photos were taken. The comparison happens on this phone.'**
+  String get locationPermissionBody;
+
+  /// No description provided for @locationPermissionAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Use my location'**
+  String get locationPermissionAction;
+
+  /// No description provided for @locationDeniedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Location is off'**
+  String get locationDeniedTitle;
+
+  /// No description provided for @locationDeniedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Without it the app can\'t tell what you have here. You can turn it on in the system settings.'**
+  String get locationDeniedBody;
+
+  /// No description provided for @locationUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No fix yet'**
+  String get locationUnavailableTitle;
+
+  /// No description provided for @locationUnavailableBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your phone hasn\'t worked out where it is. Indoors this can take a moment.'**
+  String get locationUnavailableBody;
+
+  /// No description provided for @locationServicesDisabledTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Location services are off'**
+  String get locationServicesDisabledTitle;
+
+  /// No description provided for @locationServicesDisabledBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn them on in the system settings and come back.'**
+  String get locationServicesDisabledBody;
+
+  /// No description provided for @hereNothingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t taken photos here'**
+  String get hereNothingTitle;
+
+  /// No description provided for @hereNothingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Try a wider radius, or come back somewhere you\'ve been before.'**
+  String get hereNothingBody;
+
+  /// No description provided for @hereNearestHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your closest memory is {distance} away.'**
+  String hereNearestHint(String distance);
+
+  /// No description provided for @photoDetailRephoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Rephoto'**
+  String get photoDetailRephoto;
+
+  /// No description provided for @photoDetailRephotoSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Rephoto arrives in a later version.'**
+  String get photoDetailRephotoSoon;
+
+  /// No description provided for @photoDetailOf.
+  ///
+  /// In en, this message translates to:
+  /// **'{index} of {total}'**
+  String photoDetailOf(int index, int total);
+
+  /// No description provided for @debugLocationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Debug location'**
+  String get debugLocationTitle;
+
+  /// No description provided for @debugLocationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Pretend to be somewhere else, so the Here screen can be tested from the sofa.'**
+  String get debugLocationBody;
+
+  /// No description provided for @debugLocationLatitude.
+  ///
+  /// In en, this message translates to:
+  /// **'Latitude'**
+  String get debugLocationLatitude;
+
+  /// No description provided for @debugLocationLongitude.
+  ///
+  /// In en, this message translates to:
+  /// **'Longitude'**
+  String get debugLocationLongitude;
+
+  /// No description provided for @debugLocationApply.
+  ///
+  /// In en, this message translates to:
+  /// **'Go there'**
+  String get debugLocationApply;
+
+  /// No description provided for @debugLocationClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Use the real location'**
+  String get debugLocationClear;
+
+  /// No description provided for @debugLocationActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Debug location active'**
+  String get debugLocationActive;
+
+  /// No description provided for @commonClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get commonClose;
 }
 
 class _AppLocalizationsDelegate

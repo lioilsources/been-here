@@ -66,6 +66,8 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Been Here compares where you are with where your photos were taken, so it can show you your own pictures of the place you just arrived at. Your location is used on this device and is never sent anywhere.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Been Here reads where and when your photos were taken so it can show you your own pictures of a place when you come back to it. Your photos and their locations stay on this device.</string>
 </dict>

@@ -99,9 +99,43 @@ Out of MVP scope, as the plan has it.
 
 ## The "here" query
 
-Bounding box over the `lat`/`lng` indexes, then an exact haversine pass in
-Dart. A box near ±180° wraps, which SQL `BETWEEN` can't express, so
-`BoundingBox.split()` returns the one or two boxes to actually query.
+Two stages, because measurement said so. The shape the plan describes —
+bounding box over the indexes, then haversine in Dart — was 122 ms for a
+dense neighbourhood on 100k rows, against a 50 ms target. Profiling put
+almost none of that in SQLite (a count took 10 ms) and almost all of it in
+carrying 21,000 rows across into Dart.
 
-No R-tree: the plan's target is under 50 ms for 100k rows, and a two-index
-range scan gets there.
+So:
+
+**The circle is cut inside SQLite, exactly.** Every located photo also
+stores its position on the unit sphere (`x`, `y`, `z`). Comparing squared
+chord length is equivalent to comparing great-circle distance, so
+`(x-cx)² + (y-cy)² + (z-cz)² <= chord²` is not an approximation — a test
+over random points confirms it accepts exactly what haversine accepts. It
+needs no trigonometry, so it does not depend on SQLite being compiled with
+the optional math functions. The `(lat, lng)` index still does the coarse
+narrowing; the chord test then cuts the exact circle on what survives.
+
+**Only what the screen needs crosses the channel.** The timeline is built
+from capture times alone — one integer per photo — and a visit's photos are
+fetched when that visit is on screen. Measured on 100k rows with ~16.5k
+matches: counting 10 ms, timestamps 19 ms, whole rows with asset ids 60 ms.
+That is also why the radius slider can recount on every step.
+
+The hot query is hand-written SQL rather than drift's query builder. Building
+typed result objects for tens of thousands of rows cost more than the query
+(66 ms against 19 ms), and this is the one place in the app where that
+matters.
+
+A box near ±180° wraps, which SQL `BETWEEN` can't express, so
+`BoundingBox.split()` returns the one or two boxes to actually query. No
+R-tree: the above gets there without one.
+
+## Visits
+
+Grouping is by *local calendar day*, and the timezone rule lives in
+`core/time/local_day.dart` rather than in a scattered `toLocal()`. A photo
+taken at 00:30 in Prague belongs to that Prague day, not to the UTC day
+before it. Day numbers come from a civil-date algorithm rather than dividing
+an epoch timestamp by 86400: across a daylight-saving change local midnights
+are 23 or 25 hours apart, and the division skips or repeats a day.

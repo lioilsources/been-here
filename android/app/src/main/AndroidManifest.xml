@@ -10,6 +10,12 @@
          and the whole app has nothing to work with. -->
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION"/>
 
+    <!-- Where the user is now, so it can be compared with where the photos
+         were taken. Foreground only; background location arrives with
+         geofencing in a later version. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
     <application
         android:label="Been Here"
         android:name="${applicationName}"

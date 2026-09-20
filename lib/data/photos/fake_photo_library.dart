@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -132,8 +133,7 @@ class FakePhotoLibrary implements PhotoLibrary {
     required int height,
   }) async {
     if (!_assets.any((a) => a.id == assetId)) return null;
-    // Not a real image; only useful for asserting that something was asked for.
-    return Uint8List.fromList(assetId.codeUnits);
+    return _placeholderPng;
   }
 
   @override
@@ -141,3 +141,13 @@ class FakePhotoLibrary implements PhotoLibrary {
 
   Future<void> dispose() => _changes.close();
 }
+
+/// A 2x2 PNG.
+///
+/// Real bytes rather than a stand-in: widget tests decode whatever the
+/// library hands back, and anything that is not an image blows up inside
+/// Flutter's image pipeline rather than in the test.
+final Uint8List _placeholderPng = base64Decode(
+  'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAEE'
+  'lEQVR42mOYle0FRAwQCgAl8gU9V1T9GwAAAABJRU5ErkJggg==',
+);

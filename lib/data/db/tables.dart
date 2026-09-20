@@ -9,8 +9,11 @@ import 'package:drift/drift.dart';
 /// Assets without GPS are indexed too (lat/lng null) so that placing them by
 /// hand later needs no reindex. MVP queries ignore them.
 @DataClassName('PhotoRow')
-@TableIndex(name: 'photos_lat', columns: {#lat})
-@TableIndex(name: 'photos_lng', columns: {#lng})
+// One composite index instead of the two single-column ones the plan named:
+// the "what do I have here" query constrains lat and lng together, and a
+// (lat, lng) index serves both the range seek and the second bound. Nothing
+// ever queries longitude on its own.
+@TableIndex(name: 'photos_lat_lng', columns: {#lat, #lng})
 @TableIndex(name: 'photos_geohash', columns: {#geohash})
 @TableIndex(name: 'photos_place_taken', columns: {#placeId, #takenAt})
 @TableIndex(name: 'photos_taken_at', columns: {#takenAt})
@@ -26,6 +29,17 @@ class Photos extends Table {
 
   /// Precision-7 geohash of lat/lng (~150 m cell). Null without GPS.
   TextColumn get geohash => text().nullable()();
+
+  /// The same position as a point on the unit sphere. Null without GPS.
+  ///
+  /// Lets SQLite answer "within r metres" exactly, with arithmetic only —
+  /// see `UnitVector` in core/geo. Denormalised on purpose: shipping the
+  /// coordinates to Dart to do it there is what made the query slow.
+  RealColumn get x => real().nullable()();
+
+  RealColumn get y => real().nullable()();
+
+  RealColumn get z => real().nullable()();
 
   IntColumn get placeId => integer().nullable().references(
     Places,

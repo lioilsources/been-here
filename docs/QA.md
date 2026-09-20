@@ -63,15 +63,29 @@ Still needs a real phone and a real library:
 
 ## Phase 2 — Here
 
+Covered by widget tests against the fake library and location service:
+permission states, the visit timeline and its ages, the radius excluding and
+including photos, the empty state with the distance to the nearest memory,
+the debug location override, Czech, and dark mode. The near query is
+benchmarked on 100k photos (timeline under 50 ms, slider count under 25 ms).
+
+**The simulator cannot finish this one.** `simctl privacy grant photos` does
+not satisfy PhotoKit's `authorizationStatusForAccessLevel:` on iOS 26, and
+the system permission dialog cannot be tapped from a script, so the screen
+can't be driven against a real library without a person. These need a phone:
+
 - [ ] Real photos from the current location appear, grouped into the right
       visits.
-- [ ] The radius slider stays smooth on a 50k index.
+- [ ] The radius slider stays smooth on a large index.
 - [ ] Visit labels ("6 years ago") match the actual dates.
-- [ ] Empty state offers a wider radius and names the nearest place with
-      memories, with a believable distance.
+- [ ] Empty state offers a wider radius and names the distance to the nearest
+      memory, and tapping the suggestion actually reveals it.
 - [ ] Photo detail loads full resolution, including for an iCloud-offloaded
       photo (watch the loading state, then check it appears).
-- [ ] Debug location override reaches a place you know has photos.
+- [ ] Swiping inside a visit reaches the photos the grid folded into "+N".
+- [ ] Debug location override (long-press the "Here" title) reaches a place
+      you know has photos.
+- [ ] Pull to refresh picks up a new photo taken a minute ago.
 
 ## Phase 3 — Places and mute
 

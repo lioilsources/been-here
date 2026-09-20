@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:been_here/core/geo/geohash.dart';
+import 'package:been_here/core/geo/unit_vector.dart';
 import 'package:been_here/core/logger.dart';
 import 'package:been_here/data/db/daos/index_state_dao.dart';
 import 'package:been_here/data/db/daos/photos_dao.dart';
@@ -206,6 +207,7 @@ class IndexerService {
 
       // Only now is the expensive read worth it.
       final point = asset.point ?? await library.resolveLocation(asset.id);
+      final vector = point == null ? null : UnitVector.of(point);
 
       rows.add(
         PhotosCompanion.insert(
@@ -214,6 +216,9 @@ class IndexerService {
           lng: Value(point?.lng),
           takenAt: asset.takenAt.toUtc().millisecondsSinceEpoch ~/ 1000,
           geohash: Value(point == null ? null : encodeGeohash(point)),
+          x: Value(vector?.x),
+          y: Value(vector?.y),
+          z: Value(vector?.z),
           isVideo: Value(asset.isVideo),
           width: asset.width,
           height: asset.height,

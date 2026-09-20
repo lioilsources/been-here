@@ -1,80 +1,178 @@
 {
   "@@locale": "en",
-
   "appTitle": "Been Here",
   "@appTitle": {
     "description": "Application name, shown in the task switcher and about box"
   },
-
   "hereTabLabel": "Here",
   "@hereTabLabel": {
     "description": "Title of the main screen showing photos around you"
   },
-
   "placesTabLabel": "Places",
   "settingsTabLabel": "Settings",
-
   "hereEmptyTitle": "You haven't taken photos here",
   "@hereEmptyTitle": {
     "description": "Shown on the Here screen when no indexed photo is nearby"
   },
-
   "hereEmptyBody": "Widen the search radius, or come back somewhere you've been before.",
-
   "hereNotIndexedTitle": "Nothing indexed yet",
   "@hereNotIndexedTitle": {
     "description": "Shown before the photo library has been scanned"
   },
-
   "hereNotIndexedBody": "Been Here needs to read your photo library once to know where you've been. Nothing leaves your phone.",
-
   "indexStartAction": "Index my photos",
-
   "indexPermissionTitle": "Been Here needs your photos",
   "@indexPermissionTitle": {
     "description": "Shown when the app has no access to the photo library yet"
   },
-
   "indexPermissionBody": "It reads only where and when each photo was taken, and keeps that on this phone.",
   "indexPermissionAction": "Allow access",
-
   "indexPermissionDeniedTitle": "Photo access is off",
   "indexPermissionDeniedBody": "Been Here can't show you anything without it. You can turn it on in the system settings.",
-
   "indexLimitedAccessNotice": "You've shared only selected photos, so Been Here can only see those. Allowing full access lets it find every place you've been.",
   "@indexLimitedAccessNotice": {
     "description": "iOS limited photo access explainer. Informational, never nagging."
   },
-
   "indexRunningTitle": "Reading your photo library",
   "indexRunningProgress": "{processed} of {total}",
   "@indexRunningProgress": {
     "description": "Indexing progress counter",
     "placeholders": {
-      "processed": { "type": "int" },
-      "total": { "type": "int" }
+      "processed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
-
   "indexFailedTitle": "Indexing stopped",
   "indexFailedBody": "Something went wrong part way through. Trying again carries on from where it stopped.",
-
   "indexedPhotoCount": "{count, plural, =0{No photos indexed} =1{1 photo indexed} other{{count} photos indexed}}",
   "@indexedPhotoCount": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
-
   "indexedLocationCoverage": "{percent}% of them have a location",
   "@indexedLocationCoverage": {
     "description": "How many indexed photos carry GPS coordinates",
     "placeholders": {
-      "percent": { "type": "int" }
+      "percent": {
+        "type": "int"
+      }
     }
   },
-
   "commonLoading": "Loading…",
   "commonRetry": "Try again",
-  "commonCancel": "Cancel"
+  "commonCancel": "Cancel",
+  "hereRadiusLabel": "Within {radius}",
+  "@hereRadiusLabel": {
+    "description": "Label above the radius slider",
+    "placeholders": {
+      "radius": {
+        "type": "String"
+      }
+    }
+  },
+  "herePhotoCount": "{count, plural, =0{No photos} =1{1 photo} other{{count} photos}}",
+  "@herePhotoCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hereVisitCount": "{count, plural, =1{1 visit} other{{count} visits}}",
+  "@hereVisitCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "distanceMeters": "{meters} m",
+  "@distanceMeters": {
+    "placeholders": {
+      "meters": {
+        "type": "int"
+      }
+    }
+  },
+  "distanceKilometers": "{km} km",
+  "@distanceKilometers": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "ageToday": "Today",
+  "ageYesterday": "Yesterday",
+  "ageDaysAgo": "{days, plural, other{{days} days ago}}",
+  "@ageDaysAgo": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "ageMonthsAgo": "{months, plural, =1{A month ago} other{{months} months ago}}",
+  "@ageMonthsAgo": {
+    "placeholders": {
+      "months": {
+        "type": "int"
+      }
+    }
+  },
+  "ageYearsAgo": "{years, plural, =1{A year ago} other{{years} years ago}}",
+  "@ageYearsAgo": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      }
+    }
+  },
+  "locationPermissionTitle": "Where are you?",
+  "locationPermissionBody": "Been Here compares your position with the places your photos were taken. The comparison happens on this phone.",
+  "locationPermissionAction": "Use my location",
+  "locationDeniedTitle": "Location is off",
+  "locationDeniedBody": "Without it the app can't tell what you have here. You can turn it on in the system settings.",
+  "locationUnavailableTitle": "No fix yet",
+  "locationUnavailableBody": "Your phone hasn't worked out where it is. Indoors this can take a moment.",
+  "locationServicesDisabledTitle": "Location services are off",
+  "locationServicesDisabledBody": "Turn them on in the system settings and come back.",
+  "hereNothingTitle": "You haven't taken photos here",
+  "hereNothingBody": "Try a wider radius, or come back somewhere you've been before.",
+  "hereNearestHint": "Your closest memory is {distance} away.",
+  "@hereNearestHint": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "photoDetailRephoto": "Rephoto",
+  "photoDetailRephotoSoon": "Rephoto arrives in a later version.",
+  "photoDetailOf": "{index} of {total}",
+  "@photoDetailOf": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "debugLocationTitle": "Debug location",
+  "debugLocationBody": "Pretend to be somewhere else, so the Here screen can be tested from the sofa.",
+  "debugLocationLatitude": "Latitude",
+  "debugLocationLongitude": "Longitude",
+  "debugLocationApply": "Go there",
+  "debugLocationClear": "Use the real location",
+  "debugLocationActive": "Debug location active",
+  "commonClose": "Close"
 }
