@@ -146,5 +146,50 @@
   "debugLocationApply": "Přenést se",
   "debugLocationClear": "Zpět na skutečnou polohu",
   "debugLocationActive": "Ladicí poloha je aktivní",
-  "commonClose": "Zavřít"
+  "commonClose": "Zavřít",
+  "placesEmptyTitle": "Zatím žádná místa",
+  "placesEmptyBody": "Místa se objeví, až budou fotky zaindexované.",
+  "placesSortLabel": "Řadit podle",
+  "placesSortLongestAgo": "Nejdéle nenavštívené",
+  "placesSortMostPhotos": "Nejvíc fotek",
+  "placesSortNearest": "Nejblíž",
+  "placesMutedSection": "{count, plural, =1{1 ztlumené místo} few{{count} ztlumená místa} other{{count} ztlumených míst}}",
+  "@placesMutedSection": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "placesMute": "Ztlumit",
+  "placesUnmute": "Zrušit ztlumení",
+  "placesUseAutoRule": "Rozhodnout automaticky",
+  "placesAutoMutedNote": "Automaticky ztlumeno — jsi tu skoro pořád",
+  "placesUserMutedNote": "Ztlumeno tebou",
+  "placesUserUnmutedNote": "Necháváš viditelné",
+  "placesUnnamed": "Místo bez názvu",
+  "placesDayCount": "{days, plural, =1{1 den} few{{days} dny} other{{days} dní}}",
+  "@placesDayCount": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsPlaceNamesTitle": "Pojmenovávat místa",
+  "settingsPlaceNamesBody": "Nechá systém převést souřadnice místa na název. Ty souřadnice jdou Applu nebo Googlu — je to jediná věc v téhle appce, která opouští telefon. Výchozí stav je vypnuto; vypnutím se všechny názvy zase zapomenou.",
+  "settingsAutoMuteTitle": "Ztlumit běžná místa po",
+  "settingsAutoMuteBody": "Místo, kde jsi fotil v tolika různých dnech, je místo, kde žiješ, ne kam jezdíš.",
+  "settingsAutoMuteValue": "{days, plural, few{{days} dnech} other{{days} dnech}}",
+  "@settingsAutoMuteValue": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsIndexTitle": "Index fotek",
+  "settingsReindex": "Projít fotky znovu od začátku",
+  "settingsPrivacyTitle": "Co zůstává v telefonu",
+  "settingsPrivacyBody": "Tvoje fotky, kde vznikly, a všechno, co si z toho appka odvodí. Žádný účet, žádný server, žádná analytika."
 }

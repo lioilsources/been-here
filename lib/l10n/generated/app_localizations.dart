@@ -439,6 +439,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Close'**
   String get commonClose;
+
+  /// No description provided for @placesEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No places yet'**
+  String get placesEmptyTitle;
+
+  /// No description provided for @placesEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Places appear once your photos have been indexed.'**
+  String get placesEmptyBody;
+
+  /// No description provided for @placesSortLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort by'**
+  String get placesSortLabel;
+
+  /// No description provided for @placesSortLongestAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'Longest since'**
+  String get placesSortLongestAgo;
+
+  /// No description provided for @placesSortMostPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Most photos'**
+  String get placesSortMostPhotos;
+
+  /// No description provided for @placesSortNearest.
+  ///
+  /// In en, this message translates to:
+  /// **'Nearest'**
+  String get placesSortNearest;
+
+  /// No description provided for @placesMutedSection.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 muted place} other{{count} muted places}}'**
+  String placesMutedSection(int count);
+
+  /// No description provided for @placesMute.
+  ///
+  /// In en, this message translates to:
+  /// **'Mute'**
+  String get placesMute;
+
+  /// No description provided for @placesUnmute.
+  ///
+  /// In en, this message translates to:
+  /// **'Unmute'**
+  String get placesUnmute;
+
+  /// No description provided for @placesUseAutoRule.
+  ///
+  /// In en, this message translates to:
+  /// **'Decide automatically'**
+  String get placesUseAutoRule;
+
+  /// No description provided for @placesAutoMutedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Muted automatically — you\'re here most days'**
+  String get placesAutoMutedNote;
+
+  /// No description provided for @placesUserMutedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Muted by you'**
+  String get placesUserMutedNote;
+
+  /// No description provided for @placesUserUnmutedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Kept visible by you'**
+  String get placesUserUnmutedNote;
+
+  /// No description provided for @placesUnnamed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unnamed place'**
+  String get placesUnnamed;
+
+  /// No description provided for @placesDayCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, =1{1 day} other{{days} days}}'**
+  String placesDayCount(int days);
+
+  /// No description provided for @settingsPlaceNamesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Name places'**
+  String get settingsPlaceNamesTitle;
+
+  /// No description provided for @settingsPlaceNamesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Asks the system to turn a place\'s coordinates into a name. That coordinate goes to Apple or Google — it is the only thing in this app that leaves your phone. Off by default; turning it off again forgets every name.'**
+  String get settingsPlaceNamesBody;
+
+  /// No description provided for @settingsAutoMuteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mute everyday places after'**
+  String get settingsAutoMuteTitle;
+
+  /// No description provided for @settingsAutoMuteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A place with photos on this many different days is somewhere you live, not somewhere you visit.'**
+  String get settingsAutoMuteBody;
+
+  /// No description provided for @settingsAutoMuteValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, other{{days} days}}'**
+  String settingsAutoMuteValue(int days);
+
+  /// No description provided for @settingsIndexTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo index'**
+  String get settingsIndexTitle;
+
+  /// No description provided for @settingsReindex.
+  ///
+  /// In en, this message translates to:
+  /// **'Index again from scratch'**
+  String get settingsReindex;
+
+  /// No description provided for @settingsPrivacyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What stays on this phone'**
+  String get settingsPrivacyTitle;
+
+  /// No description provided for @settingsPrivacyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your photos, where they were taken, and everything this app works out from them. There is no account, no server and no analytics.'**
+  String get settingsPrivacyBody;
 }
 
 class _AppLocalizationsDelegate

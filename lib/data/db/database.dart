@@ -3,6 +3,8 @@ import 'package:been_here/core/geo/unit_vector.dart';
 import 'package:been_here/data/db/daos/index_state_dao.dart';
 import 'package:been_here/data/db/daos/memories_dao.dart';
 import 'package:been_here/data/db/daos/photos_dao.dart';
+import 'package:been_here/data/db/daos/places_dao.dart';
+import 'package:been_here/data/db/daos/preferences_dao.dart';
 import 'package:been_here/data/db/tables.dart';
 // Used by the generated part file for the `mute` text enum column.
 import 'package:been_here/domain/places/mute_state.dart';
@@ -13,8 +15,22 @@ import 'package:meta/meta.dart' show visibleForTesting;
 part 'database.g.dart';
 
 @DriftDatabase(
-  tables: [Photos, Places, Rephotos, IndexState, ScanSeen],
-  daos: [PhotosDao, IndexStateDao, MemoriesDao],
+  tables: [
+    Photos,
+    Places,
+    PlaceCells,
+    Rephotos,
+    IndexState,
+    ScanSeen,
+    Preferences,
+  ],
+  daos: [
+    PhotosDao,
+    IndexStateDao,
+    MemoriesDao,
+    PlacesDao,
+    PreferencesDao,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(driftDatabase(name: 'been_here'));
@@ -26,7 +42,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.withExecutor(super.e);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -45,6 +61,17 @@ class AppDatabase extends _$AppDatabase {
           'CREATE INDEX IF NOT EXISTS photos_lat_lng ON photos (lat, lng)',
         );
         await backfillUnitVectors();
+      }
+      if (from < 3) {
+        await m.createTable(placeCells);
+        await m.createTable(preferences);
+        await m.createIndex(
+          Index(
+            'place_cells_place',
+            'CREATE INDEX IF NOT EXISTS place_cells_place '
+                'ON place_cells (place_id)',
+          ),
+        );
       }
     },
     beforeOpen: (details) async {

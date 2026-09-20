@@ -22,15 +22,17 @@ Everything happens on the device.
 
 ## Status
 
-Early. Phase 0 (scaffold) is done; see `PHOTOMEMORIES_PLAN.md` for the plan
-and `docs/ARCHITECTURE.md` for how the code is laid out.
+Early but usable: it indexes your library, shows what you photographed where
+you're standing, and works out which places are everyday ones. See
+`PHOTOMEMORIES_PLAN.md` for the plan and `docs/ARCHITECTURE.md` for how the
+code is laid out. The device-only checks are tracked in `docs/QA.md`.
 
 | Phase | What | State |
 |---|---|---|
 | 0 | Scaffold, schema, fakes, geo utils | done |
-| 1 | Library indexing | todo |
-| 2 | The "Here" screen | todo |
-| 3 | Places, clustering, auto-mute | todo |
+| 1 | Library indexing | done |
+| 2 | The "Here" screen | done |
+| 3 | Places, clustering, auto-mute | done |
 | 4 | Geofence notifications | todo |
 | 5 | Rephoto (then & now) | todo |
 | 6 | Onboarding, settings, polish | todo |
@@ -42,7 +44,7 @@ Requires Flutter stable (3.44+) and Xcode 26 for iOS.
 ```sh
 make get      # resolve dependencies
 make gen      # drift + localizations codegen
-make check    # analyze + test, what CI runs
+make check    # analyze + test + bench, what CI runs
 make run-ios
 ```
 

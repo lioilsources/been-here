@@ -89,11 +89,24 @@ can't be driven against a real library without a person. These need a phone:
 
 ## Phase 3 — Places and mute
 
+Covered by tests: clustering (adjacency, centroids across the antimeridian,
+radius clamps), the auto-mute rule, and the whole pipeline against the 50k
+fixture — home and work come out auto-muted, the forty trip places do not,
+and exactly two places are muted. Plus the screen itself: the muted section,
+mute/unmute, sorting, and that no coordinate reaches the geocoder until the
+user turns naming on.
+
+Needs a real library:
+
 - [ ] Home and workplace end up auto-muted without being told.
 - [ ] Trip destinations are not muted.
+- [ ] The places list looks like places you recognise, not like noise. If it
+      doesn't, the geohash cell size is the first thing to reconsider.
 - [ ] Manual mute and unmute stick across a reindex.
-- [ ] Place names appear only after geocoding is enabled, and the privacy
-      note explains where the coordinate goes.
+- [ ] Moving the auto-mute threshold in settings changes which places are
+      muted, without undoing anything you decided by hand.
+- [ ] Place names appear only after the setting is on, read correctly, and
+      turning the setting off removes them again.
 
 ## Phase 4 — Geofence notifications
 

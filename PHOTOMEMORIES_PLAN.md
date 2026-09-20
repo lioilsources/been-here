@@ -153,15 +153,21 @@ indexace. Logika výběru = čistá funkce v `domain/`, testovaná.
 
 Nejbližší *místo* nahradí nejbližší fotku ve fázi 3.
 
-### Fáze 3: Místa a mute
+### Fáze 3: Místa a mute — hotovo (kromě ověření na reálných datech)
 
-- Clustering + auto-mute, přepočet po indexaci
-- Obrazovka Místa: seznam (řazení: nejdéle nenavštívené / nejvíc fotek /
-  nejblíž)
-- Ruční mute/unmute, zobrazení ztlumených zvlášť
-- Reverse geocoding popisků líně a s cache, vypínatelné, zmíněné v onboardingu
-- **Hotovo když:** fixtures test ověří, že domov/práce jsou auto-mute a
-  výletová místa ne; na reálných datech dávají místa smysl
+- [x] Clustering (geohash-7, connected components) + auto-mute, přepočet
+      navázaný na doběhnutí indexace
+- [x] Obrazovka Místa: seznam se třemi řazeními, ztlumená zvlášť
+- [x] Ruční mute/unmute + „rozhodnout automaticky"; rozhodnutí uživatele
+      přežije přepočet v obou směrech
+- [x] Reverse geocoding líně a s cache, **vypnutý default**, vypnutí zapomene
+      i uložené názvy
+- [x] Nastavení: práh auto-mute, pojmenovávání míst, reindex, statistika
+      indexu (fáze 6 ho rozšíří)
+- [x] Fixtures test: domov i práce auto-mute, 40 výletových míst ne, ztlumená
+      jsou přesně dvě
+- [ ] **Zbývá tobě:** na reálných datech ověřit, že místa dávají smysl. Viz
+      `docs/QA.md`.
 
 ### Fáze 4: Geofence notifikace
 

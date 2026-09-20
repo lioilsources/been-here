@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:been_here/core/logger.dart';
 import 'package:been_here/data/photos/photo_library.dart';
+import 'package:been_here/domain/indexing/index_progress.dart';
 import 'package:been_here/domain/indexing/indexer_service.dart';
 
 /// Keeps the index in step while the app is open.
@@ -13,6 +14,7 @@ class LibrarySync {
   LibrarySync({
     required this.library,
     required this.indexer,
+    this.afterPass,
     this.debounce = const Duration(seconds: 2),
   });
 
@@ -20,6 +22,12 @@ class LibrarySync {
 
   final PhotoLibrary library;
   final IndexerService indexer;
+
+  /// Runs after every pass that finished. Clustering hangs off this: places
+  /// are derived from the index, so they are recomputed exactly when the
+  /// index has changed and never on a timer.
+  final Future<void> Function()? afterPass;
+
   final Duration debounce;
 
   StreamSubscription<void>? _subscription;
@@ -36,14 +44,19 @@ class LibrarySync {
       onError: (Object e) => _log.warning('library change stream failed', e),
     );
 
-    await indexer.run();
+    await _pass();
+  }
+
+  Future<void> _pass() async {
+    final result = await indexer.run();
+    if (result.status == IndexStatus.completed) await afterPass?.call();
   }
 
   void _schedule() {
     _timer?.cancel();
     _timer = Timer(debounce, () {
       _log.info('Library changed, syncing');
-      unawaited(indexer.run());
+      unawaited(_pass());
     });
   }
 

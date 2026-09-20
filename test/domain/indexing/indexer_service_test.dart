@@ -468,20 +468,26 @@ void main() {
   });
 
   group('performance', () {
-    test('a 50k first scan stays well under a minute', () async {
-      final fixture = generateLibraryFixture();
-      build(fixture.assets, batchSize: 500);
+    test(
+      'a 50k first scan stays well under a minute',
+      tags: [
+        'performance',
+      ],
+      () async {
+        final fixture = generateLibraryFixture();
+        build(fixture.assets, batchSize: 500);
 
-      final stopwatch = Stopwatch()..start();
-      final result = await indexer.run();
-      stopwatch.stop();
+        final stopwatch = Stopwatch()..start();
+        final result = await indexer.run();
+        stopwatch.stop();
 
-      expect(result.status, IndexStatus.completed);
-      expect(
-        stopwatch.elapsed,
-        lessThan(const Duration(seconds: 60)),
-        reason: 'first scan took ${stopwatch.elapsed}',
-      );
-    });
+        expect(result.status, IndexStatus.completed);
+        expect(
+          stopwatch.elapsed,
+          lessThan(const Duration(seconds: 60)),
+          reason: 'first scan took ${stopwatch.elapsed}',
+        );
+      },
+    );
   });
 }

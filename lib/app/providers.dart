@@ -1,5 +1,7 @@
 import 'package:been_here/core/geo/geo_point.dart';
+import 'package:been_here/core/geo/haversine.dart';
 import 'package:been_here/data/db/database.dart';
+import 'package:been_here/data/geocoding/geocoding_service.dart';
 import 'package:been_here/data/location/geolocator_location_service.dart';
 import 'package:been_here/data/location/location_service.dart';
 import 'package:been_here/data/photos/photo_library.dart';
@@ -10,6 +12,9 @@ import 'package:been_here/domain/indexing/library_sync.dart';
 import 'package:been_here/domain/memories/memories_service.dart';
 import 'package:been_here/domain/memories/memory.dart';
 import 'package:been_here/domain/memories/visit.dart';
+import 'package:been_here/domain/places/place_labels.dart';
+import 'package:been_here/domain/places/places_service.dart';
+import 'package:been_here/domain/settings/app_settings.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meta/meta.dart';
 
@@ -82,6 +87,10 @@ final librarySyncProvider = Provider<LibrarySync>((ref) {
   final sync = LibrarySync(
     library: ref.watch(photoLibraryProvider),
     indexer: ref.watch(indexerProvider),
+    afterPass: () async {
+      await ref.read(placesServiceProvider).recompute();
+      ref.invalidate(placesProvider);
+    },
   );
   ref.onDispose(sync.dispose);
   return sync;
@@ -230,4 +239,119 @@ final originalFileProvider = FutureProvider.family<String?, String>((
 ) async {
   final file = await ref.watch(photoLibraryProvider).originalFile(assetId);
   return file?.path;
+});
+
+// --- Settings ---------------------------------------------------------------
+
+final settingsStoreProvider = Provider<SettingsStore>(
+  (ref) => SettingsStore(ref.watch(databaseProvider).preferencesDao),
+);
+
+/// What the user has chosen. Everything that reads a threshold reads it here.
+class SettingsController extends AsyncNotifier<AppSettings> {
+  @override
+  Future<AppSettings> build() => ref.watch(settingsStoreProvider).read();
+
+  Future<void> setAutoMuteDays(int days) async {
+    await ref.read(settingsStoreProvider).setAutoMuteDays(days);
+    ref.invalidateSelf();
+    // The threshold changed, so every place's mute state may have.
+    await ref.read(placesServiceProvider).recompute();
+    ref.invalidate(placesProvider);
+  }
+
+  Future<void> setPlaceNames({required bool enabled}) async {
+    await ref
+        .read(settingsStoreProvider)
+        .setPlaceNamesEnabled(enabled: enabled);
+    // Turning it off forgets the names, not just stops asking for new ones.
+    if (!enabled) await ref.read(placeLabellerProvider).forgetAll();
+    ref
+      ..invalidateSelf()
+      ..invalidate(placesProvider);
+  }
+}
+
+final settingsProvider = AsyncNotifierProvider<SettingsController, AppSettings>(
+  SettingsController.new,
+);
+
+// --- Places -----------------------------------------------------------------
+
+final geocodingServiceProvider = Provider<GeocodingService>(
+  (ref) => PlatformGeocodingService(),
+);
+
+final placeLabellerProvider = Provider<PlaceLabeller>(
+  (ref) => PlaceLabeller(
+    dao: ref.watch(databaseProvider).placesDao,
+    geocoder: ref.watch(geocodingServiceProvider),
+  ),
+);
+
+final placesServiceProvider = Provider<PlacesService>((ref) {
+  final settings = ref.watch(settingsProvider).value ?? const AppSettings();
+  return PlacesService(
+    dao: ref.watch(databaseProvider).placesDao,
+    autoMuteDays: settings.autoMuteDays,
+  );
+});
+
+enum PlacesSort { longestAgo, mostPhotos, nearest }
+
+class PlacesSortOrder extends Notifier<PlacesSort> {
+  @override
+  PlacesSort build() => PlacesSort.longestAgo;
+
+  PlacesSort get order => state;
+
+  set order(PlacesSort value) => state = value;
+}
+
+final placesSortProvider = NotifierProvider<PlacesSortOrder, PlacesSort>(
+  PlacesSortOrder.new,
+);
+
+/// Every place, in the order the user asked for.
+final placesProvider = FutureProvider<List<PlaceRow>>((ref) async {
+  // Places are derived from the index, so they follow it.
+  ref.watch(indexProgressProvider);
+
+  final rows = await ref.watch(databaseProvider).placesDao.all();
+  final sort = ref.watch(placesSortProvider);
+  final from = sort == PlacesSort.nearest
+      ? await ref.watch(currentLocationProvider.future)
+      : null;
+
+  final sorted = [...rows];
+  switch (sort) {
+    case PlacesSort.longestAgo:
+      sorted.sort((a, b) => a.lastAt.compareTo(b.lastAt));
+    case PlacesSort.mostPhotos:
+      sorted.sort((a, b) => b.photoCount.compareTo(a.photoCount));
+    case PlacesSort.nearest:
+      if (from == null) {
+        sorted.sort((a, b) => b.photoCount.compareTo(a.photoCount));
+      } else {
+        double distance(PlaceRow p) =>
+            distanceMeters(from, GeoPoint(p.centerLat, p.centerLng));
+        sorted.sort((a, b) => distance(a).compareTo(distance(b)));
+      }
+  }
+  return sorted;
+});
+
+/// A place's name, asked for only when it is on screen and only if the user
+/// turned naming on.
+// ignore: specify_nonobvious_property_types — Riverpod's family type.
+final placeLabelProvider = FutureProvider.family<String?, int>((
+  ref,
+  placeId,
+) async {
+  final settings = await ref.watch(settingsProvider.future);
+  final place = await ref.watch(databaseProvider).placesDao.byId(placeId);
+  if (place == null) return null;
+  return ref
+      .watch(placeLabellerProvider)
+      .labelFor(place, enabled: settings.placeNamesEnabled);
 });

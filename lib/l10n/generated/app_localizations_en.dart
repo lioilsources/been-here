@@ -253,4 +253,104 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get commonClose => 'Close';
+
+  @override
+  String get placesEmptyTitle => 'No places yet';
+
+  @override
+  String get placesEmptyBody =>
+      'Places appear once your photos have been indexed.';
+
+  @override
+  String get placesSortLabel => 'Sort by';
+
+  @override
+  String get placesSortLongestAgo => 'Longest since';
+
+  @override
+  String get placesSortMostPhotos => 'Most photos';
+
+  @override
+  String get placesSortNearest => 'Nearest';
+
+  @override
+  String placesMutedSection(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count muted places',
+      one: '1 muted place',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get placesMute => 'Mute';
+
+  @override
+  String get placesUnmute => 'Unmute';
+
+  @override
+  String get placesUseAutoRule => 'Decide automatically';
+
+  @override
+  String get placesAutoMutedNote =>
+      'Muted automatically — you\'re here most days';
+
+  @override
+  String get placesUserMutedNote => 'Muted by you';
+
+  @override
+  String get placesUserUnmutedNote => 'Kept visible by you';
+
+  @override
+  String get placesUnnamed => 'Unnamed place';
+
+  @override
+  String placesDayCount(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days',
+      one: '1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settingsPlaceNamesTitle => 'Name places';
+
+  @override
+  String get settingsPlaceNamesBody =>
+      'Asks the system to turn a place\'s coordinates into a name. That coordinate goes to Apple or Google — it is the only thing in this app that leaves your phone. Off by default; turning it off again forgets every name.';
+
+  @override
+  String get settingsAutoMuteTitle => 'Mute everyday places after';
+
+  @override
+  String get settingsAutoMuteBody =>
+      'A place with photos on this many different days is somewhere you live, not somewhere you visit.';
+
+  @override
+  String settingsAutoMuteValue(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settingsIndexTitle => 'Photo index';
+
+  @override
+  String get settingsReindex => 'Index again from scratch';
+
+  @override
+  String get settingsPrivacyTitle => 'What stays on this phone';
+
+  @override
+  String get settingsPrivacyBody =>
+      'Your photos, where they were taken, and everything this app works out from them. There is no account, no server and no analytics.';
 }

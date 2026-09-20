@@ -258,4 +258,105 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get commonClose => 'Zavřít';
+
+  @override
+  String get placesEmptyTitle => 'Zatím žádná místa';
+
+  @override
+  String get placesEmptyBody => 'Místa se objeví, až budou fotky zaindexované.';
+
+  @override
+  String get placesSortLabel => 'Řadit podle';
+
+  @override
+  String get placesSortLongestAgo => 'Nejdéle nenavštívené';
+
+  @override
+  String get placesSortMostPhotos => 'Nejvíc fotek';
+
+  @override
+  String get placesSortNearest => 'Nejblíž';
+
+  @override
+  String placesMutedSection(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ztlumených míst',
+      few: '$count ztlumená místa',
+      one: '1 ztlumené místo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get placesMute => 'Ztlumit';
+
+  @override
+  String get placesUnmute => 'Zrušit ztlumení';
+
+  @override
+  String get placesUseAutoRule => 'Rozhodnout automaticky';
+
+  @override
+  String get placesAutoMutedNote => 'Automaticky ztlumeno — jsi tu skoro pořád';
+
+  @override
+  String get placesUserMutedNote => 'Ztlumeno tebou';
+
+  @override
+  String get placesUserUnmutedNote => 'Necháváš viditelné';
+
+  @override
+  String get placesUnnamed => 'Místo bez názvu';
+
+  @override
+  String placesDayCount(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days dní',
+      few: '$days dny',
+      one: '1 den',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settingsPlaceNamesTitle => 'Pojmenovávat místa';
+
+  @override
+  String get settingsPlaceNamesBody =>
+      'Nechá systém převést souřadnice místa na název. Ty souřadnice jdou Applu nebo Googlu — je to jediná věc v téhle appce, která opouští telefon. Výchozí stav je vypnuto; vypnutím se všechny názvy zase zapomenou.';
+
+  @override
+  String get settingsAutoMuteTitle => 'Ztlumit běžná místa po';
+
+  @override
+  String get settingsAutoMuteBody =>
+      'Místo, kde jsi fotil v tolika různých dnech, je místo, kde žiješ, ne kam jezdíš.';
+
+  @override
+  String settingsAutoMuteValue(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days dnech',
+      few: '$days dnech',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settingsIndexTitle => 'Index fotek';
+
+  @override
+  String get settingsReindex => 'Projít fotky znovu od začátku';
+
+  @override
+  String get settingsPrivacyTitle => 'Co zůstává v telefonu';
+
+  @override
+  String get settingsPrivacyBody =>
+      'Tvoje fotky, kde vznikly, a všechno, co si z toho appka odvodí. Žádný účet, žádný server, žádná analytika.';
 }

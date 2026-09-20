@@ -53,6 +53,12 @@ void main() {
     child: const BeenHereApp(),
   );
 
+  /// The app bar title, not the navigation bar label of the same name.
+  Finder appBarTitle(String text) => find.descendant(
+    of: find.byType(AppBar),
+    matching: find.text(text),
+  );
+
   /// Pumps frames without waiting for the progress indicator, which never
   /// settles.
   Future<void> settle(WidgetTester tester, {int frames = 30}) async {
@@ -229,7 +235,7 @@ void main() {
       await settle(tester, frames: 40);
       expect(find.byType(PhotoThumbnail), findsNWidgets(1));
 
-      final context = tester.element(find.byType(Scaffold));
+      final context = tester.element(find.byType(Scaffold).first);
       final container = ProviderScope.containerOf(context);
       container.read(searchRadiusProvider.notifier).meters = 10000;
       await settle(tester, frames: 40);
@@ -299,7 +305,7 @@ void main() {
       await settle(tester, frames: 40);
       expect(find.byType(PhotoThumbnail), findsNothing);
 
-      await tester.longPress(find.text('Here'));
+      await tester.longPress(appBarTitle('Here'));
       await settle(tester);
 
       expect(find.text('Debug location'), findsOneWidget);
@@ -323,7 +329,7 @@ void main() {
       await tester.pumpWidget(app());
       await settle(tester, frames: 40);
 
-      expect(find.text('Tady'), findsOneWidget);
+      expect(appBarTitle('Tady'), findsOneWidget);
       expect(find.text('před 2 lety'), findsOneWidget);
       expect(find.text('V okruhu 500 m'), findsOneWidget);
     });
@@ -338,7 +344,7 @@ void main() {
       await tester.pumpWidget(app());
       await settle(tester);
 
-      final context = tester.element(find.byType(Scaffold));
+      final context = tester.element(find.byType(Scaffold).first);
       expect(Theme.of(context).brightness, Brightness.dark);
     });
   });

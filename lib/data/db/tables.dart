@@ -94,6 +94,24 @@ class Places extends Table {
   IntColumn get lastNotifiedAt => integer().nullable()();
 }
 
+/// Which geohash cell belongs to which place.
+///
+/// Clustering is recomputed from scratch after every indexing pass, so places
+/// come and go; the cells are what let a new cluster be recognised as the
+/// same place as an old one, and what assigns photos to places in a single
+/// SQL statement.
+@DataClassName('PlaceCellRow')
+@TableIndex(name: 'place_cells_place', columns: {#placeId})
+class PlaceCells extends Table {
+  TextColumn get geohash => text()();
+
+  IntColumn get placeId =>
+      integer().references(Places, #id, onDelete: KeyAction.cascade)();
+
+  @override
+  Set<Column<Object>> get primaryKey => {geohash};
+}
+
 /// A then & now pair: an old photo and the one taken to match it.
 @DataClassName('RephotoRow')
 @TableIndex(name: 'rephotos_original', columns: {#originalAssetId})
@@ -125,6 +143,18 @@ class ScanSeen extends Table {
 
   @override
   Set<Column<Object>> get primaryKey => {assetId};
+}
+
+/// What the user has chosen. Key/value, because settings are few and the
+/// alternative is a migration every time one is added.
+@DataClassName('PreferenceRow')
+class Preferences extends Table {
+  TextColumn get key => text()();
+
+  TextColumn get value => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {key};
 }
 
 /// Key/value scratch space for the indexer: last full scan, last sync,

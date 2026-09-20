@@ -349,40 +349,52 @@ void main() {
       await db.batch((b) => b.insertAll(db.photos, rows));
     }
 
-    test('the visit timeline on 100k photos stays under 50 ms', () async {
-      await seed();
-      await service.near(_prague, radiusMeters: 1000); // warm
+    test(
+      'the visit timeline on 100k photos stays under 50 ms',
+      tags: [
+        'performance',
+      ],
+      () async {
+        await seed();
+        await service.near(_prague, radiusMeters: 1000); // warm
 
-      final stopwatch = Stopwatch()..start();
-      final result = await service.near(_prague, radiusMeters: 1000);
-      stopwatch.stop();
+        final stopwatch = Stopwatch()..start();
+        final result = await service.near(_prague, radiusMeters: 1000);
+        stopwatch.stop();
 
-      expect(result.photoCount, greaterThan(10000));
-      expect(
-        stopwatch.elapsedMilliseconds,
-        lessThan(50),
-        reason:
-            'near() took ${stopwatch.elapsedMilliseconds} ms for '
-            '${result.photoCount} photos',
-      );
-    });
+        expect(result.photoCount, greaterThan(10000));
+        expect(
+          stopwatch.elapsedMilliseconds,
+          lessThan(50),
+          reason:
+              'near() took ${stopwatch.elapsedMilliseconds} ms for '
+              '${result.photoCount} photos',
+        );
+      },
+    );
 
-    test('the slider count on 100k photos stays under 25 ms', () async {
-      await seed();
-      await service.countNear(_prague, radiusMeters: 1000); // warm
+    test(
+      'the slider count on 100k photos stays under 25 ms',
+      tags: [
+        'performance',
+      ],
+      () async {
+        await seed();
+        await service.countNear(_prague, radiusMeters: 1000); // warm
 
-      final stopwatch = Stopwatch()..start();
-      for (final radius in [100.0, 250.0, 500.0, 1000.0, 2000.0]) {
-        await service.countNear(_prague, radiusMeters: radius);
-      }
-      stopwatch.stop();
+        final stopwatch = Stopwatch()..start();
+        for (final radius in [100.0, 250.0, 500.0, 1000.0, 2000.0]) {
+          await service.countNear(_prague, radiusMeters: radius);
+        }
+        stopwatch.stop();
 
-      final perStep = stopwatch.elapsedMilliseconds / 5;
-      expect(
-        perStep,
-        lessThan(25),
-        reason: 'countNear() averaged $perStep ms per slider step',
-      );
-    });
+        final perStep = stopwatch.elapsedMilliseconds / 5;
+        expect(
+          perStep,
+          lessThan(25),
+          reason: 'countNear() averaged $perStep ms per slider step',
+        );
+      },
+    );
   });
 }

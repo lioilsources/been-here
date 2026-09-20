@@ -139,3 +139,45 @@ taken at 00:30 in Prague belongs to that Prague day, not to the UTC day
 before it. Day numbers come from a civil-date algorithm rather than dividing
 an epoch timestamp by 86400: across a daylight-saving change local midnights
 are 23 or 25 hours apart, and the division skips or repeats a day.
+
+## Places
+
+A place is a connected group of occupied geohash-7 cells. Clustering is a
+pure function over per-cell summaries — count, first and last time, summed
+unit vectors, and which local days have photos — so a hundred thousand photos
+become a few thousand rows before any Dart runs.
+
+That is also why there is no incremental recompute, which the plan left room
+for: rebuilding every place costs cells, not photos, and a full rebuild can't
+drift out of step with the index the way an incremental one can.
+
+The centre is the normalised sum of the photos' unit vectors, which is the
+only averaging that survives the antimeridian. The radius is measured to the
+cells' corners and clamped to 100–500 m: a single photo would otherwise be a
+place of radius zero.
+
+**What a recompute must never lose is the user's decision.** New clusters are
+matched to existing places by how many cells they share (`place_cells`), and
+a matched place keeps its id, its mute state and when it last notified. That
+table also assigns every photo to its place in one SQL statement.
+
+Distinct days are counted inside SQLite with a fixed UTC offset rather than
+through the calendar-correct `LocalDay`. A photo within an hour of midnight
+in the other half of the year lands in the wrong bucket — which cannot move a
+thirty-day threshold, and is what keeps the count out of Dart.
+
+## Place names
+
+The only thing in the app that can put data on the network. Naming a place
+means handing its coordinates to the system geocoder, which is Apple's or
+Google's, so:
+
+- it is off by default;
+- names are asked for lazily, only for places actually on screen;
+- an answer is stored on the place, so it is asked once;
+- turning the setting off forgets every stored name, rather than merely
+  stopping new requests.
+
+`GeocodingService` is an interface with a fake, and the tests assert on *what
+was asked*, not just on what came back — the meaningful thing to check is
+that no coordinate leaves when the setting is off.

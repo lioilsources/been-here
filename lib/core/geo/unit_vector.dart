@@ -67,3 +67,22 @@ double chordSquaredForRadius(double radiusMeters) {
   final chord = 2 * math.sin(radiusMeters / (2 * earthRadiusMeters));
   return chord * chord;
 }
+
+/// The point a set of unit vectors averages to.
+///
+/// Averaging latitude and longitude directly breaks at the antimeridian —
+/// 179° and -179° average to 0°, the wrong side of the planet — and misbehaves
+/// near the poles. Summing the vectors and normalising does not.
+///
+/// Returns null when the vectors cancel out, which needs points spread over
+/// the whole globe and cannot happen inside one cluster.
+GeoPoint? centroidOfSum(double sumX, double sumY, double sumZ) {
+  final length = math.sqrt(sumX * sumX + sumY * sumY + sumZ * sumZ);
+  if (length < 1e-12) return null;
+
+  final z = (sumZ / length).clamp(-1.0, 1.0);
+  return GeoPoint(
+    math.asin(z) / UnitVector._degToRad,
+    math.atan2(sumY, sumX) / UnitVector._degToRad,
+  );
+}

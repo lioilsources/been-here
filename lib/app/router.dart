@@ -1,4 +1,4 @@
-import 'package:been_here/features/here/here_screen.dart';
+import 'package:been_here/features/home_shell.dart';
 import 'package:flutter/material.dart';
 
 /// Route names. Notifications deep-link into these, so they are part of the
@@ -19,7 +19,7 @@ abstract final class AppRouter {
         final args = settings.arguments;
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => HereScreen(
+          builder: (_) => HomeShell(
             placeId: args is HereScreenArgs ? args.placeId : null,
           ),
         );

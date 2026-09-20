@@ -152,6 +152,20 @@ void main() {
     expect(await db.backfillUnitVectors(), 0);
   });
 
+  test('the upgrade adds the places and preferences tables', () async {
+    writeV1([('a', 50.0755, 14.4378)]);
+
+    final db = AppDatabase.withExecutor(NativeDatabase(file));
+    addTearDown(db.close);
+
+    // Reachable means created; a missing table throws here.
+    expect(await db.placesDao.cellOwners(), isEmpty);
+    expect(await db.preferencesDao.readAll(), isEmpty);
+
+    await db.preferencesDao.write('auto_mute_days', '45');
+    expect(await db.preferencesDao.readAll(), {'auto_mute_days': '45'});
+  });
+
   test('a fresh database is created at the current version', () async {
     final db = AppDatabase.withExecutor(NativeDatabase(file));
     addTearDown(db.close);

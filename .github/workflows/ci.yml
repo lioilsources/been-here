@@ -28,4 +28,7 @@ jobs:
 
       - run: flutter analyze --fatal-infos --fatal-warnings
 
-      - run: flutter test
+      - run: flutter test --exclude-tags performance
+
+      - name: Performance tests, one at a time
+        run: flutter test --tags performance -j 1

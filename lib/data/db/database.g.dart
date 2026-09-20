@@ -996,8 +996,8 @@ class PhotoRow extends DataClass implements Insertable<PhotoRow> {
   /// The same position as a point on the unit sphere. Null without GPS.
   ///
   /// Lets SQLite answer "within r metres" exactly, with arithmetic only —
-  /// see [UnitVector]. Denormalised on purpose: recomputing it per row per
-  /// query is what made the radius slider stutter.
+  /// see `UnitVector` in core/geo. Denormalised on purpose: shipping the
+  /// coordinates to Dart to do it there is what made the query slow.
   final double? x;
   final double? y;
   final double? z;
@@ -1408,6 +1408,226 @@ class PhotosCompanion extends UpdateCompanion<PhotoRow> {
           ..write('width: $width, ')
           ..write('height: $height, ')
           ..write('indexedAt: $indexedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PlaceCellsTable extends PlaceCells
+    with TableInfo<$PlaceCellsTable, PlaceCellRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PlaceCellsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _geohashMeta = const VerificationMeta(
+    'geohash',
+  );
+  @override
+  late final GeneratedColumn<String> geohash = GeneratedColumn<String>(
+    'geohash',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _placeIdMeta = const VerificationMeta(
+    'placeId',
+  );
+  @override
+  late final GeneratedColumn<int> placeId = GeneratedColumn<int>(
+    'place_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES places (id) ON DELETE CASCADE',
+    ),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [geohash, placeId];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'place_cells';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PlaceCellRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('geohash')) {
+      context.handle(
+        _geohashMeta,
+        geohash.isAcceptableOrUnknown(data['geohash']!, _geohashMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_geohashMeta);
+    }
+    if (data.containsKey('place_id')) {
+      context.handle(
+        _placeIdMeta,
+        placeId.isAcceptableOrUnknown(data['place_id']!, _placeIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_placeIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {geohash};
+  @override
+  PlaceCellRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PlaceCellRow(
+      geohash: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}geohash'],
+      )!,
+      placeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}place_id'],
+      )!,
+    );
+  }
+
+  @override
+  $PlaceCellsTable createAlias(String alias) {
+    return $PlaceCellsTable(attachedDatabase, alias);
+  }
+}
+
+class PlaceCellRow extends DataClass implements Insertable<PlaceCellRow> {
+  final String geohash;
+  final int placeId;
+  const PlaceCellRow({required this.geohash, required this.placeId});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['geohash'] = Variable<String>(geohash);
+    map['place_id'] = Variable<int>(placeId);
+    return map;
+  }
+
+  PlaceCellsCompanion toCompanion(bool nullToAbsent) {
+    return PlaceCellsCompanion(
+      geohash: Value(geohash),
+      placeId: Value(placeId),
+    );
+  }
+
+  factory PlaceCellRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PlaceCellRow(
+      geohash: serializer.fromJson<String>(json['geohash']),
+      placeId: serializer.fromJson<int>(json['placeId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'geohash': serializer.toJson<String>(geohash),
+      'placeId': serializer.toJson<int>(placeId),
+    };
+  }
+
+  PlaceCellRow copyWith({String? geohash, int? placeId}) => PlaceCellRow(
+    geohash: geohash ?? this.geohash,
+    placeId: placeId ?? this.placeId,
+  );
+  PlaceCellRow copyWithCompanion(PlaceCellsCompanion data) {
+    return PlaceCellRow(
+      geohash: data.geohash.present ? data.geohash.value : this.geohash,
+      placeId: data.placeId.present ? data.placeId.value : this.placeId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PlaceCellRow(')
+          ..write('geohash: $geohash, ')
+          ..write('placeId: $placeId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(geohash, placeId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PlaceCellRow &&
+          other.geohash == this.geohash &&
+          other.placeId == this.placeId);
+}
+
+class PlaceCellsCompanion extends UpdateCompanion<PlaceCellRow> {
+  final Value<String> geohash;
+  final Value<int> placeId;
+  final Value<int> rowid;
+  const PlaceCellsCompanion({
+    this.geohash = const Value.absent(),
+    this.placeId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PlaceCellsCompanion.insert({
+    required String geohash,
+    required int placeId,
+    this.rowid = const Value.absent(),
+  }) : geohash = Value(geohash),
+       placeId = Value(placeId);
+  static Insertable<PlaceCellRow> custom({
+    Expression<String>? geohash,
+    Expression<int>? placeId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (geohash != null) 'geohash': geohash,
+      if (placeId != null) 'place_id': placeId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PlaceCellsCompanion copyWith({
+    Value<String>? geohash,
+    Value<int>? placeId,
+    Value<int>? rowid,
+  }) {
+    return PlaceCellsCompanion(
+      geohash: geohash ?? this.geohash,
+      placeId: placeId ?? this.placeId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (geohash.present) {
+      map['geohash'] = Variable<String>(geohash.value);
+    }
+    if (placeId.present) {
+      map['place_id'] = Variable<int>(placeId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PlaceCellsCompanion(')
+          ..write('geohash: $geohash, ')
+          ..write('placeId: $placeId, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2151,14 +2371,224 @@ class ScanSeenCompanion extends UpdateCompanion<ScanSeenRow> {
   }
 }
 
+class $PreferencesTable extends Preferences
+    with TableInfo<$PreferencesTable, PreferenceRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PreferencesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _keyMeta = const VerificationMeta('key');
+  @override
+  late final GeneratedColumn<String> key = GeneratedColumn<String>(
+    'key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _valueMeta = const VerificationMeta('value');
+  @override
+  late final GeneratedColumn<String> value = GeneratedColumn<String>(
+    'value',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [key, value];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'preferences';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PreferenceRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('key')) {
+      context.handle(
+        _keyMeta,
+        key.isAcceptableOrUnknown(data['key']!, _keyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_keyMeta);
+    }
+    if (data.containsKey('value')) {
+      context.handle(
+        _valueMeta,
+        value.isAcceptableOrUnknown(data['value']!, _valueMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_valueMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {key};
+  @override
+  PreferenceRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PreferenceRow(
+      key: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}key'],
+      )!,
+      value: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}value'],
+      )!,
+    );
+  }
+
+  @override
+  $PreferencesTable createAlias(String alias) {
+    return $PreferencesTable(attachedDatabase, alias);
+  }
+}
+
+class PreferenceRow extends DataClass implements Insertable<PreferenceRow> {
+  final String key;
+  final String value;
+  const PreferenceRow({required this.key, required this.value});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['key'] = Variable<String>(key);
+    map['value'] = Variable<String>(value);
+    return map;
+  }
+
+  PreferencesCompanion toCompanion(bool nullToAbsent) {
+    return PreferencesCompanion(key: Value(key), value: Value(value));
+  }
+
+  factory PreferenceRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PreferenceRow(
+      key: serializer.fromJson<String>(json['key']),
+      value: serializer.fromJson<String>(json['value']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'key': serializer.toJson<String>(key),
+      'value': serializer.toJson<String>(value),
+    };
+  }
+
+  PreferenceRow copyWith({String? key, String? value}) =>
+      PreferenceRow(key: key ?? this.key, value: value ?? this.value);
+  PreferenceRow copyWithCompanion(PreferencesCompanion data) {
+    return PreferenceRow(
+      key: data.key.present ? data.key.value : this.key,
+      value: data.value.present ? data.value.value : this.value,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PreferenceRow(')
+          ..write('key: $key, ')
+          ..write('value: $value')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(key, value);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PreferenceRow &&
+          other.key == this.key &&
+          other.value == this.value);
+}
+
+class PreferencesCompanion extends UpdateCompanion<PreferenceRow> {
+  final Value<String> key;
+  final Value<String> value;
+  final Value<int> rowid;
+  const PreferencesCompanion({
+    this.key = const Value.absent(),
+    this.value = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PreferencesCompanion.insert({
+    required String key,
+    required String value,
+    this.rowid = const Value.absent(),
+  }) : key = Value(key),
+       value = Value(value);
+  static Insertable<PreferenceRow> custom({
+    Expression<String>? key,
+    Expression<String>? value,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (key != null) 'key': key,
+      if (value != null) 'value': value,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PreferencesCompanion copyWith({
+    Value<String>? key,
+    Value<String>? value,
+    Value<int>? rowid,
+  }) {
+    return PreferencesCompanion(
+      key: key ?? this.key,
+      value: value ?? this.value,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (key.present) {
+      map['key'] = Variable<String>(key.value);
+    }
+    if (value.present) {
+      map['value'] = Variable<String>(value.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PreferencesCompanion(')
+          ..write('key: $key, ')
+          ..write('value: $value, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $PlacesTable places = $PlacesTable(this);
   late final $PhotosTable photos = $PhotosTable(this);
+  late final $PlaceCellsTable placeCells = $PlaceCellsTable(this);
   late final $RephotosTable rephotos = $RephotosTable(this);
   late final $IndexStateTable indexState = $IndexStateTable(this);
   late final $ScanSeenTable scanSeen = $ScanSeenTable(this);
+  late final $PreferencesTable preferences = $PreferencesTable(this);
   late final Index photosLatLng = Index(
     'photos_lat_lng',
     'CREATE INDEX photos_lat_lng ON photos (lat, lng)',
@@ -2179,6 +2609,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'places_center',
     'CREATE INDEX places_center ON places (center_lat, center_lng)',
   );
+  late final Index placeCellsPlace = Index(
+    'place_cells_place',
+    'CREATE INDEX place_cells_place ON place_cells (place_id)',
+  );
   late final Index rephotosOriginal = Index(
     'rephotos_original',
     'CREATE INDEX rephotos_original ON rephotos (original_asset_id)',
@@ -2186,6 +2620,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final PhotosDao photosDao = PhotosDao(this as AppDatabase);
   late final IndexStateDao indexStateDao = IndexStateDao(this as AppDatabase);
   late final MemoriesDao memoriesDao = MemoriesDao(this as AppDatabase);
+  late final PlacesDao placesDao = PlacesDao(this as AppDatabase);
+  late final PreferencesDao preferencesDao = PreferencesDao(
+    this as AppDatabase,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2193,14 +2631,17 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     places,
     photos,
+    placeCells,
     rephotos,
     indexState,
     scanSeen,
+    preferences,
     photosLatLng,
     photosGeohash,
     photosPlaceTaken,
     photosTakenAt,
     placesCenter,
+    placeCellsPlace,
     rephotosOriginal,
   ];
   @override
@@ -2211,6 +2652,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('photos', kind: UpdateKind.update)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'places',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('place_cells', kind: UpdateKind.delete)],
     ),
     WritePropagation(
       on: TableUpdateQuery.onTableName(
@@ -2269,6 +2717,24 @@ final class $$PlacesTableReferences
     ).filter((f) => f.placeId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_photosRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$PlaceCellsTable, List<PlaceCellRow>>
+  _placeCellsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.placeCells,
+    aliasName: 'places__id__place_cells__place_id',
+  );
+
+  $$PlaceCellsTableProcessedTableManager get placeCellsRefs {
+    final manager = $$PlaceCellsTableTableManager(
+      $_db,
+      $_db.placeCells,
+    ).filter((f) => f.placeId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_placeCellsRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -2374,6 +2840,31 @@ class $$PlacesTableFilterComposer
           }) => $$PhotosTableFilterComposer(
             $db: $db,
             $table: $db.photos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> placeCellsRefs(
+    Expression<bool> Function($$PlaceCellsTableFilterComposer f) f,
+  ) {
+    final $$PlaceCellsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.placeCells,
+      getReferencedColumn: (t) => t.placeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlaceCellsTableFilterComposer(
+            $db: $db,
+            $table: $db.placeCells,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -2547,6 +3038,31 @@ class $$PlacesTableAnnotationComposer
     return f(composer);
   }
 
+  Expression<T> placeCellsRefs<T extends Object>(
+    Expression<T> Function($$PlaceCellsTableAnnotationComposer a) f,
+  ) {
+    final $$PlaceCellsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.placeCells,
+      getReferencedColumn: (t) => t.placeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlaceCellsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.placeCells,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
   Expression<T> rephotosRefs<T extends Object>(
     Expression<T> Function($$RephotosTableAnnotationComposer a) f,
   ) {
@@ -2586,7 +3102,11 @@ class $$PlacesTableTableManager
           $$PlacesTableUpdateCompanionBuilder,
           (PlaceRow, $$PlacesTableReferences),
           PlaceRow,
-          PrefetchHooks Function({bool photosRefs, bool rephotosRefs})
+          PrefetchHooks Function({
+            bool photosRefs,
+            bool placeCellsRefs,
+            bool rephotosRefs,
+          })
         > {
   $$PlacesTableTableManager(_$AppDatabase db, $PlacesTable table)
     : super(
@@ -2659,47 +3179,85 @@ class $$PlacesTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({photosRefs = false, rephotosRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [
-                if (photosRefs) db.photos,
-                if (rephotosRefs) db.rephotos,
-              ],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (photosRefs)
-                    await $_getPrefetchedData<PlaceRow, $PlacesTable, PhotoRow>(
-                      currentTable: table,
-                      referencedTable: $$PlacesTableReferences._photosRefsTable(
-                        db,
-                      ),
-                      managerFromTypedResult: (p0) =>
-                          $$PlacesTableReferences(db, table, p0).photosRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.placeId == item.id),
-                      typedResults: items,
-                    ),
-                  if (rephotosRefs)
-                    await $_getPrefetchedData<
-                      PlaceRow,
-                      $PlacesTable,
-                      RephotoRow
-                    >(
-                      currentTable: table,
-                      referencedTable: $$PlacesTableReferences
-                          ._rephotosRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$PlacesTableReferences(db, table, p0).rephotosRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.placeId == item.id),
-                      typedResults: items,
-                    ),
-                ];
+          prefetchHooksCallback:
+              ({
+                photosRefs = false,
+                placeCellsRefs = false,
+                rephotosRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (photosRefs) db.photos,
+                    if (placeCellsRefs) db.placeCells,
+                    if (rephotosRefs) db.rephotos,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (photosRefs)
+                        await $_getPrefetchedData<
+                          PlaceRow,
+                          $PlacesTable,
+                          PhotoRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PlacesTableReferences
+                              ._photosRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PlacesTableReferences(db, table, p0).photosRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.placeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (placeCellsRefs)
+                        await $_getPrefetchedData<
+                          PlaceRow,
+                          $PlacesTable,
+                          PlaceCellRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PlacesTableReferences
+                              ._placeCellsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PlacesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).placeCellsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.placeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (rephotosRefs)
+                        await $_getPrefetchedData<
+                          PlaceRow,
+                          $PlacesTable,
+                          RephotoRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PlacesTableReferences
+                              ._rephotosRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PlacesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).rephotosRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.placeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -2716,7 +3274,11 @@ typedef $$PlacesTableProcessedTableManager =
       $$PlacesTableUpdateCompanionBuilder,
       (PlaceRow, $$PlacesTableReferences),
       PlaceRow,
-      PrefetchHooks Function({bool photosRefs, bool rephotosRefs})
+      PrefetchHooks Function({
+        bool photosRefs,
+        bool placeCellsRefs,
+        bool rephotosRefs,
+      })
     >;
 typedef $$PhotosTableCreateCompanionBuilder =
     PhotosCompanion Function({
@@ -3185,6 +3747,266 @@ typedef $$PhotosTableProcessedTableManager =
       $$PhotosTableUpdateCompanionBuilder,
       (PhotoRow, $$PhotosTableReferences),
       PhotoRow,
+      PrefetchHooks Function({bool placeId})
+    >;
+typedef $$PlaceCellsTableCreateCompanionBuilder =
+    PlaceCellsCompanion Function({
+      required String geohash,
+      required int placeId,
+      Value<int> rowid,
+    });
+typedef $$PlaceCellsTableUpdateCompanionBuilder =
+    PlaceCellsCompanion Function({
+      Value<String> geohash,
+      Value<int> placeId,
+      Value<int> rowid,
+    });
+
+final class $$PlaceCellsTableReferences
+    extends BaseReferences<_$AppDatabase, $PlaceCellsTable, PlaceCellRow> {
+  $$PlaceCellsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $PlacesTable _placeIdTable(_$AppDatabase db) =>
+      db.places.createAlias('place_cells__place_id__places__id');
+
+  $$PlacesTableProcessedTableManager get placeId {
+    final $_column = $_itemColumn<int>('place_id')!;
+
+    final manager = $$PlacesTableTableManager(
+      $_db,
+      $_db.places,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_placeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$PlaceCellsTableFilterComposer
+    extends Composer<_$AppDatabase, $PlaceCellsTable> {
+  $$PlaceCellsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get geohash => $composableBuilder(
+    column: $table.geohash,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$PlacesTableFilterComposer get placeId {
+    final $$PlacesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.placeId,
+      referencedTable: $db.places,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlacesTableFilterComposer(
+            $db: $db,
+            $table: $db.places,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PlaceCellsTableOrderingComposer
+    extends Composer<_$AppDatabase, $PlaceCellsTable> {
+  $$PlaceCellsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get geohash => $composableBuilder(
+    column: $table.geohash,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$PlacesTableOrderingComposer get placeId {
+    final $$PlacesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.placeId,
+      referencedTable: $db.places,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlacesTableOrderingComposer(
+            $db: $db,
+            $table: $db.places,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PlaceCellsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PlaceCellsTable> {
+  $$PlaceCellsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get geohash =>
+      $composableBuilder(column: $table.geohash, builder: (column) => column);
+
+  $$PlacesTableAnnotationComposer get placeId {
+    final $$PlacesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.placeId,
+      referencedTable: $db.places,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlacesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.places,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PlaceCellsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PlaceCellsTable,
+          PlaceCellRow,
+          $$PlaceCellsTableFilterComposer,
+          $$PlaceCellsTableOrderingComposer,
+          $$PlaceCellsTableAnnotationComposer,
+          $$PlaceCellsTableCreateCompanionBuilder,
+          $$PlaceCellsTableUpdateCompanionBuilder,
+          (PlaceCellRow, $$PlaceCellsTableReferences),
+          PlaceCellRow,
+          PrefetchHooks Function({bool placeId})
+        > {
+  $$PlaceCellsTableTableManager(_$AppDatabase db, $PlaceCellsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PlaceCellsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PlaceCellsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PlaceCellsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> geohash = const Value.absent(),
+                Value<int> placeId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PlaceCellsCompanion(
+                geohash: geohash,
+                placeId: placeId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String geohash,
+                required int placeId,
+                Value<int> rowid = const Value.absent(),
+              }) => PlaceCellsCompanion.insert(
+                geohash: geohash,
+                placeId: placeId,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$PlaceCellsTable, PlaceCellRow>(table),
+                  $$PlaceCellsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({placeId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (placeId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.placeId,
+                                referencedTable: $$PlaceCellsTableReferences
+                                    ._placeIdTable(db),
+                                referencedColumn: $$PlaceCellsTableReferences
+                                    ._placeIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$PlaceCellsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PlaceCellsTable,
+      PlaceCellRow,
+      $$PlaceCellsTableFilterComposer,
+      $$PlaceCellsTableOrderingComposer,
+      $$PlaceCellsTableAnnotationComposer,
+      $$PlaceCellsTableCreateCompanionBuilder,
+      $$PlaceCellsTableUpdateCompanionBuilder,
+      (PlaceCellRow, $$PlaceCellsTableReferences),
+      PlaceCellRow,
       PrefetchHooks Function({bool placeId})
     >;
 typedef $$RephotosTableCreateCompanionBuilder =
@@ -3768,6 +4590,154 @@ typedef $$ScanSeenTableProcessedTableManager =
       ScanSeenRow,
       PrefetchHooks Function()
     >;
+typedef $$PreferencesTableCreateCompanionBuilder =
+    PreferencesCompanion Function({
+      required String key,
+      required String value,
+      Value<int> rowid,
+    });
+typedef $$PreferencesTableUpdateCompanionBuilder =
+    PreferencesCompanion Function({
+      Value<String> key,
+      Value<String> value,
+      Value<int> rowid,
+    });
+
+class $$PreferencesTableFilterComposer
+    extends Composer<_$AppDatabase, $PreferencesTable> {
+  $$PreferencesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PreferencesTableOrderingComposer
+    extends Composer<_$AppDatabase, $PreferencesTable> {
+  $$PreferencesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PreferencesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PreferencesTable> {
+  $$PreferencesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get key =>
+      $composableBuilder(column: $table.key, builder: (column) => column);
+
+  GeneratedColumn<String> get value =>
+      $composableBuilder(column: $table.value, builder: (column) => column);
+}
+
+class $$PreferencesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PreferencesTable,
+          PreferenceRow,
+          $$PreferencesTableFilterComposer,
+          $$PreferencesTableOrderingComposer,
+          $$PreferencesTableAnnotationComposer,
+          $$PreferencesTableCreateCompanionBuilder,
+          $$PreferencesTableUpdateCompanionBuilder,
+          (
+            PreferenceRow,
+            BaseReferences<_$AppDatabase, $PreferencesTable, PreferenceRow>,
+          ),
+          PreferenceRow,
+          PrefetchHooks Function()
+        > {
+  $$PreferencesTableTableManager(_$AppDatabase db, $PreferencesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PreferencesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PreferencesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PreferencesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> key = const Value.absent(),
+                Value<String> value = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PreferencesCompanion(key: key, value: value, rowid: rowid),
+          createCompanionCallback:
+              ({
+                required String key,
+                required String value,
+                Value<int> rowid = const Value.absent(),
+              }) => PreferencesCompanion.insert(
+                key: key,
+                value: value,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$PreferencesTable, PreferenceRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $PreferencesTable,
+                    PreferenceRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PreferencesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PreferencesTable,
+      PreferenceRow,
+      $$PreferencesTableFilterComposer,
+      $$PreferencesTableOrderingComposer,
+      $$PreferencesTableAnnotationComposer,
+      $$PreferencesTableCreateCompanionBuilder,
+      $$PreferencesTableUpdateCompanionBuilder,
+      (
+        PreferenceRow,
+        BaseReferences<_$AppDatabase, $PreferencesTable, PreferenceRow>,
+      ),
+      PreferenceRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3776,10 +4746,14 @@ class $AppDatabaseManager {
       $$PlacesTableTableManager(_db, _db.places);
   $$PhotosTableTableManager get photos =>
       $$PhotosTableTableManager(_db, _db.photos);
+  $$PlaceCellsTableTableManager get placeCells =>
+      $$PlaceCellsTableTableManager(_db, _db.placeCells);
   $$RephotosTableTableManager get rephotos =>
       $$RephotosTableTableManager(_db, _db.rephotos);
   $$IndexStateTableTableManager get indexState =>
       $$IndexStateTableTableManager(_db, _db.indexState);
   $$ScanSeenTableTableManager get scanSeen =>
       $$ScanSeenTableTableManager(_db, _db.scanSeen);
+  $$PreferencesTableTableManager get preferences =>
+      $$PreferencesTableTableManager(_db, _db.preferences);
 }

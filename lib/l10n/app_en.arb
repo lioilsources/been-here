@@ -174,5 +174,50 @@
   "debugLocationApply": "Go there",
   "debugLocationClear": "Use the real location",
   "debugLocationActive": "Debug location active",
-  "commonClose": "Close"
+  "commonClose": "Close",
+  "placesEmptyTitle": "No places yet",
+  "placesEmptyBody": "Places appear once your photos have been indexed.",
+  "placesSortLabel": "Sort by",
+  "placesSortLongestAgo": "Longest since",
+  "placesSortMostPhotos": "Most photos",
+  "placesSortNearest": "Nearest",
+  "placesMutedSection": "{count, plural, =1{1 muted place} other{{count} muted places}}",
+  "@placesMutedSection": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "placesMute": "Mute",
+  "placesUnmute": "Unmute",
+  "placesUseAutoRule": "Decide automatically",
+  "placesAutoMutedNote": "Muted automatically — you're here most days",
+  "placesUserMutedNote": "Muted by you",
+  "placesUserUnmutedNote": "Kept visible by you",
+  "placesUnnamed": "Unnamed place",
+  "placesDayCount": "{days, plural, =1{1 day} other{{days} days}}",
+  "@placesDayCount": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsPlaceNamesTitle": "Name places",
+  "settingsPlaceNamesBody": "Asks the system to turn a place's coordinates into a name. That coordinate goes to Apple or Google — it is the only thing in this app that leaves your phone. Off by default; turning it off again forgets every name.",
+  "settingsAutoMuteTitle": "Mute everyday places after",
+  "settingsAutoMuteBody": "A place with photos on this many different days is somewhere you live, not somewhere you visit.",
+  "settingsAutoMuteValue": "{days, plural, other{{days} days}}",
+  "@settingsAutoMuteValue": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsIndexTitle": "Photo index",
+  "settingsReindex": "Index again from scratch",
+  "settingsPrivacyTitle": "What stays on this phone",
+  "settingsPrivacyBody": "Your photos, where they were taken, and everything this app works out from them. There is no account, no server and no analytics."
 }
