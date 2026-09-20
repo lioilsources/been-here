@@ -238,6 +238,38 @@ void main() {
     expect(sorted.first.photoCount, 60);
   });
 
+  testWidgets('a place says how many times you were there', (tester) async {
+    await openPlaces(tester);
+
+    // Sixty consecutive days at home is one stay, not sixty — which is the
+    // whole reason visits are counted separately from days.
+    expect(find.textContaining('60 days'), findsOneWidget);
+    expect(find.textContaining('1 visit'), findsNWidgets(2));
+  });
+
+  testWidgets('separate trips count separately', (tester) async {
+    library = FakePhotoLibrary(
+      assets: [
+        for (final day in [1, 2, 3, 40, 100])
+          for (var shot = 0; shot < 2; shot++)
+            PhotoAsset(
+              id: 'trip-$day-$shot',
+              lat: _trip.lat,
+              lng: _trip.lng,
+              takenAt: DateTime.utc(2022).add(Duration(days: day, hours: shot)),
+              width: 100,
+              height: 100,
+            ),
+      ],
+    );
+
+    await openPlaces(tester);
+
+    // Days 1-3 are one trip; day 40 and day 100 are two more.
+    expect(find.textContaining('3 visits'), findsOneWidget);
+    expect(find.textContaining('5 days'), findsOneWidget);
+  });
+
   testWidgets('tapping a place shows what you photographed there', (
     tester,
   ) async {

@@ -171,6 +171,7 @@ class _PlaceTile extends ConsumerWidget {
     final details = <String>[
       // With a name in the title, the age and count move down here.
       if (name != null) ...[age, photos],
+      l10n.placesVisitCount(place.visitCount),
       l10n.placesDayCount(place.distinctDays),
       ?distance,
     ];
