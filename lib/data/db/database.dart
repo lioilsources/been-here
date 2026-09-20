@@ -42,7 +42,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.withExecutor(super.e);
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -62,13 +62,20 @@ class AppDatabase extends _$AppDatabase {
         );
         await backfillUnitVectors();
       }
+      if (from < 5 && from >= 3) {
+        // Backfilled by the next clustering pass, which runs after every
+        // indexing pass anyway.
+        await m.addColumn(places, places.visitCount);
+      }
       if (from < 4 && from >= 3) {
         await m.addColumn(places, places.userLabel);
+        await m.addColumn(places, places.visitCount);
       }
       if (from < 3) {
         await m.createTable(placeCells);
         await m.createTable(preferences);
         await m.addColumn(places, places.userLabel);
+        await m.addColumn(places, places.visitCount);
         await m.createIndex(
           Index(
             'place_cells_place',

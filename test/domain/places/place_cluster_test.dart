@@ -89,6 +89,36 @@ void main() {
       expect(places.single.distinctDays, 3);
     });
 
+    test('counts separate visits, not days', () {
+      // Days 1-3 are one stay; day 10 is another.
+      final places = clusterCells([
+        _cell(_prague, days: {1, 2, 3, 10}),
+      ]);
+
+      expect(places.single.distinctDays, 4);
+      expect(places.single.visitCount, 2);
+    });
+
+    test('a single day is a single visit', () {
+      expect(clusterCells([_cell(_prague)]).single.visitCount, 1);
+    });
+
+    test('a week straight is one visit', () {
+      final places = clusterCells([
+        _cell(_prague, days: {1, 2, 3, 4, 5, 6, 7}),
+      ]);
+      expect(places.single.visitCount, 1);
+    });
+
+    test('visits are counted across the whole component', () {
+      final places = clusterCells([
+        _cell(_prague, days: {1, 2}),
+        _cell(_north(_prague, 150), days: {2, 3, 40}),
+      ]);
+      // Days 1-3 together, then day 40.
+      expect(places.single.visitCount, 2);
+    });
+
     test('takes the earliest and latest time in the component', () {
       final places = clusterCells([
         _cell(_prague, firstAt: 500, lastAt: 900),

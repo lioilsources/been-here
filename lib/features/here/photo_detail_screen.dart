@@ -126,36 +126,70 @@ class _FullPhoto extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final file = ref.watch(originalFileProvider(memory.assetId));
+    final path = file.value;
 
     return InteractiveViewer(
       maxScale: 5,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Center(
-            child: PhotoThumbnail(
-              assetId: memory.assetId,
-              size: 600,
-              borderRadius: 0,
-            ),
-          ),
-          file.when(
-            loading: () => const Center(
-              child: SizedBox(
-                width: 28,
-                height: 28,
-                child: CircularProgressIndicator(strokeWidth: 2),
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 180),
+        // One image at a time. Showing the thumbnail *behind* the full
+        // photo means it fills the letterbox around it, and the result is
+        // two pictures on screen at once.
+        child: path == null
+            ? _Placeholder(
+                key: const ValueKey('placeholder'),
+                assetId: memory.assetId,
+                loading: file.isLoading,
+              )
+            : Image.file(
+                File(path),
+                key: ValueKey(path),
+                fit: BoxFit.contain,
+                width: double.infinity,
+                height: double.infinity,
               ),
-            ),
-            error: (_, _) => const SizedBox.shrink(),
-            data: (path) => path == null
-                ? const SizedBox.shrink()
-                : Image.file(File(path), fit: BoxFit.contain),
-          ),
-        ],
       ),
     );
   }
+}
+
+/// The thumbnail, shown alone until the original arrives.
+///
+/// Contained rather than cropped: this is the photo, not a tile, and the
+/// full-resolution version that replaces it will be contained too — so the
+/// swap doesn't jump.
+class _Placeholder extends StatelessWidget {
+  const _Placeholder({
+    required this.assetId,
+    required this.loading,
+    super.key,
+  });
+
+  final String assetId;
+  final bool loading;
+
+  @override
+  Widget build(BuildContext context) => Stack(
+    fit: StackFit.expand,
+    children: [
+      Center(
+        child: PhotoThumbnail(
+          assetId: assetId,
+          size: 600,
+          borderRadius: 0,
+          fit: BoxFit.contain,
+        ),
+      ),
+      if (loading)
+        const Center(
+          child: SizedBox(
+            width: 28,
+            height: 28,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        ),
+    ],
+  );
 }
 
 class _Footer extends StatelessWidget {

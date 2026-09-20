@@ -238,6 +238,24 @@ void main() {
     expect(sorted.first.photoCount, 60);
   });
 
+  testWidgets('tapping a place shows what you photographed there', (
+    tester,
+  ) async {
+    await openPlaces(tester);
+
+    await tester.tap(find.byType(ListTile).first);
+    await settle(tester);
+
+    // Back on Here, looking at that place rather than at the phone.
+    expect(find.text('Here'), findsWidgets);
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(Scaffold).first),
+    );
+    expect(container.read(selectedTabProvider), 0);
+    expect(container.read(viewpointProvider), isNotNull);
+  });
+
   testWidgets('an empty library has no places', (tester) async {
     library = FakePhotoLibrary();
 

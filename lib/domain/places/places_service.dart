@@ -102,6 +102,7 @@ class PlacesService {
       radiusM: cluster.radiusMeters,
       photoCount: Value(cluster.photoCount),
       distinctDays: Value(cluster.distinctDays),
+      visitCount: Value(cluster.visitCount),
       firstAt: cluster.firstAt,
       lastAt: cluster.lastAt,
       mute: Value(
@@ -130,6 +131,7 @@ class PlacesService {
         radiusM: Value(cluster.radiusMeters),
         photoCount: Value(cluster.photoCount),
         distinctDays: Value(cluster.distinctDays),
+        visitCount: Value(cluster.visitCount),
         firstAt: Value(cluster.firstAt),
         lastAt: Value(cluster.lastAt),
         mute: Value(mute),

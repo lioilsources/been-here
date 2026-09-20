@@ -227,5 +227,45 @@
   "alwaysLocationDeniedBody": "Poloha na pozadí je vypnutá, takže se appka sama neozve. Všechno ostatní funguje dál; zapnout ji jde kdykoliv v nastavení systému.",
   "settingsArrivalsTitle": "Příjezdy",
   "settingsArrivalsOn": "Been Here se ozve, když dorazíš někam, kde jsi dlouho nefotil.",
-  "settingsArrivalsOff": "Been Here mlčí. Zapnutí si řekne o polohu na pozadí."
+  "settingsArrivalsOff": "Been Here mlčí. Zapnutí si řekne o polohu na pozadí.",
+  "settingsMemoryAgeTitle": "Ozvat se jen u míst starších než",
+  "settingsMemoryAgeValue": "{days, plural, =1{1 den} few{{days} dny} other{{days} dní}}",
+  "@settingsMemoryAgeValue": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsPlaceCooldownTitle": "Pak to místo nechat mlčet",
+  "settingsDailyLimitTitle": "A neříkat vůbec nic po dobu",
+  "settingsDailyLimitValue": "{hours, plural, =0{žádnou} =1{1 hodiny} few{{hours} hodin} other{{hours} hodin}}",
+  "@settingsDailyLimitValue": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsThresholdsBody": "Sniž je, když si chceš příjezdy vyzkoušet a nečekat půl roku.",
+  "placesTestArrival": "Vyzkoušet příjezd",
+  "arrivalTestNotified": "Notifikace odeslána",
+  "arrivalTestMuted": "Nic: místo je ztlumené",
+  "arrivalTestTooFewPhotos": "Nic: je tu málo fotek",
+  "arrivalTestTooRecent": "Nic: fotil jsi tu nedávno",
+  "arrivalTestPlaceCooldown": "Nic: tohle místo se nedávno ozvalo",
+  "arrivalTestDailyLimit": "Nic: dnes už se appka jednou ozvala",
+  "alwaysLocationNeedsSettingsBody": "Telefon nechal polohu na „Při používání aplikace\". iOS už tuhle volbu z appky znovu nenabídne, takže polohu na pozadí je potřeba přepnout na „Vždy\" v nastavení systému — pak příjezdy začnou fungovat.",
+  "commonOpenSettings": "Otevřít nastavení",
+  "settingsArrivalsPending": "Skoro: poloha je pořád na „Při používání\". V nastavení systému ji přepni na „Vždy\".",
+  "placesSortVisits": "Nejvíc návštěv",
+  "placesSortAscending": "Obrátit pořadí",
+  "placesVisitCount": "{count, plural, =0{nikdy} =1{1 návštěva} few{{count} návštěvy} other{{count} návštěv}}",
+  "@placesVisitCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

@@ -35,6 +35,7 @@ class FakeLocationService implements LocationService {
   LocationPermissionState? permissionAfterAlwaysRequest;
 
   int alwaysRequests = 0;
+  int systemSettingsOpened = 0;
 
   int currentLocationCalls = 0;
 
@@ -67,4 +68,7 @@ class FakeLocationService implements LocationService {
 
   @override
   Future<LocationFix?> lastKnownLocation() => currentLocation();
+
+  @override
+  Future<void> openSystemSettings() async => systemSettingsOpened++;
 }

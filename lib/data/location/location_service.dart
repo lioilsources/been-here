@@ -77,4 +77,11 @@ abstract interface class LocationService {
   /// The last fix the system already had. Cheap and instant, possibly stale —
   /// good enough to render something while the real fix arrives.
   Future<LocationFix?> lastKnownLocation();
+
+  /// Opens this app's page in the system settings.
+  ///
+  /// The only way out of some states: iOS will not raise the "Always" prompt
+  /// again once the user has settled on "While Using", so an in-app button
+  /// cannot fix it and pretending otherwise leaves them stuck.
+  Future<void> openSystemSettings();
 }

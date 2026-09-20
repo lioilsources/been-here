@@ -5,6 +5,7 @@ import 'package:been_here/core/geo/geo_point.dart';
 import 'package:been_here/core/geo/geohash.dart';
 import 'package:been_here/core/geo/haversine.dart';
 import 'package:been_here/core/geo/unit_vector.dart';
+import 'package:been_here/domain/memories/visit.dart';
 import 'package:meta/meta.dart';
 
 /// Smallest and largest a place is allowed to be.
@@ -57,6 +58,7 @@ class PlaceCluster {
     required this.radiusMeters,
     required this.photoCount,
     required this.distinctDays,
+    required this.visitCount,
     required this.firstAt,
     required this.lastAt,
   });
@@ -72,6 +74,12 @@ class PlaceCluster {
   /// Distinct local days with a photo here — what the auto-mute rule reads.
   final int distinctDays;
 
+  /// How many separate times you came here.
+  ///
+  /// Runs of consecutive days count once: a week's holiday is one visit, not
+  /// seven. Same rule as the Here timeline, so the two never disagree.
+  final int visitCount;
+
   /// Unix seconds UTC.
   final int firstAt;
   final int lastAt;
@@ -79,7 +87,7 @@ class PlaceCluster {
   @override
   String toString() =>
       'PlaceCluster($center ±${radiusMeters.round()}m, $photoCount photos, '
-      '$distinctDays days, ${cells.length} cells)';
+      '$visitCount visits over $distinctDays days, ${cells.length} cells)';
 }
 
 /// Groups occupied cells into places.
@@ -165,9 +173,26 @@ PlaceCluster? _toPlace(List<CellStats> component) {
     radiusMeters: _radiusOf(center, cells),
     photoCount: photoCount,
     distinctDays: days.length,
+    visitCount: countVisits(days),
     firstAt: firstAt,
     lastAt: lastAt,
   );
+}
+
+/// How many separate visits a set of day numbers represents.
+///
+/// Consecutive days belong to the same visit, the same way the Here timeline
+/// groups them — otherwise a long weekend at the cottage would read as three
+/// trips.
+int countVisits(Set<int> days) {
+  if (days.isEmpty) return 0;
+  final sorted = days.toList()..sort();
+
+  var visits = 1;
+  for (var i = 1; i < sorted.length; i++) {
+    if (sorted[i] - sorted[i - 1] > maxVisitGapDays) visits++;
+  }
+  return visits;
 }
 
 /// Far enough out to cover every cell, then clamped.

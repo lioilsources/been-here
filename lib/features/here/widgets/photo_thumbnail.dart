@@ -78,6 +78,7 @@ class PhotoThumbnail extends ConsumerStatefulWidget {
     super.key,
     this.size = 200,
     this.borderRadius = 8,
+    this.fit = BoxFit.cover,
   });
 
   final String assetId;
@@ -86,6 +87,9 @@ class PhotoThumbnail extends ConsumerStatefulWidget {
   final int size;
 
   final double borderRadius;
+
+  /// Cropped in a grid, contained when it is the photo itself.
+  final BoxFit fit;
 
   @override
   ConsumerState<PhotoThumbnail> createState() => _PhotoThumbnailState();
@@ -144,7 +148,7 @@ class _PhotoThumbnailState extends ConsumerState<PhotoThumbnail> {
         child: switch ((bytes, _loading)) {
           (final Uint8List data, _) => Image.memory(
             data,
-            fit: BoxFit.cover,
+            fit: widget.fit,
             width: double.infinity,
             height: double.infinity,
             gaplessPlayback: true,

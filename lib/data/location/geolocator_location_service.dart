@@ -81,6 +81,9 @@ class GeolocatorLocationService implements LocationService {
     }
   }
 
+  @override
+  Future<void> openSystemSettings() => ph.openAppSettings();
+
   static LocationFix _toFix(geo.Position position) => LocationFix(
     point: GeoPoint(position.latitude, position.longitude),
     accuracyMeters: position.accuracy,

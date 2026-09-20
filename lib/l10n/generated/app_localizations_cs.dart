@@ -415,4 +415,93 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get settingsArrivalsOff =>
       'Been Here mlčí. Zapnutí si řekne o polohu na pozadí.';
+
+  @override
+  String get settingsMemoryAgeTitle => 'Ozvat se jen u míst starších než';
+
+  @override
+  String settingsMemoryAgeValue(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days dní',
+      few: '$days dny',
+      one: '1 den',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settingsPlaceCooldownTitle => 'Pak to místo nechat mlčet';
+
+  @override
+  String get settingsDailyLimitTitle => 'A neříkat vůbec nic po dobu';
+
+  @override
+  String settingsDailyLimitValue(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: '$hours hodin',
+      few: '$hours hodin',
+      one: '1 hodiny',
+      zero: 'žádnou',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settingsThresholdsBody =>
+      'Sniž je, když si chceš příjezdy vyzkoušet a nečekat půl roku.';
+
+  @override
+  String get placesTestArrival => 'Vyzkoušet příjezd';
+
+  @override
+  String get arrivalTestNotified => 'Notifikace odeslána';
+
+  @override
+  String get arrivalTestMuted => 'Nic: místo je ztlumené';
+
+  @override
+  String get arrivalTestTooFewPhotos => 'Nic: je tu málo fotek';
+
+  @override
+  String get arrivalTestTooRecent => 'Nic: fotil jsi tu nedávno';
+
+  @override
+  String get arrivalTestPlaceCooldown => 'Nic: tohle místo se nedávno ozvalo';
+
+  @override
+  String get arrivalTestDailyLimit => 'Nic: dnes už se appka jednou ozvala';
+
+  @override
+  String get alwaysLocationNeedsSettingsBody =>
+      'Telefon nechal polohu na „Při používání aplikace\". iOS už tuhle volbu z appky znovu nenabídne, takže polohu na pozadí je potřeba přepnout na „Vždy\" v nastavení systému — pak příjezdy začnou fungovat.';
+
+  @override
+  String get commonOpenSettings => 'Otevřít nastavení';
+
+  @override
+  String get settingsArrivalsPending =>
+      'Skoro: poloha je pořád na „Při používání\". V nastavení systému ji přepni na „Vždy\".';
+
+  @override
+  String get placesSortVisits => 'Nejvíc návštěv';
+
+  @override
+  String get placesSortAscending => 'Obrátit pořadí';
+
+  @override
+  String placesVisitCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count návštěv',
+      few: '$count návštěvy',
+      one: '1 návštěva',
+      zero: 'nikdy',
+    );
+    return '$_temp0';
+  }
 }

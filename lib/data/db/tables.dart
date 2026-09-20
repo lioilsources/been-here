@@ -81,6 +81,9 @@ class Places extends Table {
   /// auto-mute rule.
   IntColumn get distinctDays => integer().withDefault(const Constant(0))();
 
+  /// Separate visits, runs of consecutive days counted once.
+  IntColumn get visitCount => integer().withDefault(const Constant(0))();
+
   IntColumn get firstAt => integer()();
 
   IntColumn get lastAt => integer()();

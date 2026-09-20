@@ -23,8 +23,6 @@ class HomeShell extends ConsumerStatefulWidget {
 }
 
 class _HomeShellState extends ConsumerState<HomeShell> {
-  int _index = 0;
-
   @override
   void initState() {
     super.initState();
@@ -44,19 +42,20 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     // at the place it was about and brings that screen forward.
     ref.listen(notificationTapsProvider, (_, next) {
       final placeId = next.value;
-      if (placeId == null) return;
-      unawaited(openPlace(ref, placeId));
-      setState(() => _index = 0);
+      if (placeId != null) unawaited(openPlace(ref, placeId));
     });
+
+    final index = ref.watch(selectedTabProvider);
 
     return Scaffold(
       body: IndexedStack(
-        index: _index,
+        index: index,
         children: const [HereScreen(), PlacesScreen(), SettingsScreen()],
       ),
       bottomNavigationBar: NavigationBar(
-        selectedIndex: _index,
-        onDestinationSelected: (i) => setState(() => _index = i),
+        selectedIndex: index,
+        onDestinationSelected: (i) =>
+            ref.read(selectedTabProvider.notifier).index = i,
         destinations: [
           NavigationDestination(
             icon: const Icon(Icons.access_time_outlined),

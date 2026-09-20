@@ -4,6 +4,7 @@ import 'package:been_here/app/providers.dart';
 import 'package:been_here/core/geo/geo_point.dart';
 import 'package:been_here/core/geo/haversine.dart';
 import 'package:been_here/data/db/database.dart';
+import 'package:been_here/domain/memories/notification_rules.dart';
 import 'package:been_here/domain/memories/relative_age.dart';
 import 'package:been_here/domain/places/mute_state.dart';
 import 'package:been_here/features/common/empty_state.dart';
@@ -80,20 +81,33 @@ class _SortMenu extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final current = ref.watch(placesSortProvider);
 
+    final ascending = ref.watch(placesSortAscendingProvider);
+
     String label(PlacesSort sort) => switch (sort) {
       PlacesSort.longestAgo => l10n.placesSortLongestAgo,
       PlacesSort.mostPhotos => l10n.placesSortMostPhotos,
+      PlacesSort.mostVisits => l10n.placesSortVisits,
       PlacesSort.nearest => l10n.placesSortNearest,
     };
 
-    return PopupMenuButton<PlacesSort>(
+    return PopupMenuButton<void Function()>(
       icon: const Icon(Icons.sort),
       tooltip: l10n.placesSortLabel,
-      initialValue: current,
-      onSelected: (sort) => ref.read(placesSortProvider.notifier).order = sort,
+      onSelected: (action) => action(),
       itemBuilder: (context) => [
         for (final sort in PlacesSort.values)
-          PopupMenuItem(value: sort, child: Text(label(sort))),
+          CheckedPopupMenuItem(
+            value: () => ref.read(placesSortProvider.notifier).order = sort,
+            checked: sort == current,
+            child: Text(label(sort)),
+          ),
+        const PopupMenuDivider(),
+        CheckedPopupMenuItem(
+          value: () =>
+              ref.read(placesSortAscendingProvider.notifier).value = !ascending,
+          checked: ascending,
+          child: Text(l10n.placesSortAscending),
+        ),
       ],
     );
   }
@@ -142,6 +156,9 @@ class _PlaceTile extends ConsumerWidget {
 
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+      // Tapping a place is the obvious thing to do with it: show what you
+      // photographed there.
+      onTap: () => unawaited(openPlace(ref, place.id)),
       leading: Icon(
         place.mute.isMuted ? Icons.notifications_off_outlined : Icons.place,
         color: place.mute.isMuted
@@ -254,6 +271,15 @@ class _PlaceMenu extends ConsumerWidget {
       await run(() => service.rename(place.id, name));
     }
 
+    Future<void> tryArrival() async {
+      final decision = await testArrival(ref, l10n, place.id);
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_arrivalOutcome(l10n, decision))),
+      );
+      ref.invalidate(placesProvider);
+    }
+
     return PopupMenuButton<VoidCallback>(
       icon: const Icon(Icons.more_vert),
       onSelected: (action) => action(),
@@ -280,7 +306,25 @@ class _PlaceMenu extends ConsumerWidget {
                 unawaited(run(() => service.clearUserDecision(place.id))),
             child: Text(l10n.placesUseAutoRule),
           ),
+        PopupMenuItem(
+          value: () => unawaited(tryArrival()),
+          child: Text(l10n.placesTestArrival),
+        ),
       ],
     );
   }
 }
+
+/// What the rules decided, in words.
+///
+/// Saying *why* nothing happened is the whole value of the test action: the
+/// silent cases are the ones that are hard to tell apart from a bug.
+String _arrivalOutcome(AppLocalizations l10n, NotificationDecision decision) =>
+    switch (decision.veto) {
+      null => l10n.arrivalTestNotified,
+      NotificationVeto.muted => l10n.arrivalTestMuted,
+      NotificationVeto.tooFewPhotos => l10n.arrivalTestTooFewPhotos,
+      NotificationVeto.tooRecent => l10n.arrivalTestTooRecent,
+      NotificationVeto.placeCooldown => l10n.arrivalTestPlaceCooldown,
+      NotificationVeto.dailyLimit => l10n.arrivalTestDailyLimit,
+    };

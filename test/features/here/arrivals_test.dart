@@ -46,7 +46,7 @@ void main() {
     child: const BeenHereApp(),
   );
 
-  Future<void> settle(WidgetTester tester, {int frames = 40}) async {
+  Future<void> settle(WidgetTester tester, {int frames = 30}) async {
     for (var i = 0; i < frames; i++) {
       await tester.pump(const Duration(milliseconds: 20));
     }
@@ -148,9 +148,10 @@ void main() {
       expect(geofence.registered.first.placeId, isPositive);
     });
 
-    testWidgets('a refusal leaves the app working and says so', (tester) async {
-      location.permissionAfterAlwaysRequest =
-          LocationPermissionState.whileInUse;
+    testWidgets('a flat refusal leaves the app working and says so', (
+      tester,
+    ) async {
+      location.permissionAfterAlwaysRequest = LocationPermissionState.denied;
 
       await tester.pumpWidget(app());
       await settle(tester, frames: 60);
@@ -162,6 +163,50 @@ void main() {
 
       expect(find.textContaining('arrivals stay quiet'), findsOneWidget);
       expect(geofence.registered, isEmpty);
+    });
+
+    testWidgets('being left on "While Using" points at the system settings', (
+      tester,
+    ) async {
+      // What iOS usually answers: it keeps the lesser grant and will not
+      // raise the prompt again, so an in-app button can never fix it.
+      location.permissionAfterAlwaysRequest =
+          LocationPermissionState.whileInUse;
+
+      await tester.pumpWidget(app());
+      await settle(tester, frames: 60);
+
+      await tester.tap(find.textContaining('notice for you'));
+      await settle(tester);
+      await tester.tap(find.text('Turn on arrivals'));
+      await settle(tester, frames: 40);
+
+      expect(
+        find.textContaining('will not offer the choice again'),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.text('Open settings'));
+      await settle(tester);
+      expect(location.systemSettingsOpened, 1);
+    });
+
+    testWidgets('settings says what is still missing rather than just "off"', (
+      tester,
+    ) async {
+      await tester.pumpWidget(app());
+      await settle(tester, frames: 60);
+
+      await tester.tap(find.byIcon(Icons.settings_outlined));
+      await settle(tester);
+      // The arrivals row sits below the fold in a test-sized window, and a
+      // ListView does not build what it cannot show.
+      await tester.drag(find.byType(ListView), const Offset(0, -400));
+      await settle(tester);
+
+      // The device has while-in-use location, so arrivals are one system
+      // setting away — saying "off" would send the user in circles.
+      expect(find.textContaining('Set it to "Always"'), findsOneWidget);
     });
   });
 

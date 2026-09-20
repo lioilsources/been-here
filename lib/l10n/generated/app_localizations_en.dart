@@ -409,4 +409,91 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsArrivalsOff =>
       'Been Here stays quiet. Turning this on asks for background location.';
+
+  @override
+  String get settingsMemoryAgeTitle => 'Only mention places older than';
+
+  @override
+  String settingsMemoryAgeValue(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days',
+      one: '1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settingsPlaceCooldownTitle => 'Then keep that place quiet for';
+
+  @override
+  String get settingsDailyLimitTitle => 'And say nothing at all for';
+
+  @override
+  String settingsDailyLimitValue(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: '$hours hours',
+      one: '1 hour',
+      zero: 'no time',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settingsThresholdsBody =>
+      'Lower these to try arrivals out without waiting half a year.';
+
+  @override
+  String get placesTestArrival => 'Test an arrival here';
+
+  @override
+  String get arrivalTestNotified => 'Notification sent';
+
+  @override
+  String get arrivalTestMuted => 'Nothing: the place is muted';
+
+  @override
+  String get arrivalTestTooFewPhotos => 'Nothing: too few photos here';
+
+  @override
+  String get arrivalTestTooRecent =>
+      'Nothing: you photographed here too recently';
+
+  @override
+  String get arrivalTestPlaceCooldown => 'Nothing: this place spoke recently';
+
+  @override
+  String get arrivalTestDailyLimit => 'Nothing: something else spoke today';
+
+  @override
+  String get alwaysLocationNeedsSettingsBody =>
+      'Your phone kept location on \"While Using\". iOS will not offer the choice again from inside an app, so background location has to be switched to \"Always\" in the system settings — then arrivals start working.';
+
+  @override
+  String get commonOpenSettings => 'Open settings';
+
+  @override
+  String get settingsArrivalsPending =>
+      'Almost: location is still \"While Using\". Set it to \"Always\" in the system settings.';
+
+  @override
+  String get placesSortVisits => 'Most visits';
+
+  @override
+  String get placesSortAscending => 'Reverse order';
+
+  @override
+  String placesVisitCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count visits',
+      one: '1 visit',
+      zero: 'never',
+    );
+    return '$_temp0';
+  }
 }

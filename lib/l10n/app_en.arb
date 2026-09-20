@@ -256,5 +256,45 @@
   "alwaysLocationDeniedBody": "Background location is off, so arrivals stay quiet. Everything else works as before; you can turn it on in the system settings whenever you like.",
   "settingsArrivalsTitle": "Arrivals",
   "settingsArrivalsOn": "Been Here will tell you when you arrive somewhere you have not photographed in a while.",
-  "settingsArrivalsOff": "Been Here stays quiet. Turning this on asks for background location."
+  "settingsArrivalsOff": "Been Here stays quiet. Turning this on asks for background location.",
+  "settingsMemoryAgeTitle": "Only mention places older than",
+  "settingsMemoryAgeValue": "{days, plural, =1{1 day} other{{days} days}}",
+  "@settingsMemoryAgeValue": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsPlaceCooldownTitle": "Then keep that place quiet for",
+  "settingsDailyLimitTitle": "And say nothing at all for",
+  "settingsDailyLimitValue": "{hours, plural, =0{no time} =1{1 hour} other{{hours} hours}}",
+  "@settingsDailyLimitValue": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsThresholdsBody": "Lower these to try arrivals out without waiting half a year.",
+  "placesTestArrival": "Test an arrival here",
+  "arrivalTestNotified": "Notification sent",
+  "arrivalTestMuted": "Nothing: the place is muted",
+  "arrivalTestTooFewPhotos": "Nothing: too few photos here",
+  "arrivalTestTooRecent": "Nothing: you photographed here too recently",
+  "arrivalTestPlaceCooldown": "Nothing: this place spoke recently",
+  "arrivalTestDailyLimit": "Nothing: something else spoke today",
+  "alwaysLocationNeedsSettingsBody": "Your phone kept location on \"While Using\". iOS will not offer the choice again from inside an app, so background location has to be switched to \"Always\" in the system settings — then arrivals start working.",
+  "commonOpenSettings": "Open settings",
+  "settingsArrivalsPending": "Almost: location is still \"While Using\". Set it to \"Always\" in the system settings.",
+  "placesSortVisits": "Most visits",
+  "placesSortAscending": "Reverse order",
+  "placesVisitCount": "{count, plural, =0{never} =1{1 visit} other{{count} visits}}",
+  "@placesVisitCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

@@ -17,10 +17,13 @@ import 'package:been_here/domain/indexing/library_sync.dart';
 import 'package:been_here/domain/memories/arrival_service.dart';
 import 'package:been_here/domain/memories/memories_service.dart';
 import 'package:been_here/domain/memories/memory.dart';
+import 'package:been_here/domain/memories/notification_rules.dart';
 import 'package:been_here/domain/memories/visit.dart';
 import 'package:been_here/domain/places/place_labels.dart';
 import 'package:been_here/domain/places/places_service.dart';
 import 'package:been_here/domain/settings/app_settings.dart';
+import 'package:been_here/features/notifications/arrival_text.dart';
+import 'package:been_here/l10n/generated/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meta/meta.dart';
 
@@ -272,6 +275,21 @@ class SettingsController extends AsyncNotifier<AppSettings> {
     ref.invalidate(placesProvider);
   }
 
+  Future<void> setMemoryAgeDays(int days) async {
+    await ref.read(settingsStoreProvider).setMemoryAgeDays(days);
+    ref.invalidateSelf();
+  }
+
+  Future<void> setPlaceCooldownDays(int days) async {
+    await ref.read(settingsStoreProvider).setPlaceCooldownDays(days);
+    ref.invalidateSelf();
+  }
+
+  Future<void> setDailyLimitHours(int hours) async {
+    await ref.read(settingsStoreProvider).setDailyLimitHours(hours);
+    ref.invalidateSelf();
+  }
+
   Future<void> setPlaceNames({required bool enabled}) async {
     await ref
         .read(settingsStoreProvider)
@@ -309,7 +327,25 @@ final placesServiceProvider = Provider<PlacesService>((ref) {
   );
 });
 
-enum PlacesSort { longestAgo, mostPhotos, nearest }
+enum PlacesSort { longestAgo, mostPhotos, mostVisits, nearest }
+
+/// Which way round the sort runs.
+///
+/// Every one of these questions has a useful opposite — the place you were
+/// at most recently, the one you have been to once — so the direction is a
+/// switch rather than four more entries in the menu.
+class PlacesSortAscending extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  bool get value => state;
+
+  set value(bool ascending) => state = ascending;
+}
+
+final placesSortAscendingProvider = NotifierProvider<PlacesSortAscending, bool>(
+  PlacesSortAscending.new,
+);
 
 class PlacesSortOrder extends Notifier<PlacesSort> {
   @override
@@ -341,6 +377,8 @@ final placesProvider = FutureProvider<List<PlaceRow>>((ref) async {
       sorted.sort((a, b) => a.lastAt.compareTo(b.lastAt));
     case PlacesSort.mostPhotos:
       sorted.sort((a, b) => b.photoCount.compareTo(a.photoCount));
+    case PlacesSort.mostVisits:
+      sorted.sort((a, b) => b.visitCount.compareTo(a.visitCount));
     case PlacesSort.nearest:
       if (from == null) {
         sorted.sort((a, b) => b.photoCount.compareTo(a.photoCount));
@@ -350,7 +388,10 @@ final placesProvider = FutureProvider<List<PlaceRow>>((ref) async {
         sorted.sort((a, b) => distance(a).compareTo(distance(b)));
       }
   }
-  return sorted;
+
+  return ref.watch(placesSortAscendingProvider)
+      ? sorted.reversed.toList()
+      : sorted;
 });
 
 /// A place's name, asked for only when it is on screen and only if the user
@@ -388,18 +429,61 @@ final geofenceServiceProvider = Provider<GeofenceService>(
   ),
 );
 
+final notificationRulesProvider = Provider<NotificationRules>((ref) {
+  final settings = ref.watch(settingsProvider).value ?? const AppSettings();
+  return settings.notificationRules;
+});
+
 final regionSyncProvider = Provider<RegionSyncService>(
   (ref) => RegionSyncService(
     places: ref.watch(databaseProvider).placesDao,
     geofence: ref.watch(geofenceServiceProvider),
+    rules: ref.watch(notificationRulesProvider),
   ),
 );
+
+/// Runs the whole arrival path for [placeId] as if the system had reported
+/// it, and reports what the rules decided.
+///
+/// Built here rather than held in a provider because it needs the strings,
+/// and the caller is a widget that already has them. The real arrival runs
+/// in a background isolate and builds its own.
+Future<NotificationDecision> testArrival(
+  WidgetRef ref,
+  AppLocalizations l10n,
+  int placeId,
+) {
+  final service = ArrivalService(
+    places: ref.read(databaseProvider).placesDao,
+    notifications: ref.read(notificationServiceProvider),
+    compose: (arrival) => composeArrival(l10n, arrival),
+    rules: ref.read(notificationRulesProvider),
+  );
+  return service.onArrival(placeId);
+}
 
 /// Whether the app can be woken on arrival at all.
 final arrivalsAvailableProvider = FutureProvider<bool>((ref) {
   // Re-read after any permission prompt.
   ref.watch(locationPermissionProvider);
   return ref.watch(geofenceServiceProvider).isAvailable();
+});
+
+/// Three states, not two.
+///
+/// The middle one is the whole point: iOS frequently answers an in-app
+/// request for background location by keeping "While Using" and never
+/// raising the prompt again. Reporting that as simply "off" leaves the user
+/// tapping a button that cannot work, which is exactly what it did.
+enum ArrivalsStatus { on, needsSystemSettings, off }
+
+final arrivalsStatusProvider = FutureProvider<ArrivalsStatus>((ref) async {
+  final permission = await ref.watch(locationPermissionProvider.future);
+  return switch (permission) {
+    LocationPermissionState.always => ArrivalsStatus.on,
+    LocationPermissionState.whileInUse => ArrivalsStatus.needsSystemSettings,
+    _ => ArrivalsStatus.off,
+  };
 });
 
 /// True once the user has actually seen memories.
@@ -454,6 +538,21 @@ Future<void> declineArrivals(WidgetRef ref) async {
   ref.invalidate(shouldOfferArrivalsProvider);
 }
 
+/// Which tab the shell is showing. A provider so that tapping a place, or a
+/// notification, can bring the Here screen forward from anywhere.
+class SelectedTab extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  set index(int value) => state = value;
+
+  int get index => state;
+}
+
+final selectedTabProvider = NotifierProvider<SelectedTab, int>(
+  SelectedTab.new,
+);
+
 /// Opens the Here screen at [placeId], as a notification tap should.
 ///
 /// Reuses the viewpoint override rather than inventing a second way to look
@@ -468,6 +567,7 @@ Future<bool> openPlace(WidgetRef ref, int placeId) async {
     place.centerLng,
   );
   ref.read(searchRadiusProvider.notifier).meters = place.radiusM * 2;
+  ref.read(selectedTabProvider.notifier).index = 0;
   return true;
 }
 

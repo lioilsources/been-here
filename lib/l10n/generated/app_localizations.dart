@@ -679,6 +679,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Been Here stays quiet. Turning this on asks for background location.'**
   String get settingsArrivalsOff;
+
+  /// No description provided for @settingsMemoryAgeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Only mention places older than'**
+  String get settingsMemoryAgeTitle;
+
+  /// No description provided for @settingsMemoryAgeValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, =1{1 day} other{{days} days}}'**
+  String settingsMemoryAgeValue(int days);
+
+  /// No description provided for @settingsPlaceCooldownTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Then keep that place quiet for'**
+  String get settingsPlaceCooldownTitle;
+
+  /// No description provided for @settingsDailyLimitTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'And say nothing at all for'**
+  String get settingsDailyLimitTitle;
+
+  /// No description provided for @settingsDailyLimitValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours, plural, =0{no time} =1{1 hour} other{{hours} hours}}'**
+  String settingsDailyLimitValue(int hours);
+
+  /// No description provided for @settingsThresholdsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Lower these to try arrivals out without waiting half a year.'**
+  String get settingsThresholdsBody;
+
+  /// No description provided for @placesTestArrival.
+  ///
+  /// In en, this message translates to:
+  /// **'Test an arrival here'**
+  String get placesTestArrival;
+
+  /// No description provided for @arrivalTestNotified.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification sent'**
+  String get arrivalTestNotified;
+
+  /// No description provided for @arrivalTestMuted.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing: the place is muted'**
+  String get arrivalTestMuted;
+
+  /// No description provided for @arrivalTestTooFewPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing: too few photos here'**
+  String get arrivalTestTooFewPhotos;
+
+  /// No description provided for @arrivalTestTooRecent.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing: you photographed here too recently'**
+  String get arrivalTestTooRecent;
+
+  /// No description provided for @arrivalTestPlaceCooldown.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing: this place spoke recently'**
+  String get arrivalTestPlaceCooldown;
+
+  /// No description provided for @arrivalTestDailyLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing: something else spoke today'**
+  String get arrivalTestDailyLimit;
+
+  /// No description provided for @alwaysLocationNeedsSettingsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your phone kept location on \"While Using\". iOS will not offer the choice again from inside an app, so background location has to be switched to \"Always\" in the system settings — then arrivals start working.'**
+  String get alwaysLocationNeedsSettingsBody;
+
+  /// No description provided for @commonOpenSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get commonOpenSettings;
+
+  /// No description provided for @settingsArrivalsPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Almost: location is still \"While Using\". Set it to \"Always\" in the system settings.'**
+  String get settingsArrivalsPending;
+
+  /// No description provided for @placesSortVisits.
+  ///
+  /// In en, this message translates to:
+  /// **'Most visits'**
+  String get placesSortVisits;
+
+  /// No description provided for @placesSortAscending.
+  ///
+  /// In en, this message translates to:
+  /// **'Reverse order'**
+  String get placesSortAscending;
+
+  /// No description provided for @placesVisitCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{never} =1{1 visit} other{{count} visits}}'**
+  String placesVisitCount(int count);
 }
 
 class _AppLocalizationsDelegate

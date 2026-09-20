@@ -78,6 +78,18 @@ class $PlacesTable extends Places with TableInfo<$PlacesTable, PlaceRow> {
     requiredDuringInsert: false,
     defaultValue: const Constant(0),
   );
+  static const VerificationMeta _visitCountMeta = const VerificationMeta(
+    'visitCount',
+  );
+  @override
+  late final GeneratedColumn<int> visitCount = GeneratedColumn<int>(
+    'visit_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   static const VerificationMeta _firstAtMeta = const VerificationMeta(
     'firstAt',
   );
@@ -147,6 +159,7 @@ class $PlacesTable extends Places with TableInfo<$PlacesTable, PlaceRow> {
     radiusM,
     photoCount,
     distinctDays,
+    visitCount,
     firstAt,
     lastAt,
     label,
@@ -206,6 +219,12 @@ class $PlacesTable extends Places with TableInfo<$PlacesTable, PlaceRow> {
           data['distinct_days']!,
           _distinctDaysMeta,
         ),
+      );
+    }
+    if (data.containsKey('visit_count')) {
+      context.handle(
+        _visitCountMeta,
+        visitCount.isAcceptableOrUnknown(data['visit_count']!, _visitCountMeta),
       );
     }
     if (data.containsKey('first_at')) {
@@ -278,6 +297,10 @@ class $PlacesTable extends Places with TableInfo<$PlacesTable, PlaceRow> {
         DriftSqlType.int,
         data['${effectivePrefix}distinct_days'],
       )!,
+      visitCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}visit_count'],
+      )!,
       firstAt: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}first_at'],
@@ -326,6 +349,9 @@ class PlaceRow extends DataClass implements Insertable<PlaceRow> {
   /// Number of distinct local calendar days with a photo here. Drives the
   /// auto-mute rule.
   final int distinctDays;
+
+  /// Separate visits, runs of consecutive days counted once.
+  final int visitCount;
   final int firstAt;
   final int lastAt;
 
@@ -348,6 +374,7 @@ class PlaceRow extends DataClass implements Insertable<PlaceRow> {
     required this.radiusM,
     required this.photoCount,
     required this.distinctDays,
+    required this.visitCount,
     required this.firstAt,
     required this.lastAt,
     this.label,
@@ -364,6 +391,7 @@ class PlaceRow extends DataClass implements Insertable<PlaceRow> {
     map['radius_m'] = Variable<double>(radiusM);
     map['photo_count'] = Variable<int>(photoCount);
     map['distinct_days'] = Variable<int>(distinctDays);
+    map['visit_count'] = Variable<int>(visitCount);
     map['first_at'] = Variable<int>(firstAt);
     map['last_at'] = Variable<int>(lastAt);
     if (!nullToAbsent || label != null) {
@@ -389,6 +417,7 @@ class PlaceRow extends DataClass implements Insertable<PlaceRow> {
       radiusM: Value(radiusM),
       photoCount: Value(photoCount),
       distinctDays: Value(distinctDays),
+      visitCount: Value(visitCount),
       firstAt: Value(firstAt),
       lastAt: Value(lastAt),
       label: label == null && nullToAbsent
@@ -416,6 +445,7 @@ class PlaceRow extends DataClass implements Insertable<PlaceRow> {
       radiusM: serializer.fromJson<double>(json['radiusM']),
       photoCount: serializer.fromJson<int>(json['photoCount']),
       distinctDays: serializer.fromJson<int>(json['distinctDays']),
+      visitCount: serializer.fromJson<int>(json['visitCount']),
       firstAt: serializer.fromJson<int>(json['firstAt']),
       lastAt: serializer.fromJson<int>(json['lastAt']),
       label: serializer.fromJson<String?>(json['label']),
@@ -436,6 +466,7 @@ class PlaceRow extends DataClass implements Insertable<PlaceRow> {
       'radiusM': serializer.toJson<double>(radiusM),
       'photoCount': serializer.toJson<int>(photoCount),
       'distinctDays': serializer.toJson<int>(distinctDays),
+      'visitCount': serializer.toJson<int>(visitCount),
       'firstAt': serializer.toJson<int>(firstAt),
       'lastAt': serializer.toJson<int>(lastAt),
       'label': serializer.toJson<String?>(label),
@@ -454,6 +485,7 @@ class PlaceRow extends DataClass implements Insertable<PlaceRow> {
     double? radiusM,
     int? photoCount,
     int? distinctDays,
+    int? visitCount,
     int? firstAt,
     int? lastAt,
     Value<String?> label = const Value.absent(),
@@ -467,6 +499,7 @@ class PlaceRow extends DataClass implements Insertable<PlaceRow> {
     radiusM: radiusM ?? this.radiusM,
     photoCount: photoCount ?? this.photoCount,
     distinctDays: distinctDays ?? this.distinctDays,
+    visitCount: visitCount ?? this.visitCount,
     firstAt: firstAt ?? this.firstAt,
     lastAt: lastAt ?? this.lastAt,
     label: label.present ? label.value : this.label,
@@ -488,6 +521,9 @@ class PlaceRow extends DataClass implements Insertable<PlaceRow> {
       distinctDays: data.distinctDays.present
           ? data.distinctDays.value
           : this.distinctDays,
+      visitCount: data.visitCount.present
+          ? data.visitCount.value
+          : this.visitCount,
       firstAt: data.firstAt.present ? data.firstAt.value : this.firstAt,
       lastAt: data.lastAt.present ? data.lastAt.value : this.lastAt,
       label: data.label.present ? data.label.value : this.label,
@@ -508,6 +544,7 @@ class PlaceRow extends DataClass implements Insertable<PlaceRow> {
           ..write('radiusM: $radiusM, ')
           ..write('photoCount: $photoCount, ')
           ..write('distinctDays: $distinctDays, ')
+          ..write('visitCount: $visitCount, ')
           ..write('firstAt: $firstAt, ')
           ..write('lastAt: $lastAt, ')
           ..write('label: $label, ')
@@ -526,6 +563,7 @@ class PlaceRow extends DataClass implements Insertable<PlaceRow> {
     radiusM,
     photoCount,
     distinctDays,
+    visitCount,
     firstAt,
     lastAt,
     label,
@@ -543,6 +581,7 @@ class PlaceRow extends DataClass implements Insertable<PlaceRow> {
           other.radiusM == this.radiusM &&
           other.photoCount == this.photoCount &&
           other.distinctDays == this.distinctDays &&
+          other.visitCount == this.visitCount &&
           other.firstAt == this.firstAt &&
           other.lastAt == this.lastAt &&
           other.label == this.label &&
@@ -558,6 +597,7 @@ class PlacesCompanion extends UpdateCompanion<PlaceRow> {
   final Value<double> radiusM;
   final Value<int> photoCount;
   final Value<int> distinctDays;
+  final Value<int> visitCount;
   final Value<int> firstAt;
   final Value<int> lastAt;
   final Value<String?> label;
@@ -571,6 +611,7 @@ class PlacesCompanion extends UpdateCompanion<PlaceRow> {
     this.radiusM = const Value.absent(),
     this.photoCount = const Value.absent(),
     this.distinctDays = const Value.absent(),
+    this.visitCount = const Value.absent(),
     this.firstAt = const Value.absent(),
     this.lastAt = const Value.absent(),
     this.label = const Value.absent(),
@@ -585,6 +626,7 @@ class PlacesCompanion extends UpdateCompanion<PlaceRow> {
     required double radiusM,
     this.photoCount = const Value.absent(),
     this.distinctDays = const Value.absent(),
+    this.visitCount = const Value.absent(),
     required int firstAt,
     required int lastAt,
     this.label = const Value.absent(),
@@ -603,6 +645,7 @@ class PlacesCompanion extends UpdateCompanion<PlaceRow> {
     Expression<double>? radiusM,
     Expression<int>? photoCount,
     Expression<int>? distinctDays,
+    Expression<int>? visitCount,
     Expression<int>? firstAt,
     Expression<int>? lastAt,
     Expression<String>? label,
@@ -617,6 +660,7 @@ class PlacesCompanion extends UpdateCompanion<PlaceRow> {
       if (radiusM != null) 'radius_m': radiusM,
       if (photoCount != null) 'photo_count': photoCount,
       if (distinctDays != null) 'distinct_days': distinctDays,
+      if (visitCount != null) 'visit_count': visitCount,
       if (firstAt != null) 'first_at': firstAt,
       if (lastAt != null) 'last_at': lastAt,
       if (label != null) 'label': label,
@@ -633,6 +677,7 @@ class PlacesCompanion extends UpdateCompanion<PlaceRow> {
     Value<double>? radiusM,
     Value<int>? photoCount,
     Value<int>? distinctDays,
+    Value<int>? visitCount,
     Value<int>? firstAt,
     Value<int>? lastAt,
     Value<String?>? label,
@@ -647,6 +692,7 @@ class PlacesCompanion extends UpdateCompanion<PlaceRow> {
       radiusM: radiusM ?? this.radiusM,
       photoCount: photoCount ?? this.photoCount,
       distinctDays: distinctDays ?? this.distinctDays,
+      visitCount: visitCount ?? this.visitCount,
       firstAt: firstAt ?? this.firstAt,
       lastAt: lastAt ?? this.lastAt,
       label: label ?? this.label,
@@ -676,6 +722,9 @@ class PlacesCompanion extends UpdateCompanion<PlaceRow> {
     }
     if (distinctDays.present) {
       map['distinct_days'] = Variable<int>(distinctDays.value);
+    }
+    if (visitCount.present) {
+      map['visit_count'] = Variable<int>(visitCount.value);
     }
     if (firstAt.present) {
       map['first_at'] = Variable<int>(firstAt.value);
@@ -709,6 +758,7 @@ class PlacesCompanion extends UpdateCompanion<PlaceRow> {
           ..write('radiusM: $radiusM, ')
           ..write('photoCount: $photoCount, ')
           ..write('distinctDays: $distinctDays, ')
+          ..write('visitCount: $visitCount, ')
           ..write('firstAt: $firstAt, ')
           ..write('lastAt: $lastAt, ')
           ..write('label: $label, ')
@@ -2734,6 +2784,7 @@ typedef $$PlacesTableCreateCompanionBuilder =
       required double radiusM,
       Value<int> photoCount,
       Value<int> distinctDays,
+      Value<int> visitCount,
       required int firstAt,
       required int lastAt,
       Value<String?> label,
@@ -2749,6 +2800,7 @@ typedef $$PlacesTableUpdateCompanionBuilder =
       Value<double> radiusM,
       Value<int> photoCount,
       Value<int> distinctDays,
+      Value<int> visitCount,
       Value<int> firstAt,
       Value<int> lastAt,
       Value<String?> label,
@@ -2853,6 +2905,11 @@ class $$PlacesTableFilterComposer
 
   ColumnFilters<int> get distinctDays => $composableBuilder(
     column: $table.distinctDays,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get visitCount => $composableBuilder(
+    column: $table.visitCount,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3002,6 +3059,11 @@ class $$PlacesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get visitCount => $composableBuilder(
+    column: $table.visitCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get firstAt => $composableBuilder(
     column: $table.firstAt,
     builder: (column) => ColumnOrderings(column),
@@ -3061,6 +3123,11 @@ class $$PlacesTableAnnotationComposer
 
   GeneratedColumn<int> get distinctDays => $composableBuilder(
     column: $table.distinctDays,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get visitCount => $composableBuilder(
+    column: $table.visitCount,
     builder: (column) => column,
   );
 
@@ -3198,6 +3265,7 @@ class $$PlacesTableTableManager
                 Value<double> radiusM = const Value.absent(),
                 Value<int> photoCount = const Value.absent(),
                 Value<int> distinctDays = const Value.absent(),
+                Value<int> visitCount = const Value.absent(),
                 Value<int> firstAt = const Value.absent(),
                 Value<int> lastAt = const Value.absent(),
                 Value<String?> label = const Value.absent(),
@@ -3211,6 +3279,7 @@ class $$PlacesTableTableManager
                 radiusM: radiusM,
                 photoCount: photoCount,
                 distinctDays: distinctDays,
+                visitCount: visitCount,
                 firstAt: firstAt,
                 lastAt: lastAt,
                 label: label,
@@ -3226,6 +3295,7 @@ class $$PlacesTableTableManager
                 required double radiusM,
                 Value<int> photoCount = const Value.absent(),
                 Value<int> distinctDays = const Value.absent(),
+                Value<int> visitCount = const Value.absent(),
                 required int firstAt,
                 required int lastAt,
                 Value<String?> label = const Value.absent(),
@@ -3239,6 +3309,7 @@ class $$PlacesTableTableManager
                 radiusM: radiusM,
                 photoCount: photoCount,
                 distinctDays: distinctDays,
+                visitCount: visitCount,
                 firstAt: firstAt,
                 lastAt: lastAt,
                 label: label,

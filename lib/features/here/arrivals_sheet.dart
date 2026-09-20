@@ -27,7 +27,9 @@ class ArrivalsSheet extends ConsumerStatefulWidget {
 
 class _ArrivalsSheetState extends ConsumerState<ArrivalsSheet> {
   bool _asking = false;
-  bool _refused = false;
+
+  /// What the system answered, once it has answered.
+  LocationPermissionState? _result;
 
   Future<void> _enable() async {
     setState(() => _asking = true);
@@ -39,6 +41,7 @@ class _ArrivalsSheetState extends ConsumerState<ArrivalsSheet> {
       ref
         ..invalidate(locationPermissionProvider)
         ..invalidate(arrivalsAvailableProvider)
+        ..invalidate(arrivalsStatusProvider)
         ..invalidate(shouldOfferArrivalsProvider);
 
       if (result == LocationPermissionState.always) {
@@ -49,7 +52,7 @@ class _ArrivalsSheetState extends ConsumerState<ArrivalsSheet> {
         if (mounted) Navigator.of(context).pop();
         return;
       }
-      if (mounted) setState(() => _refused = true);
+      if (mounted) setState(() => _result = result);
     } finally {
       if (mounted) setState(() => _asking = false);
     }
@@ -86,15 +89,31 @@ class _ArrivalsSheetState extends ConsumerState<ArrivalsSheet> {
               ),
               const SizedBox(height: 12),
               Text(
-                _refused
-                    ? l10n.alwaysLocationDeniedBody
-                    : l10n.alwaysLocationBody,
+                switch (_result) {
+                  null => l10n.alwaysLocationBody,
+                  // The common iOS answer: kept on "While Using", and the
+                  // prompt will not come back.
+                  LocationPermissionState.whileInUse =>
+                    l10n.alwaysLocationNeedsSettingsBody,
+                  _ => l10n.alwaysLocationDeniedBody,
+                },
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
               const SizedBox(height: 24),
-              if (_refused)
+              if (_result == LocationPermissionState.whileInUse) ...[
+                FilledButton(
+                  onPressed: () => unawaited(
+                    ref.read(locationServiceProvider).openSystemSettings(),
+                  ),
+                  child: Text(l10n.commonOpenSettings),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(l10n.commonClose),
+                ),
+              ] else if (_result != null)
                 FilledButton(
                   onPressed: () => Navigator.of(context).pop(),
                   child: Text(l10n.commonClose),

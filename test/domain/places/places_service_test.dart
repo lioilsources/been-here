@@ -82,6 +82,27 @@ void main() {
       expect(work.mute, MuteState.auto);
     });
 
+    test('counts trips, not days, at the trip places', () async {
+      var checked = 0;
+      for (final trip in fixture.tripPlaces) {
+        final place = await placeNear(trip);
+        if (place == null) continue;
+        checked++;
+        expect(place.visitCount, greaterThan(0));
+        expect(
+          place.visitCount,
+          lessThanOrEqualTo(place.distinctDays),
+          reason: 'a visit cannot span fewer days than itself',
+        );
+      }
+      expect(checked, greaterThan(20));
+    });
+
+    test('home is one long run of visits, not one visit', () async {
+      final home = await placeNear(fixture.home);
+      expect(home!.visitCount, greaterThan(100));
+    });
+
     test('leaves trip places alone', () async {
       var checked = 0;
       for (final trip in fixture.tripPlaces) {
