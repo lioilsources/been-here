@@ -290,6 +290,11 @@ class SettingsController extends AsyncNotifier<AppSettings> {
     ref.invalidateSelf();
   }
 
+  Future<void> setMapEnabled({required bool enabled}) async {
+    await ref.read(settingsStoreProvider).setMapEnabled(enabled: enabled);
+    ref.invalidateSelf();
+  }
+
   Future<void> setPlaceNames({required bool enabled}) async {
     await ref
         .read(settingsStoreProvider)

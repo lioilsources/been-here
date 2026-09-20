@@ -267,5 +267,10 @@
         "type": "int"
       }
     }
-  }
+  },
+  "settingsMapTitle": "Ukazovat místa na mapě",
+  "settingsMapBody": "Dlaždice mapy se při posouvání a přibližování stahují z OpenStreetMap, takže ten server průběžně vidí, kam se díváš. Na rozdíl od názvu místa, na který se appka zeptá jednou, tohle pokračuje celou dobu, co je mapa otevřená. Výchozí stav vypnuto.",
+  "placesShowMap": "Mapa",
+  "placesShowList": "Seznam",
+  "placesMapAttribution": "© přispěvatelé OpenStreetMap"
 }

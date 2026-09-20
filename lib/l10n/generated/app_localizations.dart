@@ -793,6 +793,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =0{never} =1{1 visit} other{{count} visits}}'**
   String placesVisitCount(int count);
+
+  /// No description provided for @settingsMapTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Show places on a map'**
+  String get settingsMapTitle;
+
+  /// No description provided for @settingsMapBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Map tiles are downloaded from OpenStreetMap as you pan and zoom, so that server sees a running account of where you are looking. Unlike a place name, which is asked once, this continues for as long as the map is open. Off by default.'**
+  String get settingsMapBody;
+
+  /// No description provided for @placesShowMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Map'**
+  String get placesShowMap;
+
+  /// No description provided for @placesShowList.
+  ///
+  /// In en, this message translates to:
+  /// **'List'**
+  String get placesShowList;
+
+  /// No description provided for @placesMapAttribution.
+  ///
+  /// In en, this message translates to:
+  /// **'© OpenStreetMap contributors'**
+  String get placesMapAttribution;
 }
 
 class _AppLocalizationsDelegate

@@ -59,6 +59,19 @@ class SettingsScreen extends ConsumerWidget {
           ),
           _AutoMuteSlider(days: settings.autoMuteDays),
 
+          SwitchListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+            title: Text(l10n.settingsMapTitle),
+            subtitle: Text(l10n.settingsMapBody),
+            isThreeLine: true,
+            value: settings.mapEnabled,
+            onChanged: (enabled) => unawaited(
+              ref
+                  .read(settingsProvider.notifier)
+                  .setMapEnabled(enabled: enabled),
+            ),
+          ),
+
           const Divider(height: 32),
           _Section(title: l10n.settingsArrivalsTitle),
           const _ArrivalsRow(),

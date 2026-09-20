@@ -16,9 +16,9 @@ Everything happens on the device.
 - Photos and their GPS coordinates never leave the phone.
 - The app doesn't copy your photos. It keeps an index (asset id + metadata);
   the system photo library stays the source of truth.
-- The one thing that *can* leave the device is a coordinate sent to the
-  system reverse geocoder to name a place. It is off by default and
-  switchable in settings.
+- Two things *can* leave the device, both off by default and both switchable
+  in settings: a coordinate sent to the system geocoder to name a place, and
+  map tiles fetched from OpenStreetMap while a map is open.
 
 ## Status
 

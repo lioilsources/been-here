@@ -116,6 +116,11 @@ Still unchecked:
       turning the setting off removes them again.
 - [ ] A name you type sticks, survives a reindex, and is not removed when
       geocoding is switched off.
+- [ ] Tapping a place opens the Here screen at it, with its photos in view.
+- [ ] Visit counts look right: a week away reads as one visit, not seven.
+- [ ] Sorting, in both directions, puts the places where you expect them.
+- [ ] With the map setting on, pins land where the places are and tapping one
+      opens it. With it off, no tile request is made at all.
 
 ## Phase 4 — Geofence notifications
 

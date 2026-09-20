@@ -180,9 +180,9 @@ void main() {
     // Turn naming on, then off again: the geocoder's answers go, this stays.
     await tester.tap(find.byIcon(Icons.settings_outlined));
     await settle(tester);
-    await tester.tap(find.byType(SwitchListTile));
+    await tester.tap(find.widgetWithText(SwitchListTile, 'Name places'));
     await settle(tester);
-    await tester.tap(find.byType(SwitchListTile));
+    await tester.tap(find.widgetWithText(SwitchListTile, 'Name places'));
     await settle(tester);
 
     await tester.tap(find.byIcon(Icons.place_outlined));
@@ -199,7 +199,7 @@ void main() {
 
     await tester.tap(find.byIcon(Icons.settings_outlined));
     await settle(tester);
-    await tester.tap(find.byType(SwitchListTile));
+    await tester.tap(find.widgetWithText(SwitchListTile, 'Name places'));
     await settle(tester);
 
     await tester.tap(find.byIcon(Icons.place_outlined));
@@ -209,7 +209,7 @@ void main() {
 
     await tester.tap(find.byIcon(Icons.settings_outlined));
     await settle(tester);
-    await tester.tap(find.byType(SwitchListTile));
+    await tester.tap(find.widgetWithText(SwitchListTile, 'Name places'));
     await settle(tester);
 
     expect(

@@ -51,8 +51,9 @@ change rather than a migration plus a full reindex.
 starting with it, and a mixed-language UI is a known App Review rejection
 reason.
 
-**No map in the MVP.** Places is a list. `flutter_map` stays the intended
-choice if a map is added later.
+**The map is opt-in, not absent.** The plan left it out of the MVP; it is in,
+behind a setting that is off by default. See "The map" below for why it isn't
+simply on.
 
 ## Data model
 
@@ -243,3 +244,21 @@ cannot escalate to Always on iOS — its `requestPermission` returns
 immediately once the status is anything but not-determined, so it can never
 turn a while-in-use grant into an always grant. `native_geofence` points at
 the same package for the same reason.
+
+## The map
+
+Places can be shown on an OpenStreetMap map, and the setting for it is off
+until the user turns it on — for the same reason place names are, only more
+so.
+
+Every tile is a request to a tile server, and the sequence of requests is a
+running account of where the user is looking, street by street. A place name
+is one question asked once and then stored; a map keeps asking for as long as
+it is open. In an app whose whole claim is that nothing leaves the device,
+that deserves a switch and a sentence rather than a silent default.
+
+`tile.openstreetmap.org` is used while this is a personal build. The [OSM
+tile usage policy](https://operations.osmfoundation.org/policies/tiles/)
+rules it out for a released app, so shipping the map means either a paid
+tile provider or self-hosting — a decision that can wait until there is
+something to ship.

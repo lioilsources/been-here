@@ -496,4 +496,20 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get settingsMapTitle => 'Show places on a map';
+
+  @override
+  String get settingsMapBody =>
+      'Map tiles are downloaded from OpenStreetMap as you pan and zoom, so that server sees a running account of where you are looking. Unlike a place name, which is asked once, this continues for as long as the map is open. Off by default.';
+
+  @override
+  String get placesShowMap => 'Map';
+
+  @override
+  String get placesShowList => 'List';
+
+  @override
+  String get placesMapAttribution => '© OpenStreetMap contributors';
 }

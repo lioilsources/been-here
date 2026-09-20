@@ -10,7 +10,7 @@ té předchozí.
 |---|---|
 | Název / bundle id | **Been Here** / `com.lioilsources.beenhere`, Dart package `been_here` |
 | Monetizace | Vše zdarma v první verzi. Žádné IAP, žádné feature flagy. |
-| Mapa | V MVP žádná. Místa jsou seznam. `flutter_map` + OSM zůstává volbou, až bude potřeba. |
+| Mapa | **Změněno 2026-09-20:** `flutter_map` + OSM je uvnitř, ale vypnutá ve výchozím stavu a zapínatelná v Nastavení. Dlaždice jsou síťový provoz, který průběžně prozradí, kam se díváš — viz `docs/ARCHITECTURE.md`. |
 | Videa | Neindexovat vůbec. Sloupec `is_video` v schématu zůstává pro budoucnost. |
 | Min OS | iOS 15, Android 8 (API 26) |
 

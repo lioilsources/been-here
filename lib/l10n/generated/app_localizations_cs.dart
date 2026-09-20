@@ -504,4 +504,20 @@ class AppLocalizationsCs extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get settingsMapTitle => 'Ukazovat místa na mapě';
+
+  @override
+  String get settingsMapBody =>
+      'Dlaždice mapy se při posouvání a přibližování stahují z OpenStreetMap, takže ten server průběžně vidí, kam se díváš. Na rozdíl od názvu místa, na který se appka zeptá jednou, tohle pokračuje celou dobu, co je mapa otevřená. Výchozí stav vypnuto.';
+
+  @override
+  String get placesShowMap => 'Mapa';
+
+  @override
+  String get placesShowList => 'Seznam';
+
+  @override
+  String get placesMapAttribution => '© přispěvatelé OpenStreetMap';
 }

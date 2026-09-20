@@ -12,6 +12,7 @@ class AppSettings {
     this.memoryAgeDays = 182,
     this.placeCooldownDays = 30,
     this.dailyLimitHours = 24,
+    this.mapEnabled = false,
   });
 
   /// Distinct days after which a place is muted automatically.
@@ -34,6 +35,14 @@ class AppSettings {
   /// How long the whole app stays quiet after any notification.
   final int dailyLimitHours;
 
+  /// Whether places may be shown on a map.
+  ///
+  /// Off by default for the same reason place names are: map tiles come from
+  /// a server, and the stream of requests is a running account of where you
+  /// are looking, street by street. Unlike a name, which is asked once per
+  /// place, this continues for as long as the map is open.
+  final bool mapEnabled;
+
   /// The thresholds, as the rules want them.
   NotificationRules get notificationRules => NotificationRules(
     minimumAge: Duration(days: memoryAgeDays),
@@ -47,12 +56,14 @@ class AppSettings {
     int? memoryAgeDays,
     int? placeCooldownDays,
     int? dailyLimitHours,
+    bool? mapEnabled,
   }) => AppSettings(
     autoMuteDays: autoMuteDays ?? this.autoMuteDays,
     placeNamesEnabled: placeNamesEnabled ?? this.placeNamesEnabled,
     memoryAgeDays: memoryAgeDays ?? this.memoryAgeDays,
     placeCooldownDays: placeCooldownDays ?? this.placeCooldownDays,
     dailyLimitHours: dailyLimitHours ?? this.dailyLimitHours,
+    mapEnabled: mapEnabled ?? this.mapEnabled,
   );
 
   @override
@@ -62,7 +73,8 @@ class AppSettings {
       other.placeNamesEnabled == placeNamesEnabled &&
       other.memoryAgeDays == memoryAgeDays &&
       other.placeCooldownDays == placeCooldownDays &&
-      other.dailyLimitHours == dailyLimitHours;
+      other.dailyLimitHours == dailyLimitHours &&
+      other.mapEnabled == mapEnabled;
 
   @override
   int get hashCode => Object.hash(
@@ -71,6 +83,7 @@ class AppSettings {
     memoryAgeDays,
     placeCooldownDays,
     dailyLimitHours,
+    mapEnabled,
   );
 
   @override
@@ -89,6 +102,7 @@ class SettingsStore {
   static const String _memoryAge = 'memory_age_days';
   static const String _placeCooldown = 'place_cooldown_days';
   static const String _dailyLimit = 'daily_limit_hours';
+  static const String _map = 'map_enabled';
 
   final PreferencesDao dao;
 
@@ -106,6 +120,7 @@ class SettingsStore {
           defaults.placeCooldownDays,
       dailyLimitHours:
           int.tryParse(values[_dailyLimit] ?? '') ?? defaults.dailyLimitHours,
+      mapEnabled: values[_map] == 'true',
     );
   }
 
@@ -123,4 +138,7 @@ class SettingsStore {
 
   Future<void> setDailyLimitHours(int hours) =>
       dao.write(_dailyLimit, '${hours.clamp(0, 168)}');
+
+  Future<void> setMapEnabled({required bool enabled}) =>
+      dao.write(_map, '$enabled');
 }

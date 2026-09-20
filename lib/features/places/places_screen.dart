@@ -9,23 +9,42 @@ import 'package:been_here/domain/memories/relative_age.dart';
 import 'package:been_here/domain/places/mute_state.dart';
 import 'package:been_here/features/common/empty_state.dart';
 import 'package:been_here/features/common/format.dart';
+import 'package:been_here/features/places/places_map.dart';
 import 'package:been_here/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Everywhere you've been, and which of those you'd rather not hear about.
-class PlacesScreen extends ConsumerWidget {
+class PlacesScreen extends ConsumerStatefulWidget {
   const PlacesScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PlacesScreen> createState() => _PlacesScreenState();
+}
+
+class _PlacesScreenState extends ConsumerState<PlacesScreen> {
+  bool _showMap = false;
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final places = ref.watch(placesProvider);
+    final mapEnabled = ref.watch(settingsProvider).value?.mapEnabled ?? false;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.placesTabLabel),
-        actions: const [_SortMenu()],
+        actions: [
+          if (mapEnabled)
+            TextButton.icon(
+              onPressed: () => setState(() => _showMap = !_showMap),
+              icon: Icon(_showMap ? Icons.list : Icons.map_outlined),
+              label: Text(
+                _showMap ? l10n.placesShowList : l10n.placesShowMap,
+              ),
+            ),
+          const _SortMenu(),
+        ],
       ),
       body: places.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -46,6 +65,8 @@ class PlacesScreen extends ConsumerWidget {
               ),
             );
           }
+
+          if (mapEnabled && _showMap) return PlacesMap(places: all);
 
           final visible = all.where((p) => !p.mute.isMuted).toList();
           final muted = all.where((p) => p.mute.isMuted).toList();
