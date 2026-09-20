@@ -1,0 +1,34 @@
+{
+  "@@locale": "en",
+
+  "appTitle": "Been Here",
+  "@appTitle": {
+    "description": "Application name, shown in the task switcher and about box"
+  },
+
+  "hereTabLabel": "Here",
+  "@hereTabLabel": {
+    "description": "Title of the main screen showing photos around you"
+  },
+
+  "placesTabLabel": "Places",
+  "settingsTabLabel": "Settings",
+
+  "hereEmptyTitle": "You haven't taken photos here",
+  "@hereEmptyTitle": {
+    "description": "Shown on the Here screen when no indexed photo is nearby"
+  },
+
+  "hereEmptyBody": "Widen the search radius, or come back somewhere you've been before.",
+
+  "hereNotIndexedTitle": "Nothing indexed yet",
+  "@hereNotIndexedTitle": {
+    "description": "Shown before the photo library has been scanned"
+  },
+
+  "hereNotIndexedBody": "Been Here needs to read your photo library once to know where you've been. Nothing leaves your phone.",
+
+  "commonLoading": "Loading…",
+  "commonRetry": "Try again",
+  "commonCancel": "Cancel"
+}

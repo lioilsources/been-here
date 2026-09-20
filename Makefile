@@ -1,0 +1,34 @@
+.PHONY: help get gen l10n analyze format test check clean run-ios run-android
+
+help:
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
+		| awk 'BEGIN {FS = ":.*?## "}; {printf "  %-14s %s\n", $$1, $$2}'
+
+get: ## Resolve dependencies
+	flutter pub get
+
+gen: get l10n ## Run all code generation (drift + localizations)
+	dart run build_runner build
+
+l10n: ## Regenerate localizations from the .arb files
+	flutter gen-l10n
+
+analyze: ## Static analysis; any finding fails the build
+	flutter analyze --fatal-infos --fatal-warnings
+
+format: ## Format every Dart file
+	dart format lib test
+
+test: ## Run the test suite
+	flutter test
+
+check: analyze test ## What CI runs
+
+clean:
+	flutter clean
+
+run-ios:
+	flutter run -d iPhone
+
+run-android:
+	flutter run -d android

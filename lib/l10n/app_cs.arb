@@ -1,0 +1,19 @@
+{
+  "@@locale": "cs",
+
+  "appTitle": "Been Here",
+
+  "hereTabLabel": "Tady",
+  "placesTabLabel": "Místa",
+  "settingsTabLabel": "Nastavení",
+
+  "hereEmptyTitle": "Tady jsi ještě nefotil",
+  "hereEmptyBody": "Zkus rozšířit okruh hledání, nebo se vrať někam, kde jsi už byl.",
+
+  "hereNotIndexedTitle": "Zatím nic nezaindexováno",
+  "hereNotIndexedBody": "Been Here si potřebuje jednou projít tvoje fotky, aby věděl, kde jsi byl. Nic neopustí telefon.",
+
+  "commonLoading": "Načítám…",
+  "commonRetry": "Zkusit znovu",
+  "commonCancel": "Zrušit"
+}

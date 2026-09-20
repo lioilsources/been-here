@@ -1,0 +1,20 @@
+include: package:very_good_analysis/analysis_options.10.3.0.yaml
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "lib/l10n/generated/**"
+  errors:
+    # Generated drift/l10n code is excluded above; everything else must be clean.
+    todo: ignore
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+
+linter:
+  rules:
+    # very_good_analysis targets published packages. Been Here is an application,
+    # so documenting every public member adds noise without a consumer.
+    public_member_api_docs: false

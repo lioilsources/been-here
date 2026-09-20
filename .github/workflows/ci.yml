@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      - name: Verify generated code is current
+        run: |
+          dart run build_runner build
+          flutter gen-l10n
+          git diff --exit-code -- lib
+
+      - run: dart format --output=none --set-exit-if-changed lib test
+
+      - run: flutter analyze --fatal-infos --fatal-warnings
+
+      - run: flutter test

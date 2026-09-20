@@ -1,0 +1,41 @@
+name: been_here
+description: "Been Here — your photos from the place you just arrived at. Everything stays on device."
+publish_to: 'none'
+
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  collection: ^1.19.0
+  cupertino_icons: ^1.0.8
+
+  # Local index (SQLite)
+  drift: ^2.35.0
+  drift_flutter: ^0.3.1
+
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State management
+  flutter_riverpod: ^3.4.3
+
+  intl: any
+
+  # Used directly by core/, which must not import Flutter.
+  meta: ^1.15.0
+
+dev_dependencies:
+  build_runner: ^2.4.13
+  drift_dev: ^2.35.0
+  flutter_test:
+    sdk: flutter
+  # 11.x requires Dart >=3.13; this project targets the current stable (3.12.2).
+  very_good_analysis: ^10.3.0
+
+flutter:
+  uses-material-design: true
+  generate: true
