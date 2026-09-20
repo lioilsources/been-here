@@ -119,17 +119,20 @@ indexace. Logika výběru = čistá funkce v `domain/`, testovaná.
       navíc)
 - [x] Appka naběhne na iOS simulátoru s prázdnou Here obrazovkou, testy běží
 
-### Fáze 1: Indexace
+### Fáze 1: Indexace — hotovo (kromě běhu na reálném telefonu)
 
-- `PhotoLibrary` nad `photo_manager`: stránkovaný průchod, čtení lat/lng + data
-- `IndexerService`: full scan v dávkách (neblokuje UI, průběžný progress
-  stream), idempotentní, přerušitelný a navazující
-- Inkrementální sync: change notifikace knihovny + kontrola při startu
-- iOS limited access: detekuj a vysvětli; funguj i s omezeným výběrem
-- Android: `ACCESS_MEDIA_LOCATION`
-- **Hotovo když:** full scan 50k fixtures projde testem; na reálném zařízení se
-  zaindexuje knihovna a progress je vidět; opakované spuštění nic neduplikuje;
-  smazaná fotka zmizí z indexu
+- [x] `PhotoLibrary` nad `photo_manager`: stránkovaný průchod, čtení lat/lng
+- [x] `IndexerService`: full scan v dávkách (neblokuje UI, průběžný progress
+      stream), idempotentní, přerušitelný a navazující
+- [x] Inkrementální sync: change notifikace knihovny + pass při startu
+- [x] iOS limited access: detekováno a vysvětleno, appka funguje dál
+- [x] Android: `ACCESS_MEDIA_LOCATION` v manifestu a v žádosti o oprávnění
+- [x] Full scan 50k fixtures projde testem; opakované spuštění nic
+      neduplikuje; smazaná fotka zmizí z indexu
+- [x] Na simulátoru se zaindexuje reálná knihovna přes PhotoKit
+      (`integration_test/`, 12 fotek, 83 % s polohou)
+- [ ] **Zbývá tobě:** běh na reálném telefonu s velkou knihovnou — progress,
+      resume po backgroundu, iCloud offload. Viz `docs/QA.md`.
 
 ### Fáze 2: Obrazovka Tady
 

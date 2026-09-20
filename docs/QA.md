@@ -17,20 +17,49 @@ _Tested 2026-09-20 on: iPhone 17 Pro simulator, iOS 26, Flutter 3.44.4._
 
 ## Phase 1 — indexing
 
-- [ ] First launch asks for photo access with a text that explains why.
-- [ ] Full scan of a real library shows visible progress and doesn't freeze
+There is an on-device test for the part only a real library can prove:
+
+```sh
+make integration DEVICE=<device id>
+```
+
+It taps through the permission prompt, waits for the pass to finish and
+asserts that photos were indexed and that at least some kept their
+coordinates. Grant photo access before running it, otherwise the system
+dialog blocks the test harness:
+
+```sh
+xcrun simctl privacy <device> grant photos com.lioilsources.beenhere
+```
+
+Verified on the iPhone 17 Pro simulator (iOS 26), seeded with six generated
+JPEGs (five with GPS EXIF, one without) plus the stock sample photos:
+
+- [x] The app shows its own explanation first; the system dialog appears only
+      after the user asks for it. (Regression: `currentPermission()` must use
+      PhotoKit's non-prompting status call.)
+- [x] The permission prompt carries the Info.plist text, and it reads like a
+      reason rather than a demand.
+- [x] A pass over the real library indexes it — 12 photos, 83 % of them with
+      a location, matching the seeded files.
+- [x] Photos without GPS are indexed too, with no coordinates.
+
+Still needs a real phone and a real library:
+
+- [ ] Full scan of a large library shows visible progress and doesn't freeze
       the UI while it runs.
 - [ ] Scan survives backgrounding the app and resumes where it stopped.
-- [ ] Running the scan twice does not duplicate anything (check the count in
-      settings).
+- [ ] Running the scan twice does not duplicate anything. (Covered by unit
+      tests against the fake; unverified on PhotoKit.)
 - [ ] Deleting a photo in Photos.app removes it from the index after the next
       sync.
 - [ ] iOS "Selected Photos": the app works with the limited set and explains
       what it can't see.
 - [ ] Android: photos keep their GPS (`ACCESS_MEDIA_LOCATION` granted). Verify
-      against a photo you know has coordinates.
-- [ ] Settings shows the "X % of photos have a location" statistic and it is
-      plausible.
+      against a photo you know has coordinates. Nothing Android has been run
+      on hardware yet.
+- [ ] The "X % of photos have a location" statistic is plausible for a real
+      library. (Moves into Settings in phase 6.)
 
 ## Phase 2 — Here
 

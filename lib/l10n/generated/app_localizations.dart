@@ -146,6 +146,84 @@ abstract class AppLocalizations {
   /// **'Been Here needs to read your photo library once to know where you\'ve been. Nothing leaves your phone.'**
   String get hereNotIndexedBody;
 
+  /// No description provided for @indexStartAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Index my photos'**
+  String get indexStartAction;
+
+  /// Shown when the app has no access to the photo library yet
+  ///
+  /// In en, this message translates to:
+  /// **'Been Here needs your photos'**
+  String get indexPermissionTitle;
+
+  /// No description provided for @indexPermissionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'It reads only where and when each photo was taken, and keeps that on this phone.'**
+  String get indexPermissionBody;
+
+  /// No description provided for @indexPermissionAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow access'**
+  String get indexPermissionAction;
+
+  /// No description provided for @indexPermissionDeniedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo access is off'**
+  String get indexPermissionDeniedTitle;
+
+  /// No description provided for @indexPermissionDeniedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Been Here can\'t show you anything without it. You can turn it on in the system settings.'**
+  String get indexPermissionDeniedBody;
+
+  /// iOS limited photo access explainer. Informational, never nagging.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve shared only selected photos, so Been Here can only see those. Allowing full access lets it find every place you\'ve been.'**
+  String get indexLimitedAccessNotice;
+
+  /// No description provided for @indexRunningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading your photo library'**
+  String get indexRunningTitle;
+
+  /// Indexing progress counter
+  ///
+  /// In en, this message translates to:
+  /// **'{processed} of {total}'**
+  String indexRunningProgress(int processed, int total);
+
+  /// No description provided for @indexFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Indexing stopped'**
+  String get indexFailedTitle;
+
+  /// No description provided for @indexFailedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong part way through. Trying again carries on from where it stopped.'**
+  String get indexFailedBody;
+
+  /// No description provided for @indexedPhotoCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No photos indexed} =1{1 photo indexed} other{{count} photos indexed}}'**
+  String indexedPhotoCount(int count);
+
+  /// How many indexed photos carry GPS coordinates
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% of them have a location'**
+  String indexedLocationCoverage(int percent);
+
   /// No description provided for @commonLoading.
   ///
   /// In en, this message translates to:

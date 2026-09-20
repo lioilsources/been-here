@@ -1,4 +1,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Reading the photo library. On API 33+ images have their own
+         permission; below that they sit behind external storage. -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32"/>
+
+    <!-- Without this, Android 10+ strips GPS out of every photo it hands us
+         and the whole app has nothing to work with. -->
+    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION"/>
+
     <application
         android:label="Been Here"
         android:name="${applicationName}"

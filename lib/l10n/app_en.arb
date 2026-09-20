@@ -28,6 +28,52 @@
 
   "hereNotIndexedBody": "Been Here needs to read your photo library once to know where you've been. Nothing leaves your phone.",
 
+  "indexStartAction": "Index my photos",
+
+  "indexPermissionTitle": "Been Here needs your photos",
+  "@indexPermissionTitle": {
+    "description": "Shown when the app has no access to the photo library yet"
+  },
+
+  "indexPermissionBody": "It reads only where and when each photo was taken, and keeps that on this phone.",
+  "indexPermissionAction": "Allow access",
+
+  "indexPermissionDeniedTitle": "Photo access is off",
+  "indexPermissionDeniedBody": "Been Here can't show you anything without it. You can turn it on in the system settings.",
+
+  "indexLimitedAccessNotice": "You've shared only selected photos, so Been Here can only see those. Allowing full access lets it find every place you've been.",
+  "@indexLimitedAccessNotice": {
+    "description": "iOS limited photo access explainer. Informational, never nagging."
+  },
+
+  "indexRunningTitle": "Reading your photo library",
+  "indexRunningProgress": "{processed} of {total}",
+  "@indexRunningProgress": {
+    "description": "Indexing progress counter",
+    "placeholders": {
+      "processed": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+
+  "indexFailedTitle": "Indexing stopped",
+  "indexFailedBody": "Something went wrong part way through. Trying again carries on from where it stopped.",
+
+  "indexedPhotoCount": "{count, plural, =0{No photos indexed} =1{1 photo indexed} other{{count} photos indexed}}",
+  "@indexedPhotoCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "indexedLocationCoverage": "{percent}% of them have a location",
+  "@indexedLocationCoverage": {
+    "description": "How many indexed photos carry GPS coordinates",
+    "placeholders": {
+      "percent": { "type": "int" }
+    }
+  },
+
   "commonLoading": "Loading…",
   "commonRetry": "Try again",
   "commonCancel": "Cancel"

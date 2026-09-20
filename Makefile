@@ -22,7 +22,11 @@ format: ## Format every Dart file
 test: ## Run the test suite
 	flutter test
 
-check: analyze test ## What CI runs
+integration: ## On-device test against the real photo library: make integration DEVICE=<id>
+	@test -n "$(DEVICE)" || (echo "DEVICE=<device id> required; see flutter devices" && exit 1)
+	flutter test integration_test -d $(DEVICE)
+
+check: analyze test ## What CI runs (integration needs a device, so not here)
 
 clean:
 	flutter clean

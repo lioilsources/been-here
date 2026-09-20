@@ -99,6 +99,20 @@ class Rephotos extends Table {
   IntColumn get createdAt => integer()();
 }
 
+/// Every asset id the library reported during the indexing pass in flight.
+///
+/// Lives in the database rather than in a Dart `Set` for two reasons: a
+/// 200k-photo library would cost tens of megabytes of strings, and the pass
+/// has to survive the app being killed half-way so that "which rows did the
+/// library stop reporting" stays answerable on resume.
+@DataClassName('ScanSeenRow')
+class ScanSeen extends Table {
+  TextColumn get assetId => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {assetId};
+}
+
 /// Key/value scratch space for the indexer: last full scan, last sync,
 /// library change token, scan cursor.
 @DataClassName('IndexStateRow')

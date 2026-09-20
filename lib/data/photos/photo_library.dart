@@ -74,10 +74,14 @@ enum PhotoPermission {
 /// because the product does not index them, and paging past them on a large
 /// library is pure cost.
 abstract interface class PhotoLibrary {
-  /// Current permission without prompting.
+  /// Current permission.
+  ///
+  /// Must never put a system dialog on screen: the app explains itself first
+  /// and prompts second, and a dialog raised behind that explanation is the
+  /// fastest route to a permanent "Don't Allow".
   Future<PhotoPermission> currentPermission();
 
-  /// Prompts if the system still allows it.
+  /// Prompts, if the system still allows it to be asked.
   Future<PhotoPermission> requestPermission();
 
   /// Number of readable image assets.
@@ -89,6 +93,16 @@ abstract interface class PhotoLibrary {
   /// The order must be stable across calls so an interrupted scan can resume
   /// from an offset.
   Future<List<PhotoAsset>> page({required int offset, required int limit});
+
+  /// Location of a single asset, read the expensive way.
+  ///
+  /// On Android 10+ the coordinates are stripped from the media store and
+  /// only EXIF (via `ACCESS_MEDIA_LOCATION`) has them, which costs a file
+  /// read per asset. On iOS the value from [page] is already authoritative
+  /// and this is only a fallback.
+  ///
+  /// Call it only for assets actually being written to the index.
+  Future<GeoPoint?> resolveLocation(String assetId);
 
   /// Fires when the library changes (asset added, edited or removed).
   Stream<void> get changes;

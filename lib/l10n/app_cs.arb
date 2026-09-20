@@ -13,6 +13,43 @@
   "hereNotIndexedTitle": "Zatím nic nezaindexováno",
   "hereNotIndexedBody": "Been Here si potřebuje jednou projít tvoje fotky, aby věděl, kde jsi byl. Nic neopustí telefon.",
 
+  "indexStartAction": "Projít moje fotky",
+
+  "indexPermissionTitle": "Been Here potřebuje tvoje fotky",
+  "indexPermissionBody": "Čte z nich jen to, kde a kdy vznikly, a nechává si to v tomhle telefonu.",
+  "indexPermissionAction": "Povolit přístup",
+
+  "indexPermissionDeniedTitle": "Přístup k fotkám je vypnutý",
+  "indexPermissionDeniedBody": "Bez něj ti Been Here nemá co ukázat. Zapnout ho jde v nastavení systému.",
+
+  "indexLimitedAccessNotice": "Sdílíš jen vybrané fotky, takže Been Here vidí jenom je. S plným přístupem najde všechna místa, kde jsi byl.",
+
+  "indexRunningTitle": "Procházím tvoje fotky",
+  "indexRunningProgress": "{processed} z {total}",
+  "@indexRunningProgress": {
+    "placeholders": {
+      "processed": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+
+  "indexFailedTitle": "Indexace se zastavila",
+  "indexFailedBody": "Něco se cestou pokazilo. Další pokus naváže tam, kde skončil.",
+
+  "indexedPhotoCount": "{count, plural, =0{Žádné zaindexované fotky} =1{1 zaindexovaná fotka} few{{count} zaindexované fotky} other{{count} zaindexovaných fotek}}",
+  "@indexedPhotoCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "indexedLocationCoverage": "{percent} % z nich má polohu",
+  "@indexedLocationCoverage": {
+    "placeholders": {
+      "percent": { "type": "int" }
+    }
+  },
+
   "commonLoading": "Načítám…",
   "commonRetry": "Zkusit znovu",
   "commonCancel": "Zrušit"

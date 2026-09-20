@@ -1857,6 +1857,168 @@ class IndexStateCompanion extends UpdateCompanion<IndexStateRow> {
   }
 }
 
+class $ScanSeenTable extends ScanSeen
+    with TableInfo<$ScanSeenTable, ScanSeenRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ScanSeenTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _assetIdMeta = const VerificationMeta(
+    'assetId',
+  );
+  @override
+  late final GeneratedColumn<String> assetId = GeneratedColumn<String>(
+    'asset_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [assetId];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'scan_seen';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ScanSeenRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('asset_id')) {
+      context.handle(
+        _assetIdMeta,
+        assetId.isAcceptableOrUnknown(data['asset_id']!, _assetIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_assetIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {assetId};
+  @override
+  ScanSeenRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ScanSeenRow(
+      assetId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}asset_id'],
+      )!,
+    );
+  }
+
+  @override
+  $ScanSeenTable createAlias(String alias) {
+    return $ScanSeenTable(attachedDatabase, alias);
+  }
+}
+
+class ScanSeenRow extends DataClass implements Insertable<ScanSeenRow> {
+  final String assetId;
+  const ScanSeenRow({required this.assetId});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['asset_id'] = Variable<String>(assetId);
+    return map;
+  }
+
+  ScanSeenCompanion toCompanion(bool nullToAbsent) {
+    return ScanSeenCompanion(assetId: Value(assetId));
+  }
+
+  factory ScanSeenRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ScanSeenRow(assetId: serializer.fromJson<String>(json['assetId']));
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{'assetId': serializer.toJson<String>(assetId)};
+  }
+
+  ScanSeenRow copyWith({String? assetId}) =>
+      ScanSeenRow(assetId: assetId ?? this.assetId);
+  ScanSeenRow copyWithCompanion(ScanSeenCompanion data) {
+    return ScanSeenRow(
+      assetId: data.assetId.present ? data.assetId.value : this.assetId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ScanSeenRow(')
+          ..write('assetId: $assetId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => assetId.hashCode;
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ScanSeenRow && other.assetId == this.assetId);
+}
+
+class ScanSeenCompanion extends UpdateCompanion<ScanSeenRow> {
+  final Value<String> assetId;
+  final Value<int> rowid;
+  const ScanSeenCompanion({
+    this.assetId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ScanSeenCompanion.insert({
+    required String assetId,
+    this.rowid = const Value.absent(),
+  }) : assetId = Value(assetId);
+  static Insertable<ScanSeenRow> custom({
+    Expression<String>? assetId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (assetId != null) 'asset_id': assetId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ScanSeenCompanion copyWith({Value<String>? assetId, Value<int>? rowid}) {
+    return ScanSeenCompanion(
+      assetId: assetId ?? this.assetId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (assetId.present) {
+      map['asset_id'] = Variable<String>(assetId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ScanSeenCompanion(')
+          ..write('assetId: $assetId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1864,6 +2026,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $PhotosTable photos = $PhotosTable(this);
   late final $RephotosTable rephotos = $RephotosTable(this);
   late final $IndexStateTable indexState = $IndexStateTable(this);
+  late final $ScanSeenTable scanSeen = $ScanSeenTable(this);
   late final Index photosLat = Index(
     'photos_lat',
     'CREATE INDEX photos_lat ON photos (lat)',
@@ -1892,6 +2055,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'rephotos_original',
     'CREATE INDEX rephotos_original ON rephotos (original_asset_id)',
   );
+  late final PhotosDao photosDao = PhotosDao(this as AppDatabase);
+  late final IndexStateDao indexStateDao = IndexStateDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1901,6 +2066,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     photos,
     rephotos,
     indexState,
+    scanSeen,
     photosLat,
     photosLng,
     photosGeohash,
@@ -3299,6 +3465,124 @@ typedef $$IndexStateTableProcessedTableManager =
       IndexStateRow,
       PrefetchHooks Function()
     >;
+typedef $$ScanSeenTableCreateCompanionBuilder =
+    ScanSeenCompanion Function({required String assetId, Value<int> rowid});
+typedef $$ScanSeenTableUpdateCompanionBuilder =
+    ScanSeenCompanion Function({Value<String> assetId, Value<int> rowid});
+
+class $$ScanSeenTableFilterComposer
+    extends Composer<_$AppDatabase, $ScanSeenTable> {
+  $$ScanSeenTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get assetId => $composableBuilder(
+    column: $table.assetId,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ScanSeenTableOrderingComposer
+    extends Composer<_$AppDatabase, $ScanSeenTable> {
+  $$ScanSeenTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get assetId => $composableBuilder(
+    column: $table.assetId,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ScanSeenTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ScanSeenTable> {
+  $$ScanSeenTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get assetId =>
+      $composableBuilder(column: $table.assetId, builder: (column) => column);
+}
+
+class $$ScanSeenTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ScanSeenTable,
+          ScanSeenRow,
+          $$ScanSeenTableFilterComposer,
+          $$ScanSeenTableOrderingComposer,
+          $$ScanSeenTableAnnotationComposer,
+          $$ScanSeenTableCreateCompanionBuilder,
+          $$ScanSeenTableUpdateCompanionBuilder,
+          (
+            ScanSeenRow,
+            BaseReferences<_$AppDatabase, $ScanSeenTable, ScanSeenRow>,
+          ),
+          ScanSeenRow,
+          PrefetchHooks Function()
+        > {
+  $$ScanSeenTableTableManager(_$AppDatabase db, $ScanSeenTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ScanSeenTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ScanSeenTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ScanSeenTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> assetId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ScanSeenCompanion(assetId: assetId, rowid: rowid),
+          createCompanionCallback:
+              ({
+                required String assetId,
+                Value<int> rowid = const Value.absent(),
+              }) => ScanSeenCompanion.insert(assetId: assetId, rowid: rowid),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ScanSeenTable, ScanSeenRow>(table),
+                  BaseReferences<_$AppDatabase, $ScanSeenTable, ScanSeenRow>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ScanSeenTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ScanSeenTable,
+      ScanSeenRow,
+      $$ScanSeenTableFilterComposer,
+      $$ScanSeenTableOrderingComposer,
+      $$ScanSeenTableAnnotationComposer,
+      $$ScanSeenTableCreateCompanionBuilder,
+      $$ScanSeenTableUpdateCompanionBuilder,
+      (ScanSeenRow, BaseReferences<_$AppDatabase, $ScanSeenTable, ScanSeenRow>),
+      ScanSeenRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3311,4 +3595,6 @@ class $AppDatabaseManager {
       $$RephotosTableTableManager(_db, _db.rephotos);
   $$IndexStateTableTableManager get indexState =>
       $$IndexStateTableTableManager(_db, _db.indexState);
+  $$ScanSeenTableTableManager get scanSeen =>
+      $$ScanSeenTableTableManager(_db, _db.scanSeen);
 }

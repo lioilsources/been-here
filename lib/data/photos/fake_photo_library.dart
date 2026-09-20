@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:been_here/core/geo/geo_point.dart';
 import 'package:been_here/data/photos/photo_library.dart';
 
 /// In-memory [PhotoLibrary] for tests, benchmarks and the simulator.
@@ -15,6 +16,7 @@ class FakePhotoLibrary implements PhotoLibrary {
     this.permission = PhotoPermission.authorized,
     this.permissionAfterRequest,
     this.pageDelay,
+    this.locationsOnlyViaResolve = false,
   }) : _assets = [...assets];
 
   final List<PhotoAsset> _assets;
@@ -35,6 +37,14 @@ class FakePhotoLibrary implements PhotoLibrary {
 
   /// Number of [page] calls served, for asserting batching behaviour.
   int pageCalls = 0;
+
+  /// Number of [resolveLocation] calls, so a test can prove the expensive
+  /// path is not taken for assets that are already indexed.
+  int resolveLocationCalls = 0;
+
+  /// Simulates Android 10+, where listing gives no coordinates at all and
+  /// only the per-asset EXIF read has them.
+  final bool locationsOnlyViaResolve;
 
   List<PhotoAsset>? _sortedImages;
 
@@ -89,7 +99,27 @@ class FakePhotoLibrary implements PhotoLibrary {
     final images = _images;
     if (offset >= images.length) return const [];
     final end = (offset + limit).clamp(0, images.length);
-    return images.sublist(offset, end);
+    final slice = images.sublist(offset, end);
+    if (!locationsOnlyViaResolve) return slice;
+    return [
+      for (final a in slice)
+        PhotoAsset(
+          id: a.id,
+          takenAt: a.takenAt,
+          width: a.width,
+          height: a.height,
+          isVideo: a.isVideo,
+        ),
+    ];
+  }
+
+  @override
+  Future<GeoPoint?> resolveLocation(String assetId) async {
+    resolveLocationCalls++;
+    for (final asset in _assets) {
+      if (asset.id == assetId) return asset.point;
+    }
+    return null;
   }
 
   @override

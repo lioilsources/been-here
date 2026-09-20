@@ -1,3 +1,5 @@
+import 'package:been_here/data/db/daos/index_state_dao.dart';
+import 'package:been_here/data/db/daos/photos_dao.dart';
 import 'package:been_here/data/db/tables.dart';
 // Used by the generated part file for the `mute` text enum column.
 import 'package:been_here/domain/places/mute_state.dart';
@@ -6,7 +8,10 @@ import 'package:drift_flutter/drift_flutter.dart';
 
 part 'database.g.dart';
 
-@DriftDatabase(tables: [Photos, Places, Rephotos, IndexState])
+@DriftDatabase(
+  tables: [Photos, Places, Rephotos, IndexState, ScanSeen],
+  daos: [PhotosDao, IndexStateDao],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(driftDatabase(name: 'been_here'));
 

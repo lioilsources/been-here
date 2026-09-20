@@ -68,6 +68,35 @@ See `lib/data/db/tables.dart`. Notes that aren't obvious from the schema:
   calendar days are computed at query time, because "which day was this" is a
   question about the viewer's timezone, not the row's.
 
+## Indexing
+
+One algorithm covers the first full scan, every later sync, and deletion
+detection. `IndexerService` walks the library oldest-first, inserts what the
+index doesn't have, records every id it saw, and finally drops indexed rows
+the library stopped reporting.
+
+- **Idempotent** because `asset_id` is the primary key and known ids are
+  skipped outright — a second pass inserts nothing.
+- **Resumable** because the offset is persisted after every batch and the
+  seen-ids live in the `scan_seen` table, not in a Dart `Set`. An interrupted
+  pass continues; it doesn't start over. A pass only resumes if the library is
+  still the same size, otherwise the offsets are meaningless and it restarts.
+- **Cheap where it counts.** On Android 10+ the media store returns no
+  coordinates at all, so the only source is EXIF — a file read per asset.
+  `PhotoLibrary.resolveLocation` is that read, and the indexer calls it only
+  for assets it is actually inserting. Re-syncing a 50k library costs zero
+  EXIF reads.
+
+Ordering is oldest-first on purpose: new photos then land at the end and leave
+earlier offsets untouched. If the library *shrinks* mid-pass the offsets do
+shift and a few assets can be skipped — they get dropped and re-added by the
+next pass, which is why the next pass is cheap.
+
+Photos edited in the system library are not re-read. Insertion is
+`INSERT OR IGNORE`, never `OR REPLACE`, because an existing row may already
+carry a `place_id` from clustering and re-indexing must not throw that away.
+Out of MVP scope, as the plan has it.
+
 ## The "here" query
 
 Bounding box over the `lat`/`lng` indexes, then an exact haversine pass in
