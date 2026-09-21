@@ -620,4 +620,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hereOpenInMaps => 'Open in Maps';
+
+  @override
+  String get hereBackToMe => 'Back to where I am';
+
+  @override
+  String get herePlaceFallbackTitle => 'A place you know';
 }

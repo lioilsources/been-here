@@ -289,6 +289,39 @@ void main() {
     );
     expect(container.read(selectedTabProvider), 0);
     expect(container.read(viewpointProvider), isNotNull);
+    // And the screen knows which place it is looking at, not just where.
+    expect(container.read(viewedPlaceProvider), isNotNull);
+  });
+
+  testWidgets('the place detail says which place, and offers the way back', (
+    tester,
+  ) async {
+    await openPlaces(tester);
+    await tester.tap(find.byType(ListTile).first);
+    await settle(tester);
+
+    // Without a name from the geocoder the title still says what the screen
+    // is: a place, not the phone's own position.
+    expect(
+      find.descendant(
+        of: find.byType(AppBar),
+        matching: find.text('A place you know'),
+      ),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byTooltip('Back to where I am'));
+    await settle(tester);
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(Scaffold).first),
+    );
+    expect(container.read(viewpointProvider), isNull);
+    expect(container.read(viewedPlaceProvider), isNull);
+    expect(
+      find.descendant(of: find.byType(AppBar), matching: find.text('Here')),
+      findsOneWidget,
+    );
   });
 
   testWidgets('an empty library has no places', (tester) async {

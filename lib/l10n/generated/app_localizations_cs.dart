@@ -628,4 +628,10 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get hereOpenInMaps => 'Otevřít v Mapách';
+
+  @override
+  String get hereBackToMe => 'Zpátky ke mně';
+
+  @override
+  String get herePlaceFallbackTitle => 'Místo, které znáš';
 }

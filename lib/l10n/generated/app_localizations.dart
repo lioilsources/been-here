@@ -1015,6 +1015,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open in Maps'**
   String get hereOpenInMaps;
+
+  /// No description provided for @hereBackToMe.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to where I am'**
+  String get hereBackToMe;
+
+  /// No description provided for @herePlaceFallbackTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A place you know'**
+  String get herePlaceFallbackTitle;
 }
 
 class _AppLocalizationsDelegate

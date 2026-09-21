@@ -141,6 +141,24 @@ final viewpointProvider = NotifierProvider<Viewpoint, GeoPoint?>(
   Viewpoint.new,
 );
 
+/// The place the Here screen is looking at, when it got there by opening one.
+///
+/// Separate from [viewpointProvider] because the two overrides mean
+/// different things on screen: a place has a name and a way back, a debug
+/// coordinate has neither and should keep saying it is a debug coordinate.
+class ViewedPlace extends Notifier<int?> {
+  @override
+  int? build() => null;
+
+  int? get id => state;
+
+  set id(int? value) => state = value;
+}
+
+final viewedPlaceProvider = NotifierProvider<ViewedPlace, int?>(
+  ViewedPlace.new,
+);
+
 /// Where the Here screen is looking: the override if there is one, otherwise
 /// the device's own fix.
 final currentLocationProvider = FutureProvider<GeoPoint?>((ref) async {
@@ -595,6 +613,7 @@ Future<bool> openPlace(WidgetRef ref, int placeId) async {
     place.centerLat,
     place.centerLng,
   );
+  ref.read(viewedPlaceProvider.notifier).id = placeId;
   ref.read(searchRadiusProvider.notifier).meters = place.radiusM * 2;
   ref.read(selectedTabProvider.notifier).index = 0;
   return true;

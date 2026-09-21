@@ -304,5 +304,7 @@
   "placesActionsLabel": "Co s tímhle místem",
   "radiusSemanticLabel": "Okruh hledání",
   "hereMapTitle": "Okolí",
-  "hereOpenInMaps": "Otevřít v Mapách"
+  "hereOpenInMaps": "Otevřít v Mapách",
+  "hereBackToMe": "Zpátky ke mně",
+  "herePlaceFallbackTitle": "Místo, které znáš"
 }

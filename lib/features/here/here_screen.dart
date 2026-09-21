@@ -72,16 +72,38 @@ class _HereScreenState extends ConsumerState<HereScreen> {
     final l10n = AppLocalizations.of(context);
     final photoPermission = ref.watch(photoPermissionProvider);
 
+    // Opening a place points this screen at it. Say which one, and offer
+    // the way back — without it the screen looks like it is simply wrong
+    // about where the phone is.
+    final placeId = ref.watch(viewedPlaceProvider);
+    final placeName = placeId == null
+        ? null
+        : ref.watch(placeLabelProvider(placeId)).value ??
+              l10n.herePlaceFallbackTitle;
+
     return Scaffold(
       appBar: AppBar(
         title: GestureDetector(
           // The debug location override. A long press keeps it out of the
           // way without hiding it behind a build flag.
           onLongPress: () => unawaited(DebugLocationSheet.show(context)),
-          child: Text(l10n.hereTabLabel),
+          child: Text(
+            placeName ?? l10n.hereTabLabel,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
         actions: [
-          if (ref.watch(viewpointProvider) != null)
+          if (placeId != null)
+            IconButton(
+              tooltip: l10n.hereBackToMe,
+              icon: const Icon(Icons.my_location),
+              onPressed: () {
+                ref.read(viewpointProvider.notifier).point = null;
+                ref.read(viewedPlaceProvider.notifier).id = null;
+              },
+            )
+          else if (ref.watch(viewpointProvider) != null)
             IconButton(
               tooltip: l10n.debugLocationActive,
               icon: const Icon(Icons.bug_report_outlined),

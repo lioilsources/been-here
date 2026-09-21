@@ -366,5 +366,7 @@
   "placesActionsLabel": "What to do with this place",
   "radiusSemanticLabel": "Search radius",
   "hereMapTitle": "Around here",
-  "hereOpenInMaps": "Open in Maps"
+  "hereOpenInMaps": "Open in Maps",
+  "hereBackToMe": "Back to where I am",
+  "herePlaceFallbackTitle": "A place you know"
 }

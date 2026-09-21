@@ -50,11 +50,13 @@ class _DebugLocationSheetState extends ConsumerState<DebugLocationSheet> {
       return;
     }
     ref.read(viewpointProvider.notifier).point = GeoPoint(lat, lng);
+    ref.read(viewedPlaceProvider.notifier).id = null;
     Navigator.of(context).pop();
   }
 
   void _clear() {
     ref.read(viewpointProvider.notifier).point = null;
+    ref.read(viewedPlaceProvider.notifier).id = null;
     Navigator.of(context).pop();
   }
 
