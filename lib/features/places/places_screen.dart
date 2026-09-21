@@ -47,6 +47,9 @@ class _PlacesScreenState extends ConsumerState<PlacesScreen> {
         ],
       ),
       body: places.when(
+        // Keep the list up while it reloads. Blanking it to a spinner every
+        // time the index steps is most of what "flickering" meant.
+        skipLoadingOnReload: true,
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, _) => Center(
           child: EmptyState(

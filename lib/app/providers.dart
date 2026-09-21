@@ -67,10 +67,21 @@ final photoPermissionProvider = FutureProvider<PhotoPermission>((ref) {
   return ref.watch(photoLibraryProvider).currentPermission();
 });
 
+/// A number that changes only when the index has changed enough to be worth
+/// asking the database again. See [indexGeneration] for why.
+///
+/// The progress bar itself still follows [indexProgressProvider], so it
+/// stays live while the queries behind it settle.
+final indexGenerationProvider = Provider<int>((ref) {
+  final progress =
+      ref.watch(indexProgressProvider).value ?? const IndexProgress.idle();
+  return indexGeneration(progress);
+});
+
 /// How many photos are indexed, and how many of them have coordinates.
 final indexStatsProvider = FutureProvider<IndexStats>((ref) async {
-  // Recomputed whenever a pass reports progress.
-  ref.watch(indexProgressProvider);
+  // Recomputed when the index has actually changed, not once per page.
+  ref.watch(indexGenerationProvider);
   final db = ref.watch(databaseProvider);
   final total = await db.photosDao.count();
   final located = await db.photosDao.countWithLocation();
@@ -203,8 +214,9 @@ final memoriesHereProvider = FutureProvider<MemoriesHere?>((ref) async {
   final center = await ref.watch(currentLocationProvider.future);
   if (center == null) return null;
 
-  // Rebuilt whenever a pass adds photos, so a first index fills the screen.
-  ref.watch(indexProgressProvider);
+  // Rebuilt as a pass adds photos, so a first index fills the screen — but
+  // in steps, not once per page.
+  ref.watch(indexGenerationProvider);
 
   return ref
       .watch(memoriesServiceProvider)
@@ -216,11 +228,18 @@ final memoryPointsProvider = FutureProvider<List<GeoPoint>>((ref) async {
   final center = await ref.watch(currentLocationProvider.future);
   if (center == null) return const [];
 
-  ref.watch(indexProgressProvider);
+  ref.watch(indexGenerationProvider);
 
   return ref
       .watch(memoriesServiceProvider)
-      .pointsNear(center, radiusMeters: ref.watch(searchRadiusProvider));
+      .pointsNear(
+        center,
+        radiusMeters: ref.watch(searchRadiusProvider),
+        // Fewer than the query would allow: these are redrawn while the
+        // radius slider moves, and at a dot every three pixels nobody can
+        // tell eight hundred from two thousand.
+        limit: 800,
+      );
 });
 
 /// The closest memory when there is nothing in the current radius.
@@ -409,8 +428,8 @@ final placesSortProvider = NotifierProvider<PlacesSortOrder, PlacesSort>(
 
 /// Every place, in the order the user asked for.
 final placesProvider = FutureProvider<List<PlaceRow>>((ref) async {
-  // Places are derived from the index, so they follow it.
-  ref.watch(indexProgressProvider);
+  // Places are derived from the index, so they follow it — in steps.
+  ref.watch(indexGenerationProvider);
 
   final rows = await ref.watch(databaseProvider).placesDao.all();
   final sort = ref.watch(placesSortProvider);

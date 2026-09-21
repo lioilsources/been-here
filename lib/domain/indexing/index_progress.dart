@@ -96,3 +96,19 @@ class IndexProgress {
       'IndexProgress(${status.name} $processed/$total '
       '+$inserted -$deleted${errorCode == null ? '' : ' $errorCode'})';
 }
+
+/// How often the screens derived from the index should refresh.
+///
+/// The indexer reports progress once per page of the library — a hundred
+/// times over for a big one — and everything derived from it runs real
+/// queries: the timeline, the map, the places, the counts. Following every
+/// page meant four queries and a rebuild each time, which is what a first
+/// scan looked like from the outside: flickering.
+///
+/// This changes once per [bucket] indexed photos, and once more when a pass
+/// ends — the end is always a step of its own, so the last photos of a pass
+/// still reach the screen.
+int indexGeneration(IndexProgress progress, {int bucket = 250}) {
+  final changed = progress.inserted + progress.deleted;
+  return progress.isRunning ? changed ~/ bucket : -(changed + 1);
+}

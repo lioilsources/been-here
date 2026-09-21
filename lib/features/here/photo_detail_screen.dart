@@ -79,6 +79,7 @@ class _PhotoDetailScreenState extends ConsumerState<PhotoDetailScreen> {
         ),
         extendBodyBehindAppBar: true,
         body: photos.when(
+          skipLoadingOnReload: true,
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (_, _) => Center(
             child: Text(

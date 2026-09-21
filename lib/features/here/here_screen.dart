@@ -164,6 +164,9 @@ class _HereScreenState extends ConsumerState<HereScreen> {
 
     final location = ref.watch(currentLocationProvider);
     return location.when(
+      // Opening a place re-resolves the location; the timeline should not
+      // blink through a spinner on the way.
+      skipLoadingOnReload: true,
       loading: _centered,
       error: (_, _) => _scrollable(
         EmptyState(

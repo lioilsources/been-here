@@ -392,3 +392,23 @@ field, the sea) and `GeocodeUnavailable` (offline or rationed). Nothing is
 final and is not asked again. Unavailable gets one retry, and if that fails
 too, nothing is stored — so the next time the place scrolls past, it is
 asked about again.
+
+## Why the screens stopped flickering
+
+Two habits, both of which look fine in a test and terrible on a phone with a
+real library.
+
+The indexer reports progress once per page of the photo library — a hundred
+times over for a big one — and everything derived from the index followed
+every one of those: the timeline, the map dots, the places, the counts. Four
+real queries per page. They follow `indexGeneration` now, which changes once
+per few hundred indexed photos and once more when a pass ends. The progress
+bar still follows the raw stream, so it stays live while the queries behind
+it settle.
+
+And `AsyncValue.when` shows its loading branch when a *dependency* changed,
+not just on a first load — so every one of those reloads blanked the places
+list to a spinner and put the Here screen back to a progress indicator.
+`skipLoadingOnReload: true` keeps what is already on screen until the new
+answer arrives, which is both calmer and more honest: the photos shown are
+still the right photos.

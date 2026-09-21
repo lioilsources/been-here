@@ -67,6 +67,7 @@ class VisitSection extends ConsumerWidget {
           ),
           const SizedBox(height: 10),
           photos.when(
+            skipLoadingOnReload: true,
             loading: () => _GridPlaceholder(
               count: visit.photoCount.clamp(1, previewCount),
             ),
