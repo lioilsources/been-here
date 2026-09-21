@@ -123,6 +123,34 @@ void main() {
     expect(find.text('Photo access is off'), findsOneWidget);
   });
 
+  testWidgets('follows the phone into dark mode', (tester) async {
+    tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
+    addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
+
+    await tester.pumpWidget(app());
+    await settle(tester);
+
+    final context = tester.element(find.byType(Scaffold).first);
+    expect(Theme.of(context).brightness, Brightness.dark);
+    // The intro is the first thing anyone sees; a white flash here would be
+    // the app's opening statement.
+    expect(
+      Theme.of(context).scaffoldBackgroundColor,
+      Theme.of(context).colorScheme.surface,
+    );
+  });
+
+  testWidgets('survives the largest text size', (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    await tester.pumpWidget(app());
+    await settle(tester);
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('Next'), findsOneWidget);
+  });
+
   testWidgets('reads in Czech', (tester) async {
     tester.platformDispatcher.localesTestValue = const [Locale('cs')];
     addTearDown(tester.platformDispatcher.clearLocalesTestValue);
