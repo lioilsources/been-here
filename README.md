@@ -34,8 +34,8 @@ code is laid out. The device-only checks are tracked in `docs/QA.md`.
 | 2 | The "Here" screen | done |
 | 3 | Places, clustering, auto-mute | done |
 | 4 | Geofence notifications | code done, needs a drive |
-| 5 | Rephoto (then & now) | todo |
-| 6 | Onboarding, settings, polish | todo |
+| 5 | Rephoto (then & now) | code done, needs a camera |
+| 6 | Onboarding, settings, polish | done, TestFlight pending |
 
 ## Build
 
@@ -53,3 +53,14 @@ clone builds without a codegen round. Re-run `make gen` after touching the
 drift tables or the `.arb` files.
 
 Targets iOS 15+ and Android 8+ (API 26). Bundle id `com.lioilsources.beenhere`.
+
+## Licence
+
+MIT — see [LICENSE](LICENSE). Take it, change it, ship it; keep the copyright
+notice, and don't expect a warranty.
+
+The dependencies carry their own permissive licences (MIT, BSD-3, Apache-2.0)
+and a binary built from this repo has to keep their notices too. OpenStreetMap
+map data is ODbL and its tile servers have a
+[usage policy](https://operations.osmfoundation.org/policies/tiles/); neither
+is affected by the licence on this code.
