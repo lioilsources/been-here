@@ -381,11 +381,11 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
-  String get notificationTitle => 'Tady jsi už byl';
+  String get notificationTitle => 'Tohle místo znáš';
 
   @override
   String notificationBody(String age, String photos) {
-    return '$age · $photos';
+    return 'Naposledy tady $age. $photos.';
   }
 
   @override
@@ -555,4 +555,71 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get rephotoShareFailed => 'Nepovedlo se složit obrázek ke sdílení.';
+
+  @override
+  String get onboardingSkip => 'Přeskočit';
+
+  @override
+  String get onboardingNext => 'Dál';
+
+  @override
+  String get onboardingWhatTitle => 'Fotky z místa, kde právě stojíš';
+
+  @override
+  String get onboardingWhatBody =>
+      'Dorazíš na místo, které máš vyfocené, a Been Here ukáže, co tam vzniklo — návštěvu po návštěvě, od nejstarší vzpomínky.';
+
+  @override
+  String get onboardingPrivacyTitle => 'Nic neopouští telefon';
+
+  @override
+  String get onboardingPrivacyBody =>
+      'Žádný účet, žádný server, žádná analytika. Been Here čte knihovnu fotek přímo v telefonu a vede si k ní malý index. Fotky ani místa, kde vznikly, nikam neodcházejí.';
+
+  @override
+  String get onboardingPrivacyFootnote =>
+      'Na síť můžou jen dvě věci a obě jsou vypnuté, dokud je nezapneš: názvy míst a mapa.';
+
+  @override
+  String get onboardingPhotosTitle => 'Potřebuje přístup k fotkám';
+
+  @override
+  String get onboardingPhotosBody =>
+      'Been Here si zapíše, která fotka kde vznikla. Nikdy nic nekopíruje ani nepřesouvá — pamatuje si id a souřadnice, a samotné obrázky čte, jen když ti je ukazuje.';
+
+  @override
+  String get onboardingPhotosAction => 'Povolit fotky';
+
+  @override
+  String get onboardingDone => 'Začít';
+
+  @override
+  String get settingsAboutTitle => 'O aplikaci';
+
+  @override
+  String settingsVersion(String version, String build) {
+    return 'Verze $version ($build)';
+  }
+
+  @override
+  String get settingsSourceTitle => 'Zdrojový kód';
+
+  @override
+  String get settingsShowIntro => 'Zobrazit úvod znovu';
+
+  @override
+  String photoSemanticLabel(String date) {
+    return 'Fotka z $date';
+  }
+
+  @override
+  String photoOpenSemanticLabel(int index, int total, String date) {
+    return 'Fotka $index z $total, $date';
+  }
+
+  @override
+  String get placesActionsLabel => 'Co s tímhle místem';
+
+  @override
+  String get radiusSemanticLabel => 'Okruh hledání';
 }

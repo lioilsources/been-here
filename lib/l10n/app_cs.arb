@@ -208,8 +208,8 @@
       }
     }
   },
-  "notificationTitle": "Tady jsi už byl",
-  "notificationBody": "{age} · {photos}",
+  "notificationTitle": "Tohle místo znáš",
+  "notificationBody": "Naposledy tady {age}. {photos}.",
   "@notificationBody": {
     "placeholders": {
       "age": {
@@ -283,5 +283,24 @@
   "rephotoShare": "Sdílet",
   "rephotoThen": "Tehdy",
   "rephotoNow": "Teď",
-  "rephotoShareFailed": "Nepovedlo se složit obrázek ke sdílení."
+  "rephotoShareFailed": "Nepovedlo se složit obrázek ke sdílení.",
+  "onboardingSkip": "Přeskočit",
+  "onboardingNext": "Dál",
+  "onboardingWhatTitle": "Fotky z místa, kde právě stojíš",
+  "onboardingWhatBody": "Dorazíš na místo, které máš vyfocené, a Been Here ukáže, co tam vzniklo — návštěvu po návštěvě, od nejstarší vzpomínky.",
+  "onboardingPrivacyTitle": "Nic neopouští telefon",
+  "onboardingPrivacyBody": "Žádný účet, žádný server, žádná analytika. Been Here čte knihovnu fotek přímo v telefonu a vede si k ní malý index. Fotky ani místa, kde vznikly, nikam neodcházejí.",
+  "onboardingPrivacyFootnote": "Na síť můžou jen dvě věci a obě jsou vypnuté, dokud je nezapneš: názvy míst a mapa.",
+  "onboardingPhotosTitle": "Potřebuje přístup k fotkám",
+  "onboardingPhotosBody": "Been Here si zapíše, která fotka kde vznikla. Nikdy nic nekopíruje ani nepřesouvá — pamatuje si id a souřadnice, a samotné obrázky čte, jen když ti je ukazuje.",
+  "onboardingPhotosAction": "Povolit fotky",
+  "onboardingDone": "Začít",
+  "settingsAboutTitle": "O aplikaci",
+  "settingsVersion": "Verze {version} ({build})",
+  "settingsSourceTitle": "Zdrojový kód",
+  "settingsShowIntro": "Zobrazit úvod znovu",
+  "photoSemanticLabel": "Fotka z {date}",
+  "photoOpenSemanticLabel": "Fotka {index} z {total}, {date}",
+  "placesActionsLabel": "Co s tímhle místem",
+  "radiusSemanticLabel": "Okruh hledání"
 }

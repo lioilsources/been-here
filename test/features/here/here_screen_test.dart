@@ -13,6 +13,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/onboarded.dart';
+
 const _prague = GeoPoint(50.0755, 14.4378);
 
 GeoPoint _north(GeoPoint from, double meters) =>
@@ -67,8 +69,9 @@ void main() {
     }
   }
 
-  setUp(() {
+  setUp(() async {
     db = AppDatabase.withExecutor(NativeDatabase.memory());
+    await markOnboarded(db);
     location = FakeLocationService(at: _prague);
   });
 

@@ -96,11 +96,23 @@ class _RadiusSliderState extends ConsumerState<RadiusSlider> {
               ),
             ],
           ),
-          Slider(
-            value: _toSlider(radius).clamp(0.0, 1.0),
-            label: formatRadius(l10n, radius),
-            onChanged: _onChanged,
-            onChangeEnd: _onChangeEnd,
+          // Merged, or the name sits on one node and the value on another,
+          // and a screen reader reads only one of them.
+          MergeSemantics(
+            child: Semantics(
+              label: l10n.radiusSemanticLabel,
+              child: Slider(
+                value: _toSlider(radius).clamp(0.0, 1.0),
+                label: formatRadius(l10n, radius),
+                // Without this a screen reader reads the slider's own 0..1
+                // position, which is the logarithm and means nothing to
+                // anyone.
+                semanticFormatterCallback: (position) =>
+                    formatRadius(l10n, _toMeters(position)),
+                onChanged: _onChanged,
+                onChangeEnd: _onChangeEnd,
+              ),
+            ),
           ),
         ],
       ),

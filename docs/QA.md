@@ -168,8 +168,16 @@ The camera itself has no test double, so these need a phone:
 
 ## Phase 6 — Polish
 
-- [ ] Onboarding reads correctly in both languages.
+Covered by tests: the intro appearing on a fresh install and not on the next
+launch, skipping it, a refusal still letting the app start, and the whole
+thing in Czech; the photo grid's semantic labels; the radius slider's name
+and value as a screen reader sees them; the timeline at double text size.
+
+- [ ] Onboarding reads correctly in both languages on a real screen — the
+      strings are long and the test only proves they are present.
 - [ ] Every settings threshold takes effect without a restart.
-- [ ] VoiceOver reaches every interactive element on Here and Places.
-- [ ] Icon and splash look right on device.
+- [ ] VoiceOver reaches every interactive element on Here and Places, in
+      order, and nothing is announced as "image" or "button" alone.
+- [ ] Icon and splash look right on device, in light and dark.
+- [ ] "Show the intro again" brings it back.
 - [ ] TestFlight build installs and launches on a clean device.

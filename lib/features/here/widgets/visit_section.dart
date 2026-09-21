@@ -74,6 +74,8 @@ class VisitSection extends ConsumerWidget {
             data: (loaded) => _PhotoGrid(
               assetIds: [for (final photo in loaded) photo.assetId],
               extra: visit.photoCount - loaded.length,
+              total: visit.photoCount,
+              dateText: dateText,
               onTap: (index) => _open(context, index),
             ),
           ),
@@ -102,17 +104,22 @@ class _PhotoGrid extends StatelessWidget {
   const _PhotoGrid({
     required this.assetIds,
     required this.extra,
+    required this.total,
+    required this.dateText,
     required this.onTap,
   });
 
   final List<String> assetIds;
   final int extra;
+  final int total;
+  final String dateText;
   final void Function(int index) onTap;
 
   @override
   Widget build(BuildContext context) {
     if (assetIds.isEmpty) return const SizedBox.shrink();
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -148,11 +155,22 @@ class _PhotoGrid extends StatelessWidget {
                           ),
                         ),
                       ),
-                    Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(8),
-                        onTap: () => onTap(i),
+                    // The label lives on the tap target rather than on
+                    // the picture: a screen reader should find one thing
+                    // per photo, and it should be the thing you can open.
+                    Semantics(
+                      button: true,
+                      label: l10n.photoOpenSemanticLabel(
+                        i + 1,
+                        total,
+                        dateText,
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(8),
+                          onTap: () => onTap(i),
+                        ),
                       ),
                     ),
                   ],

@@ -79,6 +79,7 @@ class PhotoThumbnail extends ConsumerStatefulWidget {
     this.size = 200,
     this.borderRadius = 8,
     this.fit = BoxFit.cover,
+    this.semanticLabel,
   });
 
   final String assetId;
@@ -90,6 +91,10 @@ class PhotoThumbnail extends ConsumerStatefulWidget {
 
   /// Cropped in a grid, contained when it is the photo itself.
   final BoxFit fit;
+
+  /// What a screen reader should call this picture. Null where something
+  /// around it already says — a tappable grid tile labels itself.
+  final String? semanticLabel;
 
   @override
   ConsumerState<PhotoThumbnail> createState() => _PhotoThumbnailState();
@@ -152,6 +157,8 @@ class _PhotoThumbnailState extends ConsumerState<PhotoThumbnail> {
             width: double.infinity,
             height: double.infinity,
             gaplessPlayback: true,
+            semanticLabel: widget.semanticLabel,
+            excludeFromSemantics: widget.semanticLabel == null,
           ),
           (null, true) => const SizedBox.expand(),
           // The asset is gone, or the library refused it. Say so quietly

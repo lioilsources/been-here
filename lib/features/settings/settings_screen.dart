@@ -134,6 +134,26 @@ class SettingsScreen extends ConsumerWidget {
             onTap: () =>
                 unawaited(ref.read(indexerProvider).run(restart: true)),
           ),
+
+          const Divider(height: 32),
+          _Section(title: l10n.settingsAboutTitle),
+          const _VersionRow(),
+          ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+            leading: const Icon(Icons.code),
+            title: Text(l10n.settingsSourceTitle),
+            subtitle: const Text('github.com/lioilsources/been-here'),
+          ),
+          ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+            leading: const Icon(Icons.slideshow_outlined),
+            title: Text(l10n.settingsShowIntro),
+            onTap: () => unawaited(
+              ref
+                  .read(settingsProvider.notifier)
+                  .setOnboardingSeen(seen: false),
+            ),
+          ),
           const SizedBox(height: 24),
         ],
       ),
@@ -156,6 +176,27 @@ class _Section extends StatelessWidget {
       ),
     ),
   );
+}
+
+class _VersionRow extends ConsumerWidget {
+  const _VersionRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final info = ref.watch(packageInfoProvider).value;
+
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+      leading: const Icon(Icons.info_outline),
+      title: Text(
+        info == null
+            ? l10n.appTitle
+            : '${l10n.appTitle} · '
+                  '${l10n.settingsVersion(info.version, info.buildNumber)}',
+      ),
+    );
+  }
 }
 
 class _ArrivalsRow extends ConsumerWidget {

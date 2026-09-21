@@ -12,6 +12,7 @@ import 'package:been_here/features/rephoto/then_and_now_screen.dart';
 import 'package:been_here/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 /// One photo, full screen, with the rest of the visit a swipe away.
 class PhotoDetailScreen extends ConsumerStatefulWidget {
@@ -150,6 +151,11 @@ class _FullPhoto extends ConsumerWidget {
                 fit: BoxFit.contain,
                 width: double.infinity,
                 height: double.infinity,
+                semanticLabel: AppLocalizations.of(context).photoSemanticLabel(
+                  DateFormat.yMMMMd(
+                    Localizations.localeOf(context).toLanguageTag(),
+                  ).format(memory.takenAt.toLocal()),
+                ),
               ),
       ),
     );

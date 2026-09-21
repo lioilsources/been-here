@@ -27,6 +27,7 @@ import 'package:been_here/features/notifications/arrival_text.dart';
 import 'package:been_here/l10n/generated/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meta/meta.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 /// The on-device index. Single instance for the lifetime of the app.
 final databaseProvider = Provider<AppDatabase>((ref) {
@@ -296,6 +297,11 @@ class SettingsController extends AsyncNotifier<AppSettings> {
     ref.invalidateSelf();
   }
 
+  Future<void> setOnboardingSeen({required bool seen}) async {
+    await ref.read(settingsStoreProvider).setOnboardingSeen(seen: seen);
+    ref.invalidateSelf();
+  }
+
   Future<void> setPlaceNames({required bool enabled}) async {
     await ref
         .read(settingsStoreProvider)
@@ -310,6 +316,11 @@ class SettingsController extends AsyncNotifier<AppSettings> {
 
 final settingsProvider = AsyncNotifierProvider<SettingsController, AppSettings>(
   SettingsController.new,
+);
+
+/// Version and build number, for the about section.
+final packageInfoProvider = FutureProvider<PackageInfo>(
+  (ref) => PackageInfo.fromPlatform(),
 );
 
 // --- Places -----------------------------------------------------------------

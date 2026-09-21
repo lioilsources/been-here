@@ -304,3 +304,53 @@ shape they were framed in, so they read as a pair.
 
 The share sheet is handed a file in the temporary directory rather than raw
 bytes: that is what other apps expect, and the system clears it up.
+
+## The intro
+
+Three screens, once: what the app does, what it does not do with your
+photos, and then the photo permission. The order is deliberate — the system
+dialog is the last thing that happens, after the reason for it has been on
+screen twice.
+
+Location is not in the intro. It is asked for on the Here screen, in front
+of the empty space it is about to fill; a permission makes sense next to the
+thing that wants it, not in a row of introductions. Skipping the intro is
+allowed and asks for nothing: the Here screen explains itself anyway, and a
+second pass through three screens would not change anyone's answer.
+
+The flag lives in `preferences` like every other setting, which is why
+"Show the intro again" in Settings is one write and nothing else.
+
+## Wording of an arrival
+
+The plan asked for "Před 6 lety jsi tu byl. 14 fotek." — a sentence with a
+past-tense verb. Czech inflects that verb for gender (*byl* / *byla*), and
+the app has no idea who is holding the phone, so half of its users would be
+addressed wrongly. The sentence is built without the verb instead:
+
+    Naposledy tady před 6 lety. 14 fotek.
+    You were last here 6 years ago. 14 photos.
+
+Same information, same shape, no assumption. The title had the same problem
+("Tady jsi už byl") and became "Tohle místo znáš".
+
+## Accessibility
+
+The grid tiles carry the label, not the pictures inside them. A screen
+reader should find one thing per photo and it should be the thing that can
+be opened — so `PhotoThumbnail` excludes itself from semantics unless it is
+given a label, and the tap target says "Photo 3 of 12, 4 July 2019".
+
+The radius slider holds a logarithm between zero and one. Left alone, that
+is what VoiceOver reads out. `semanticFormatterCallback` turns it back into
+metres, and `MergeSemantics` puts the name and the value on one node — two
+nodes and a screen reader announces only one of them.
+
+## The icon
+
+Drawn by `tool/make_icon.py` rather than committed as an opaque PNG, so the
+shapes stay arguable: a cream place marker whose head is a clock face. A pin
+says *here*, a clock says *then*, and the app is those two words. The script
+writes three files — the launcher icon, the splash mark, and a smaller
+foreground for Android's adaptive-icon safe zone, which crops a circle
+through anything drawn edge to edge.

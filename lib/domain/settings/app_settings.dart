@@ -13,6 +13,7 @@ class AppSettings {
     this.placeCooldownDays = 30,
     this.dailyLimitHours = 24,
     this.mapEnabled = false,
+    this.onboardingSeen = false,
   });
 
   /// Distinct days after which a place is muted automatically.
@@ -43,6 +44,13 @@ class AppSettings {
   /// place, this continues for as long as the map is open.
   final bool mapEnabled;
 
+  /// Whether the three intro screens have been through once.
+  ///
+  /// Lives with the settings because it is one more thing the preferences
+  /// table already knows how to keep, and because the user can ask to see
+  /// the intro again.
+  final bool onboardingSeen;
+
   /// The thresholds, as the rules want them.
   NotificationRules get notificationRules => NotificationRules(
     minimumAge: Duration(days: memoryAgeDays),
@@ -57,6 +65,7 @@ class AppSettings {
     int? placeCooldownDays,
     int? dailyLimitHours,
     bool? mapEnabled,
+    bool? onboardingSeen,
   }) => AppSettings(
     autoMuteDays: autoMuteDays ?? this.autoMuteDays,
     placeNamesEnabled: placeNamesEnabled ?? this.placeNamesEnabled,
@@ -64,6 +73,7 @@ class AppSettings {
     placeCooldownDays: placeCooldownDays ?? this.placeCooldownDays,
     dailyLimitHours: dailyLimitHours ?? this.dailyLimitHours,
     mapEnabled: mapEnabled ?? this.mapEnabled,
+    onboardingSeen: onboardingSeen ?? this.onboardingSeen,
   );
 
   @override
@@ -74,7 +84,8 @@ class AppSettings {
       other.memoryAgeDays == memoryAgeDays &&
       other.placeCooldownDays == placeCooldownDays &&
       other.dailyLimitHours == dailyLimitHours &&
-      other.mapEnabled == mapEnabled;
+      other.mapEnabled == mapEnabled &&
+      other.onboardingSeen == onboardingSeen;
 
   @override
   int get hashCode => Object.hash(
@@ -84,6 +95,7 @@ class AppSettings {
     placeCooldownDays,
     dailyLimitHours,
     mapEnabled,
+    onboardingSeen,
   );
 
   @override
@@ -103,6 +115,7 @@ class SettingsStore {
   static const String _placeCooldown = 'place_cooldown_days';
   static const String _dailyLimit = 'daily_limit_hours';
   static const String _map = 'map_enabled';
+  static const String _onboarding = 'onboarding_seen';
 
   final PreferencesDao dao;
 
@@ -121,6 +134,7 @@ class SettingsStore {
       dailyLimitHours:
           int.tryParse(values[_dailyLimit] ?? '') ?? defaults.dailyLimitHours,
       mapEnabled: values[_map] == 'true',
+      onboardingSeen: values[_onboarding] == 'true',
     );
   }
 
@@ -141,4 +155,7 @@ class SettingsStore {
 
   Future<void> setMapEnabled({required bool enabled}) =>
       dao.write(_map, '$enabled');
+
+  Future<void> setOnboardingSeen({required bool seen}) =>
+      dao.write(_onboarding, '$seen');
 }

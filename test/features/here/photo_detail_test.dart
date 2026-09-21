@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/onboarded.dart';
+
 const _prague = GeoPoint(50.0755, 14.4378);
 
 /// One photo, here, years ago — so the visit has exactly one tile and there
@@ -56,8 +58,9 @@ void main() {
     await settle(tester);
   }
 
-  setUp(() {
+  setUp(() async {
     db = AppDatabase.withExecutor(NativeDatabase.memory());
+    await markOnboarded(db);
     library = FakePhotoLibrary(assets: _onePhoto());
     location = FakeLocationService(at: _prague);
   });

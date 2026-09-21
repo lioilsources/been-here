@@ -238,7 +238,7 @@
     }
   },
   "notificationTitle": "You've been here before",
-  "notificationBody": "{age} · {photos}",
+  "notificationBody": "You were last here {age}. {photos}.",
   "@notificationBody": {
     "placeholders": {
       "age": {
@@ -312,5 +312,57 @@
   "rephotoShare": "Share",
   "rephotoThen": "Then",
   "rephotoNow": "Now",
-  "rephotoShareFailed": "Could not build the image to share."
+  "rephotoShareFailed": "Could not build the image to share.",
+  "onboardingSkip": "Skip",
+  "onboardingNext": "Next",
+  "onboardingWhatTitle": "Photos from the spot you are standing on",
+  "onboardingWhatBody": "Arrive somewhere you have photographed before and Been Here shows you what you took there — visit by visit, longest ago first.",
+  "onboardingPrivacyTitle": "Nothing leaves your phone",
+  "onboardingPrivacyBody": "No account, no server, no analytics. Been Here reads your photo library on the device and keeps a small index beside it. Your photos, and where they were taken, stay where they are.",
+  "onboardingPrivacyFootnote": "Two things can reach the network, and both are off until you turn them on: place names and the map.",
+  "onboardingPhotosTitle": "It needs your photos",
+  "onboardingPhotosBody": "Been Here notes which photo was taken where. It never copies or moves anything — it remembers ids and coordinates, and reads the pictures themselves only when it shows them to you.",
+  "onboardingPhotosAction": "Allow photos",
+  "onboardingDone": "Start",
+  "settingsAboutTitle": "About",
+  "settingsVersion": "Version {version} ({build})",
+  "@settingsVersion": {
+    "description": "App version and build number in the about section",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "build": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsSourceTitle": "Source code",
+  "settingsShowIntro": "Show the intro again",
+  "photoSemanticLabel": "Photo from {date}",
+  "@photoSemanticLabel": {
+    "description": "Screen reader label for a photo shown on its own",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "photoOpenSemanticLabel": "Photo {index} of {total}, {date}",
+  "@photoOpenSemanticLabel": {
+    "description": "Screen reader label for one photo in a visit's grid",
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "placesActionsLabel": "What to do with this place",
+  "radiusSemanticLabel": "Search radius"
 }

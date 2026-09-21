@@ -379,7 +379,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String notificationBody(String age, String photos) {
-    return '$age · $photos';
+    return 'You were last here $age. $photos.';
   }
 
   @override
@@ -547,4 +547,71 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rephotoShareFailed => 'Could not build the image to share.';
+
+  @override
+  String get onboardingSkip => 'Skip';
+
+  @override
+  String get onboardingNext => 'Next';
+
+  @override
+  String get onboardingWhatTitle => 'Photos from the spot you are standing on';
+
+  @override
+  String get onboardingWhatBody =>
+      'Arrive somewhere you have photographed before and Been Here shows you what you took there — visit by visit, longest ago first.';
+
+  @override
+  String get onboardingPrivacyTitle => 'Nothing leaves your phone';
+
+  @override
+  String get onboardingPrivacyBody =>
+      'No account, no server, no analytics. Been Here reads your photo library on the device and keeps a small index beside it. Your photos, and where they were taken, stay where they are.';
+
+  @override
+  String get onboardingPrivacyFootnote =>
+      'Two things can reach the network, and both are off until you turn them on: place names and the map.';
+
+  @override
+  String get onboardingPhotosTitle => 'It needs your photos';
+
+  @override
+  String get onboardingPhotosBody =>
+      'Been Here notes which photo was taken where. It never copies or moves anything — it remembers ids and coordinates, and reads the pictures themselves only when it shows them to you.';
+
+  @override
+  String get onboardingPhotosAction => 'Allow photos';
+
+  @override
+  String get onboardingDone => 'Start';
+
+  @override
+  String get settingsAboutTitle => 'About';
+
+  @override
+  String settingsVersion(String version, String build) {
+    return 'Version $version ($build)';
+  }
+
+  @override
+  String get settingsSourceTitle => 'Source code';
+
+  @override
+  String get settingsShowIntro => 'Show the intro again';
+
+  @override
+  String photoSemanticLabel(String date) {
+    return 'Photo from $date';
+  }
+
+  @override
+  String photoOpenSemanticLabel(int index, int total, String date) {
+    return 'Photo $index of $total, $date';
+  }
+
+  @override
+  String get placesActionsLabel => 'What to do with this place';
+
+  @override
+  String get radiusSemanticLabel => 'Search radius';
 }

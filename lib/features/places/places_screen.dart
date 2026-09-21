@@ -304,6 +304,7 @@ class _PlaceMenu extends ConsumerWidget {
 
     return PopupMenuButton<VoidCallback>(
       icon: const Icon(Icons.more_vert),
+      tooltip: l10n.placesActionsLabel,
       onSelected: (action) => action(),
       itemBuilder: (context) => [
         PopupMenuItem(

@@ -629,7 +629,7 @@ abstract class AppLocalizations {
   /// No description provided for @notificationBody.
   ///
   /// In en, this message translates to:
-  /// **'{age} · {photos}'**
+  /// **'You were last here {age}. {photos}.'**
   String notificationBody(String age, String photos);
 
   /// No description provided for @alwaysLocationTitle.
@@ -889,6 +889,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not build the image to share.'**
   String get rephotoShareFailed;
+
+  /// No description provided for @onboardingSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get onboardingSkip;
+
+  /// No description provided for @onboardingNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get onboardingNext;
+
+  /// No description provided for @onboardingWhatTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos from the spot you are standing on'**
+  String get onboardingWhatTitle;
+
+  /// No description provided for @onboardingWhatBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrive somewhere you have photographed before and Been Here shows you what you took there — visit by visit, longest ago first.'**
+  String get onboardingWhatBody;
+
+  /// No description provided for @onboardingPrivacyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing leaves your phone'**
+  String get onboardingPrivacyTitle;
+
+  /// No description provided for @onboardingPrivacyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'No account, no server, no analytics. Been Here reads your photo library on the device and keeps a small index beside it. Your photos, and where they were taken, stay where they are.'**
+  String get onboardingPrivacyBody;
+
+  /// No description provided for @onboardingPrivacyFootnote.
+  ///
+  /// In en, this message translates to:
+  /// **'Two things can reach the network, and both are off until you turn them on: place names and the map.'**
+  String get onboardingPrivacyFootnote;
+
+  /// No description provided for @onboardingPhotosTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'It needs your photos'**
+  String get onboardingPhotosTitle;
+
+  /// No description provided for @onboardingPhotosBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Been Here notes which photo was taken where. It never copies or moves anything — it remembers ids and coordinates, and reads the pictures themselves only when it shows them to you.'**
+  String get onboardingPhotosBody;
+
+  /// No description provided for @onboardingPhotosAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow photos'**
+  String get onboardingPhotosAction;
+
+  /// No description provided for @onboardingDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get onboardingDone;
+
+  /// No description provided for @settingsAboutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get settingsAboutTitle;
+
+  /// App version and build number in the about section
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version} ({build})'**
+  String settingsVersion(String version, String build);
+
+  /// No description provided for @settingsSourceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Source code'**
+  String get settingsSourceTitle;
+
+  /// No description provided for @settingsShowIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Show the intro again'**
+  String get settingsShowIntro;
+
+  /// Screen reader label for a photo shown on its own
+  ///
+  /// In en, this message translates to:
+  /// **'Photo from {date}'**
+  String photoSemanticLabel(String date);
+
+  /// Screen reader label for one photo in a visit's grid
+  ///
+  /// In en, this message translates to:
+  /// **'Photo {index} of {total}, {date}'**
+  String photoOpenSemanticLabel(int index, int total, String date);
+
+  /// No description provided for @placesActionsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'What to do with this place'**
+  String get placesActionsLabel;
+
+  /// No description provided for @radiusSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Search radius'**
+  String get radiusSemanticLabel;
 }
 
 class _AppLocalizationsDelegate

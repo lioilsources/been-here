@@ -13,6 +13,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/onboarded.dart';
+
 const _home = GeoPoint(50.0755, 14.4378);
 
 /// A library with one place worth remembering: plenty of photos, years old.
@@ -52,8 +54,9 @@ void main() {
     }
   }
 
-  setUp(() {
+  setUp(() async {
     db = AppDatabase.withExecutor(NativeDatabase.memory());
+    await markOnboarded(db);
     library = FakePhotoLibrary(assets: _library());
     location = FakeLocationService(at: _home);
     geofence = FakeGeofenceService(location: location);

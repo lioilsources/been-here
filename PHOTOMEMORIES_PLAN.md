@@ -210,14 +210,21 @@ a skloňování ve dvou jazycích. Patří to do polishe ve fázi 6.
 - [ ] **Zbývá tobě:** vyfotit něco znovu na telefonu — sedí overlay, uloží se
       to do Fotek, sdílení dá rozumný obrázek. Viz `docs/QA.md`.
 
-### Fáze 6: Onboarding a polish
+### Fáze 6: Onboarding a polish — kód hotový, TestFlight zbývá
 
-- Onboarding: 3 obrazovky (co to dělá, soukromí, oprávnění k fotkám). Poloha
-  až na obrazovce Tady.
-- Settings: prahy (mute dny, stáří vzpomínky, cooldown), geocoding on/off,
-  reindex, debug poloha
-- Dark mode, prázdné/chybové stavy, přístupnost základně
-- Ikona, splash, TestFlight build
+- [x] Onboarding: 3 obrazovky (co to dělá, soukromí, oprávnění k fotkám).
+      Poloha až na obrazovce Tady, jak plán chtěl. Jde přeskočit.
+- [x] Settings: prahy, geocoding on/off, mapa, reindex, statistika indexu,
+      verze, odkaz na zdrojový kód, „zobrazit úvod znovu". Debug poloha
+      zůstala na dlouhém stisku nadpisu — je to vývojářská berlička, ne
+      nastavení.
+- [x] Dark mode (celá appka jede z jednoho seedu), prázdné a chybové stavy
+- [x] Přístupnost: fotky v mřížce jsou pojmenovaná tlačítka, slider okruhu
+      hlásí metry místo logaritmu, úvod přežije dvojnásobné písmo
+- [x] Znění notifikace přepsané bez rodu (viz docs/ARCHITECTURE.md)
+- [x] Ikona a splash, kreslené `tool/make_icon.py`
+- [ ] **Zbývá:** TestFlight build — potřebuje záznam v App Store Connect
+      a distribuční profil
 
 ## 7. Testování
 
