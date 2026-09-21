@@ -364,5 +364,7 @@
     }
   },
   "placesActionsLabel": "What to do with this place",
-  "radiusSemanticLabel": "Search radius"
+  "radiusSemanticLabel": "Search radius",
+  "hereMapTitle": "Around here",
+  "hereOpenInMaps": "Open in Maps"
 }

@@ -622,4 +622,10 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get radiusSemanticLabel => 'Okruh hledání';
+
+  @override
+  String get hereMapTitle => 'Okolí';
+
+  @override
+  String get hereOpenInMaps => 'Otevřít v Mapách';
 }

@@ -261,7 +261,25 @@ that deserves a switch and a sentence rather than a silent default.
 tile usage policy](https://operations.osmfoundation.org/policies/tiles/)
 rules it out for a released app, so shipping the map means either a paid
 tile provider or self-hosting — a decision that can wait until there is
-something to ship.
+something to ship. One definition of the tile layer, in
+`features/common/osm_tiles.dart`, so the endpoint and the user agent cannot
+drift apart between the two maps that use them.
+
+The Here screen carries a small one under the radius slider: the circle on
+it *is* the radius the slider just set, with a dot per photo inside it. It
+does not pan — a map that scrolls inside a scrolling list fights it for
+every drag — and a tap opens one that does.
+
+The dots come from a query that returns two doubles per photo and nothing
+else, capped at two thousand. A dense neighbourhood holds far more than a
+map can usefully show, and past a few thousand the dots stop being
+information and become a stain.
+
+With maps switched off the card becomes a single button that hands one
+coordinate to the phone's own maps app. That is a different thing from
+drawing tiles here: one jump the user asked for, to an app they already
+trust with their location, instead of a stream of requests that follows them
+around as they pan.
 
 ## Rephoto
 
@@ -354,3 +372,23 @@ says *here*, a clock says *then*, and the app is those two words. The script
 writes three files — the launcher icon, the splash mark, and a smaller
 foreground for Android's adaptive-icon safe zone, which crops a circle
 through anything drawn edge to edge.
+
+## Naming places, one at a time
+
+Every name costs one coordinate sent to Apple's or Google's geocoder, so
+names are asked for lazily — only for a place actually on screen — and
+stored, so each place costs exactly one lookup ever.
+
+The requests go through a queue: one in flight, a quarter of a second
+between them. Both platform geocoders ration an app that asks in bursts, and
+a list of forty places scrolled quickly *is* a burst. The requests that lose
+come back empty, which used to leave those places unnamed for the rest of
+the session — the queue turns "some of them, unpredictably" into "all of
+them, shortly".
+
+For that to work the geocoder has to distinguish two answers that both used
+to be null: `GeocodeNothing` (there is genuinely nothing there to name — a
+field, the sea) and `GeocodeUnavailable` (offline or rationed). Nothing is
+final and is not asked again. Unavailable gets one retry, and if that fails
+too, nothing is stored — so the next time the place scrolls past, it is
+asked about again.

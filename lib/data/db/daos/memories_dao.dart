@@ -74,6 +74,31 @@ class MemoriesDao extends DatabaseAccessor<AppDatabase>
     return [for (final row in rows) row.read<int>('taken_at')];
   }
 
+  /// Where the photos inside the circle are, and nothing else.
+  ///
+  /// Two doubles per photo: a map needs no asset ids, no sizes and no dates,
+  /// and this is the one query that can be asked for thousands of rows at
+  /// once. Newest first, so a [limit] keeps the most recent ones.
+  Future<List<({double lat, double lng})>> pointsWithin({
+    required List<BoundingBox> boxes,
+    required UnitVector center,
+    required double chordSquared,
+    int limit = 2000,
+  }) async {
+    if (boxes.isEmpty) return const [];
+    final circle = _circle(boxes, center, chordSquared);
+    final rows = await customSelect(
+      'SELECT lat, lng FROM photos WHERE ${circle.where} '
+      'ORDER BY taken_at DESC LIMIT ?',
+      variables: [...circle.variables, Variable.withInt(limit)],
+      readsFrom: {photos},
+    ).get();
+    return [
+      for (final row in rows)
+        (lat: row.read<double>('lat'), lng: row.read<double>('lng')),
+    ];
+  }
+
   /// The rectangles an index can seek plus the exact circle, as SQL.
   ({String where, List<Variable<Object>> variables}) _circle(
     List<BoundingBox> boxes,

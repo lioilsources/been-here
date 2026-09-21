@@ -1,6 +1,39 @@
 import 'package:been_here/core/geo/geo_point.dart';
 import 'package:been_here/core/logger.dart';
 import 'package:geocoding/geocoding.dart' as geo;
+import 'package:meta/meta.dart';
+
+/// What came back from a reverse geocode.
+///
+/// "No name" and "no answer" are different things and the difference decides
+/// what to do next: nothing is there, or the question has to be asked again
+/// later. Collapsing both into null is what made a fast scroll leave half a
+/// list permanently unnamed.
+@immutable
+sealed class GeocodeResult {
+  const GeocodeResult();
+}
+
+/// A name for the place.
+@immutable
+final class GeocodeName extends GeocodeResult {
+  const GeocodeName(this.name);
+
+  final String name;
+}
+
+/// The geocoder answered, and there is nothing there worth calling a name —
+/// a field, a stretch of motorway, the sea.
+@immutable
+final class GeocodeNothing extends GeocodeResult {
+  const GeocodeNothing();
+}
+
+/// The geocoder did not answer: offline, or rate-limited. Worth asking again.
+@immutable
+final class GeocodeUnavailable extends GeocodeResult {
+  const GeocodeUnavailable();
+}
 
 /// Turns a coordinate into a name a person would use.
 ///
@@ -12,8 +45,7 @@ import 'package:geocoding/geocoding.dart' as geo;
 // substituted at, and where the platform plugin stops.
 // ignore: one_member_abstracts
 abstract interface class GeocodingService {
-  /// A short label, or null if nothing useful came back.
-  Future<String?> describe(GeoPoint point);
+  Future<GeocodeResult> describe(GeoPoint point);
 }
 
 class PlatformGeocodingService implements GeocodingService {
@@ -24,19 +56,20 @@ class PlatformGeocodingService implements GeocodingService {
   final _geocoding = geo.Geocoding();
 
   @override
-  Future<String?> describe(GeoPoint point) async {
+  Future<GeocodeResult> describe(GeoPoint point) async {
     try {
       final marks = await _geocoding.placemarkFromCoordinates(
         point.lat,
         point.lng,
       );
-      if (marks.isEmpty) return null;
-      return _label(marks.first);
+      if (marks.isEmpty) return const GeocodeNothing();
+      final label = _label(marks.first);
+      return label == null ? const GeocodeNothing() : GeocodeName(label);
     } on Exception catch (e) {
-      // Offline, rate-limited, or nothing there. A place without a name is
-      // still a place.
+      // Both platforms throttle an app that asks too quickly, and both fail
+      // the same way offline. Neither is permanent.
       _log.warning('reverse geocode failed for $point', e);
-      return null;
+      return const GeocodeUnavailable();
     }
   }
 
@@ -61,7 +94,7 @@ class PlatformGeocodingService implements GeocodingService {
 
 /// For tests, and for anyone who would rather the app never asked.
 class FakeGeocodingService implements GeocodingService {
-  FakeGeocodingService({this.fallback, this.resolve});
+  FakeGeocodingService({this.fallback, this.resolve, this.failFirst = 0});
 
   /// Returned for any point [resolve] has no opinion about.
   final String? fallback;
@@ -70,13 +103,34 @@ class FakeGeocodingService implements GeocodingService {
   /// map key avoids tying assertions to the exact decimals of a double.
   final String? Function(GeoPoint point)? resolve;
 
+  /// How many of the first calls should come back unavailable — a stand-in
+  /// for a throttled geocoder.
+  int failFirst;
+
   /// Every point this was asked about — which is the thing worth asserting,
   /// since each one is a coordinate that would have left the device.
   final List<GeoPoint> asked = [];
 
+  /// How many requests were in flight at once. The geocoders throttle, so
+  /// the answer has to stay one.
+  int concurrent = 0;
+  int peakConcurrent = 0;
+
   @override
-  Future<String?> describe(GeoPoint point) async {
+  Future<GeocodeResult> describe(GeoPoint point) async {
     asked.add(point);
-    return resolve?.call(point) ?? fallback;
+    concurrent++;
+    peakConcurrent = concurrent > peakConcurrent ? concurrent : peakConcurrent;
+    try {
+      await Future<void>.delayed(Duration.zero);
+      if (failFirst > 0) {
+        failFirst--;
+        return const GeocodeUnavailable();
+      }
+      final name = resolve?.call(point) ?? fallback;
+      return name == null ? const GeocodeNothing() : GeocodeName(name);
+    } finally {
+      concurrent--;
+    }
   }
 }

@@ -13,7 +13,12 @@ void main() {
   setUp(() {
     db = AppDatabase.withExecutor(NativeDatabase.memory());
     geocoder = FakeGeocodingService(fallback: 'Old Town Square, Prague');
-    labeller = PlaceLabeller(dao: db.placesDao, geocoder: geocoder);
+    labeller = PlaceLabeller(
+      dao: db.placesDao,
+      geocoder: geocoder,
+      gap: Duration.zero,
+      retryAfter: Duration.zero,
+    );
   });
 
   tearDown(() => db.close());
@@ -87,11 +92,81 @@ void main() {
     labeller = PlaceLabeller(
       dao: db.placesDao,
       geocoder: FakeGeocodingService(),
+      gap: Duration.zero,
+      retryAfter: Duration.zero,
     );
     final place = await insertPlace();
 
     expect(await labeller.labelFor(place, enabled: true), isNull);
     expect((await db.placesDao.byId(place.id))!.label, isNull);
+  });
+
+  test('asks one at a time, however many places are on screen', () async {
+    final places = [for (var i = 0; i < 8; i++) await insertPlace()];
+
+    await Future.wait([
+      for (final place in places) labeller.labelFor(place, enabled: true),
+    ]);
+
+    expect(geocoder.asked, hasLength(8));
+    // Both platform geocoders throttle a burst, and a throttled request
+    // comes back empty — so the queue is the thing that makes a long list
+    // finish with every row named.
+    expect(geocoder.peakConcurrent, 1);
+  });
+
+  test('a geocoder that did not answer is asked again', () async {
+    geocoder = FakeGeocodingService(
+      fallback: 'Old Town Square, Prague',
+      failFirst: 1,
+    );
+    labeller = PlaceLabeller(
+      dao: db.placesDao,
+      geocoder: geocoder,
+      gap: Duration.zero,
+      retryAfter: Duration.zero,
+    );
+    final place = await insertPlace();
+
+    expect(
+      await labeller.labelFor(place, enabled: true),
+      'Old Town Square, Prague',
+    );
+    expect(geocoder.asked, hasLength(2));
+  });
+
+  test('a place left unanswered can be asked about again later', () async {
+    geocoder = FakeGeocodingService(fallback: 'Later', failFirst: 2);
+    labeller = PlaceLabeller(
+      dao: db.placesDao,
+      geocoder: geocoder,
+      gap: Duration.zero,
+      retryAfter: Duration.zero,
+    );
+    final place = await insertPlace();
+
+    // Both the request and its retry come back empty.
+    expect(await labeller.labelFor(place, enabled: true), isNull);
+    expect((await db.placesDao.byId(place.id))!.label, isNull);
+
+    // Nothing was stored, so the next time it is on screen it tries again —
+    // and by then the geocoder is answering.
+    expect(await labeller.labelFor(place, enabled: true), 'Later');
+  });
+
+  test('nothing there is not retried', () async {
+    geocoder = FakeGeocodingService();
+    labeller = PlaceLabeller(
+      dao: db.placesDao,
+      geocoder: geocoder,
+      gap: Duration.zero,
+      retryAfter: Duration.zero,
+    );
+    final place = await insertPlace();
+
+    expect(await labeller.labelFor(place, enabled: true), isNull);
+    // The sea has no street name and asking twice will not change that.
+    expect(geocoder.asked, hasLength(1));
   });
 
   test('switching naming off forgets every name', () async {

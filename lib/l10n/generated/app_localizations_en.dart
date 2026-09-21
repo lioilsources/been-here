@@ -614,4 +614,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get radiusSemanticLabel => 'Search radius';
+
+  @override
+  String get hereMapTitle => 'Around here';
+
+  @override
+  String get hereOpenInMaps => 'Open in Maps';
 }

@@ -193,6 +193,18 @@ final memoriesHereProvider = FutureProvider<MemoriesHere?>((ref) async {
       .near(center, radiusMeters: ref.watch(searchRadiusProvider));
 });
 
+/// Where the photos in the current radius are. Only ever read by the map.
+final memoryPointsProvider = FutureProvider<List<GeoPoint>>((ref) async {
+  final center = await ref.watch(currentLocationProvider.future);
+  if (center == null) return const [];
+
+  ref.watch(indexProgressProvider);
+
+  return ref
+      .watch(memoriesServiceProvider)
+      .pointsNear(center, radiusMeters: ref.watch(searchRadiusProvider));
+});
+
 /// The closest memory when there is nothing in the current radius.
 final nearestMemoryProvider = FutureProvider<NearestMemory?>((ref) async {
   final center = await ref.watch(currentLocationProvider.future);

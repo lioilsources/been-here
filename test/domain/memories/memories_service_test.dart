@@ -397,4 +397,41 @@ void main() {
       },
     );
   });
+
+  group('points for the map', () {
+    test('are the located photos inside the circle', () async {
+      await insert(_prague, DateTime.utc(2020));
+      await insert(north(_prague, 200), DateTime.utc(2020, 1, 2));
+      await insert(north(_prague, 3000), DateTime.utc(2020, 1, 3));
+      await insert(null, DateTime.utc(2020, 1, 4));
+
+      final points = await service.pointsNear(_prague, radiusMeters: 500);
+
+      expect(points, hasLength(2));
+      expect(
+        points.every((p) => distanceMeters(p, _prague) <= 500),
+        isTrue,
+      );
+    });
+
+    test('are capped, keeping the newest', () async {
+      for (var i = 0; i < 20; i++) {
+        await insert(_prague, DateTime.utc(2020).add(Duration(days: i)));
+      }
+
+      final points = await service.pointsNear(
+        _prague,
+        radiusMeters: 500,
+        limit: 5,
+      );
+
+      // A dense neighbourhood holds more photos than a map can show dots
+      // for, and past a few thousand they stop being information.
+      expect(points, hasLength(5));
+    });
+
+    test('an empty index draws nothing', () async {
+      expect(await service.pointsNear(_prague, radiusMeters: 500), isEmpty);
+    });
+  });
 }

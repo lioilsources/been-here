@@ -302,5 +302,7 @@
   "photoSemanticLabel": "Fotka z {date}",
   "photoOpenSemanticLabel": "Fotka {index} z {total}, {date}",
   "placesActionsLabel": "Co s tímhle místem",
-  "radiusSemanticLabel": "Okruh hledání"
+  "radiusSemanticLabel": "Okruh hledání",
+  "hereMapTitle": "Okolí",
+  "hereOpenInMaps": "Otevřít v Mapách"
 }

@@ -79,6 +79,26 @@ class MemoriesService {
     );
   }
 
+  /// Where the photos around [center] are, for drawing on a map.
+  ///
+  /// Capped, because a dense city block holds more photos than a map can
+  /// usefully show dots for — and past a few thousand the dots stop being
+  /// information and start being a stain.
+  Future<List<GeoPoint>> pointsNear(
+    GeoPoint center, {
+    required double radiusMeters,
+    int limit = 2000,
+  }) async {
+    final query = _Circle(center, radiusMeters);
+    final points = await dao.pointsWithin(
+      boxes: query.boxes,
+      center: query.center,
+      chordSquared: query.chordSquared,
+      limit: limit,
+    );
+    return [for (final p in points) GeoPoint(p.lat, p.lng)];
+  }
+
   /// How many photos are within [radiusMeters].
   ///
   /// Counted inside SQLite, so dragging the radius slider costs one cheap

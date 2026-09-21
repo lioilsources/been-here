@@ -1003,6 +1003,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Search radius'**
   String get radiusSemanticLabel;
+
+  /// No description provided for @hereMapTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Around here'**
+  String get hereMapTitle;
+
+  /// No description provided for @hereOpenInMaps.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in Maps'**
+  String get hereOpenInMaps;
 }
 
 class _AppLocalizationsDelegate

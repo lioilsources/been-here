@@ -8,6 +8,7 @@ import 'package:been_here/features/common/empty_state.dart';
 import 'package:been_here/features/common/format.dart';
 import 'package:been_here/features/here/arrivals_sheet.dart';
 import 'package:been_here/features/here/debug_location_sheet.dart';
+import 'package:been_here/features/here/widgets/here_map.dart';
 import 'package:been_here/features/here/widgets/radius_slider.dart';
 import 'package:been_here/features/here/widgets/visit_section.dart';
 import 'package:been_here/l10n/generated/app_localizations.dart';
@@ -246,6 +247,15 @@ class _HereScreenState extends ConsumerState<HereScreen> {
         SliverToBoxAdapter(
           child: RadiusSlider(photoCount: memories?.photoCount),
         ),
+        // Under the slider, because it is a picture of what the slider just
+        // did: the circle on the map is the radius it set.
+        if (memories != null && !memories.isEmpty)
+          SliverToBoxAdapter(
+            child: HereMapCard(
+              center: memories.center,
+              radiusMeters: memories.radiusMeters,
+            ),
+          ),
         const SliverToBoxAdapter(child: ArrivalsCard()),
         if (memories == null)
           const SliverFillRemaining(
