@@ -31,6 +31,7 @@ class HereMapCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider).value ?? const AppSettings();
     final points = ref.watch(memoryPointsProvider).value ?? const <GeoPoint>[];
+    final atPlace = ref.watch(viewedPlaceProvider) != null;
 
     if (!settings.mapEnabled) {
       return _OpenInMapsRow(center: center);
@@ -49,6 +50,7 @@ class HereMapCard extends ConsumerWidget {
                   center: center,
                   radiusMeters: radiusMeters,
                   points: points,
+                  centreIsPlace: atPlace,
                   // A map that pans inside a scrolling list fights the list
                   // for every drag. Tap it to get one that doesn't.
                   interactive: false,
@@ -77,13 +79,14 @@ class HereMapCard extends ConsumerWidget {
 }
 
 /// The map itself, without the card around it.
-class HereMap extends StatelessWidget {
+class HereMap extends StatefulWidget {
   const HereMap({
     required this.center,
     required this.radiusMeters,
     required this.points,
     super.key,
     this.interactive = true,
+    this.centreIsPlace = false,
   });
 
   final GeoPoint center;
@@ -91,30 +94,73 @@ class HereMap extends StatelessWidget {
   final List<GeoPoint> points;
   final bool interactive;
 
+  /// Whether the middle of the circle is a place being looked at rather than
+  /// where the phone is. A "you are here" crosshair on a place two thousand
+  /// kilometres away is a small lie.
+  final bool centreIsPlace;
+
+  @override
+  State<HereMap> createState() => _HereMapState();
+}
+
+class _HereMapState extends State<HereMap> {
+  final _controller = MapController();
+  bool _ready = false;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   /// A zoom that fits the search circle, near enough.
   ///
   /// The tile grid doubles its scale every level, and one tile is roughly
   /// 40 075 km wide at the equator divided by 2^zoom — so this is that,
   /// solved for the diameter on screen.
   double get _zoom {
-    final span = radiusMeters * 2.4;
+    final span = widget.radiusMeters * 2.4;
     for (var zoom = 18.0; zoom > 2; zoom--) {
       if (40075016 / (1 << zoom.toInt()) > span) return zoom;
     }
     return 2;
   }
 
+  LatLng get _center => LatLng(widget.center.lat, widget.center.lng);
+
+  /// Follows the screen.
+  ///
+  /// `initialCenter` is exactly that — initial. The widget survives the
+  /// screen being pointed somewhere else, so without this the map keeps the
+  /// camera it was born with: open a place two thousand kilometres away and
+  /// the photos change while the map still shows the street you are on.
+  @override
+  void didUpdateWidget(HereMap old) {
+    super.didUpdateWidget(old);
+    if (old.center == widget.center &&
+        old.radiusMeters == widget.radiusMeters) {
+      return;
+    }
+    if (_ready) _controller.move(_center, _zoom);
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final here = LatLng(center.lat, center.lng);
+    final here = _center;
 
     return FlutterMap(
+      mapController: _controller,
       options: MapOptions(
         initialCenter: here,
         initialZoom: _zoom,
+        // Moving the camera before the map has been laid out throws, so the
+        // first move waits for this.
+        onMapReady: () => _ready = true,
         interactionOptions: InteractionOptions(
-          flags: interactive ? InteractiveFlag.all : InteractiveFlag.none,
+          flags: widget.interactive
+              ? InteractiveFlag.all
+              : InteractiveFlag.none,
         ),
       ),
       children: [
@@ -123,7 +169,7 @@ class HereMap extends StatelessWidget {
           circles: [
             CircleMarker(
               point: here,
-              radius: radiusMeters,
+              radius: widget.radiusMeters,
               useRadiusInMeter: true,
               color: theme.colorScheme.primary.withValues(alpha: 0.10),
               borderColor: theme.colorScheme.primary.withValues(alpha: 0.55),
@@ -131,7 +177,7 @@ class HereMap extends StatelessWidget {
             ),
             // One dot per photo. Circles rather than markers: a marker is a
             // widget, and a thousand widgets is a different kind of app.
-            for (final point in points)
+            for (final point in widget.points)
               CircleMarker(
                 point: LatLng(point.lat, point.lng),
                 radius: 3.5,
@@ -148,7 +194,7 @@ class HereMap extends StatelessWidget {
               width: 28,
               height: 28,
               child: Icon(
-                Icons.my_location,
+                widget.centreIsPlace ? Icons.place : Icons.my_location,
                 size: 20,
                 color: theme.colorScheme.primary,
                 shadows: const [Shadow(blurRadius: 3, color: Colors.black45)],
@@ -203,6 +249,7 @@ class HereMapScreen extends ConsumerWidget {
         center: center,
         radiusMeters: radiusMeters,
         points: points,
+        centreIsPlace: ref.watch(viewedPlaceProvider) != null,
       ),
     );
   }

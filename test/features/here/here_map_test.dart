@@ -16,6 +16,12 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../support/onboarded.dart';
 
 const _prague = GeoPoint(50.0755, 14.4378);
+const _berlin = GeoPoint(52.5251, 13.3694);
+
+/// Where the map is actually looking, as opposed to where it was told to
+/// look when it was built.
+MapCamera _cameraOf(WidgetTester tester) =>
+    MapCamera.of(tester.element(find.byType(CircleLayer).first));
 
 List<PhotoAsset> _photos() => [
   for (var i = 0; i < 4; i++)
@@ -79,6 +85,45 @@ void main() {
 
     expect(find.byType(HereMapCard), findsOneWidget);
     expect(find.byType(FlutterMap), findsOneWidget);
+  });
+
+  testWidgets('follows the screen when it is pointed somewhere else', (
+    tester,
+  ) async {
+    // Photos in both places, so the map card is on screen either way.
+    library = FakePhotoLibrary(
+      assets: [
+        ..._photos(),
+        for (var i = 0; i < 3; i++)
+          PhotoAsset(
+            id: 'berlin-$i',
+            lat: _berlin.lat,
+            lng: _berlin.lng,
+            takenAt: DateTime.utc(2022, 9, 19 + i),
+            width: 4032,
+            height: 3024,
+          ),
+      ],
+    );
+    await SettingsStore(db.preferencesDao).setMapEnabled(enabled: true);
+
+    await tester.pumpWidget(app());
+    await settle(tester);
+
+    expect(_cameraOf(tester).center.latitude, closeTo(_prague.lat, 0.01));
+
+    // Now look at a place two thousand kilometres away, the way tapping a
+    // place on the Places screen does.
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(Scaffold).first),
+    );
+    container.read(viewpointProvider.notifier).point = _berlin;
+    await settle(tester);
+
+    // The photos change; so must the map. `initialCenter` is only initial,
+    // and the widget outlives the screen being pointed somewhere else.
+    expect(_cameraOf(tester).center.latitude, closeTo(_berlin.lat, 0.01));
+    expect(_cameraOf(tester).center.longitude, closeTo(_berlin.lng, 0.01));
   });
 
   testWidgets('an empty place has no map at all', (tester) async {
