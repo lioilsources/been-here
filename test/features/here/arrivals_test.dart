@@ -227,8 +227,10 @@ void main() {
       );
       final viewpoint = container.read(viewpointProvider);
 
-      expect(viewpoint, isNotNull);
-      expect(viewpoint!.lat, closeTo(place.centerLat, 1e-9));
+      expect(viewpoint.point, isNotNull);
+      expect(viewpoint.point!.lat, closeTo(place.centerLat, 1e-9));
+      // And it knows it is looking at a place, not at a debug coordinate.
+      expect(viewpoint.source, ViewpointSource.place);
     });
 
     testWidgets('a tap for a place that no longer exists changes nothing', (
@@ -243,7 +245,7 @@ void main() {
       final container = ProviderScope.containerOf(
         tester.element(find.byType(Scaffold).first),
       );
-      expect(container.read(viewpointProvider), isNull);
+      expect(container.read(viewpointProvider).point, isNull);
     });
   });
 }

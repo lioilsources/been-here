@@ -132,48 +132,99 @@ final locationPermissionProvider = FutureProvider<LocationPermissionState>(
   (ref) => ref.watch(locationServiceProvider).currentPermission(),
 );
 
-/// Somewhere other than where the phone is.
-///
-/// Two things set it: the debug sheet, so the Here screen can be tested from
-/// the sofa, and a notification tap, which opens the screen at the place the
-/// notification was about. Both are the same idea — look over there instead
-/// of here — so they are the same switch.
-class Viewpoint extends Notifier<GeoPoint?> {
-  @override
-  GeoPoint? build() => null;
+/// Why the Here screen is looking somewhere other than at the phone.
+enum ViewpointSource {
+  /// It isn't. This is the phone's own fix.
+  device,
 
-  GeoPoint? get point => state;
+  /// The debug sheet, so the screen can be tested from the sofa.
+  debug,
 
-  /// Null hands the screen back to the real device location.
-  set point(GeoPoint? value) => state = value;
+  /// A place that was opened, from the list, the map, or a notification.
+  place,
+
+  /// The middle of a map the user dragged.
+  map,
 }
 
-final viewpointProvider = NotifierProvider<Viewpoint, GeoPoint?>(
-  Viewpoint.new,
+/// Where the Here screen is looking, and why.
+///
+/// The why matters as much as the where: a place has a name and a way back,
+/// a dragged map has a way back, and a debug coordinate should keep saying
+/// it is a debug coordinate. One object rather than three flags that have to
+/// be kept in step.
+@immutable
+class Viewpoint {
+  const Viewpoint.device()
+    : point = null,
+      source = ViewpointSource.device,
+      placeId = null;
+
+  const Viewpoint.debug(GeoPoint this.point)
+    : source = ViewpointSource.debug,
+      placeId = null;
+
+  const Viewpoint.place(GeoPoint this.point, int this.placeId)
+    : source = ViewpointSource.place;
+
+  const Viewpoint.map(GeoPoint this.point)
+    : source = ViewpointSource.map,
+      placeId = null;
+
+  /// Null means the device's own location.
+  final GeoPoint? point;
+  final ViewpointSource source;
+
+  /// Set only when [source] is [ViewpointSource.place].
+  final int? placeId;
+
+  bool get isOverride => point != null;
+
+  @override
+  bool operator ==(Object other) =>
+      other is Viewpoint &&
+      other.point == point &&
+      other.source == source &&
+      other.placeId == placeId;
+
+  @override
+  int get hashCode => Object.hash(point, source, placeId);
+
+  @override
+  String toString() => 'Viewpoint(${source.name}, $point)';
+}
+
+class ViewpointController extends Notifier<Viewpoint> {
+  @override
+  Viewpoint build() => const Viewpoint.device();
+
+  GeoPoint? get point => state.point;
+
+  void toPlace(GeoPoint point, int placeId) =>
+      state = Viewpoint.place(point, placeId);
+
+  void toDebug(GeoPoint point) => state = Viewpoint.debug(point);
+
+  /// Dragging the map is a way of asking "and what about over there?".
+  void toMapCentre(GeoPoint point) => state = Viewpoint.map(point);
+
+  /// Hands the screen back to the phone.
+  void toDevice() => state = const Viewpoint.device();
+}
+
+final viewpointProvider = NotifierProvider<ViewpointController, Viewpoint>(
+  ViewpointController.new,
 );
 
 /// The place the Here screen is looking at, when it got there by opening one.
-///
-/// Separate from [viewpointProvider] because the two overrides mean
-/// different things on screen: a place has a name and a way back, a debug
-/// coordinate has neither and should keep saying it is a debug coordinate.
-class ViewedPlace extends Notifier<int?> {
-  @override
-  int? build() => null;
-
-  int? get id => state;
-
-  set id(int? value) => state = value;
-}
-
-final viewedPlaceProvider = NotifierProvider<ViewedPlace, int?>(
-  ViewedPlace.new,
+final viewedPlaceProvider = Provider<int?>(
+  (ref) => ref.watch(viewpointProvider.select((v) => v.placeId)),
 );
 
 /// Where the Here screen is looking: the override if there is one, otherwise
 /// the device's own fix.
 final currentLocationProvider = FutureProvider<GeoPoint?>((ref) async {
-  final override = ref.watch(viewpointProvider);
+  final override = ref.watch(viewpointProvider.select((v) => v.point));
   if (override != null) return override;
 
   final permission = await ref.watch(locationPermissionProvider.future);
@@ -628,11 +679,9 @@ Future<bool> openPlace(WidgetRef ref, int placeId) async {
   final place = await ref.read(databaseProvider).placesDao.byId(placeId);
   if (place == null) return false;
 
-  ref.read(viewpointProvider.notifier).point = GeoPoint(
-    place.centerLat,
-    place.centerLng,
-  );
-  ref.read(viewedPlaceProvider.notifier).id = placeId;
+  ref
+      .read(viewpointProvider.notifier)
+      .toPlace(GeoPoint(place.centerLat, place.centerLng), placeId);
   ref.read(searchRadiusProvider.notifier).meters = place.radiusM * 2;
   ref.read(selectedTabProvider.notifier).index = 0;
   return true;

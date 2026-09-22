@@ -117,13 +117,94 @@ void main() {
     final container = ProviderScope.containerOf(
       tester.element(find.byType(Scaffold).first),
     );
-    container.read(viewpointProvider.notifier).point = _berlin;
+    container.read(viewpointProvider.notifier).toPlace(_berlin, 1);
     await settle(tester);
 
     // The photos change; so must the map. `initialCenter` is only initial,
     // and the widget outlives the screen being pointed somewhere else.
     expect(_cameraOf(tester).center.latitude, closeTo(_berlin.lat, 0.01));
     expect(_cameraOf(tester).center.longitude, closeTo(_berlin.lng, 0.01));
+  });
+
+  testWidgets('dragging the map looks somewhere else', (tester) async {
+    await SettingsStore(db.preferencesDao).setMapEnabled(enabled: true);
+
+    await tester.pumpWidget(app());
+    await settle(tester);
+
+    // Into the full screen map, which is the one that pans.
+    await tester.tap(find.byType(HereMapCard));
+    await settle(tester);
+    expect(find.byType(HereMapScreen), findsOneWidget);
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(HereMapScreen)),
+    );
+    expect(container.read(viewpointProvider).point, isNull);
+
+    final before = _cameraOf(tester).center;
+    await tester.drag(find.byType(FlutterMap), const Offset(-120, -80));
+    await settle(tester);
+
+    // The screen follows where the map ended up — after the pan settles,
+    // not once per frame of it.
+    final viewpoint = container.read(viewpointProvider);
+    expect(viewpoint.source, ViewpointSource.map);
+    expect(viewpoint.point, isNotNull);
+    expect(viewpoint.point!.lat, isNot(closeTo(_prague.lat, 1e-9)));
+
+    // And the camera stays where the finger left it: the screen moving to
+    // the new centre must not shove the map back.
+    final after = _cameraOf(tester).center;
+    expect(after.latitude, isNot(closeTo(before.latitude, 1e-9)));
+    expect(after.latitude, closeTo(viewpoint.point!.lat, 1e-6));
+    expect(after.longitude, closeTo(viewpoint.point!.lng, 1e-6));
+  });
+
+  testWidgets('after dragging, the way back is on the Here screen', (
+    tester,
+  ) async {
+    await SettingsStore(db.preferencesDao).setMapEnabled(enabled: true);
+
+    await tester.pumpWidget(app());
+    await settle(tester);
+    await tester.tap(find.byType(HereMapCard));
+    await settle(tester);
+    await tester.drag(find.byType(FlutterMap), const Offset(-120, -80));
+    await settle(tester);
+
+    await tester.pageBack();
+    await settle(tester);
+
+    // Looking elsewhere is a state you must be able to leave.
+    expect(find.byTooltip('Back to where I am'), findsOneWidget);
+    await tester.tap(find.byTooltip('Back to where I am'));
+    await settle(tester);
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(Scaffold).first),
+    );
+    expect(container.read(viewpointProvider).point, isNull);
+  });
+
+  testWidgets('the range can be changed from the map itself', (tester) async {
+    await SettingsStore(db.preferencesDao).setMapEnabled(enabled: true);
+
+    await tester.pumpWidget(app());
+    await settle(tester);
+    await tester.tap(find.byType(HereMapCard));
+    await settle(tester);
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(HereMapScreen)),
+    );
+    final before = container.read(searchRadiusProvider);
+
+    // You are looking at the circle, so the handle that sizes it is here.
+    await tester.drag(find.byType(Slider), const Offset(60, 0));
+    await settle(tester);
+
+    expect(container.read(searchRadiusProvider), greaterThan(before));
   });
 
   testWidgets('an empty place has no map at all', (tester) async {

@@ -30,7 +30,7 @@ class _DebugLocationSheetState extends ConsumerState<DebugLocationSheet> {
   @override
   void initState() {
     super.initState();
-    final current = ref.read(viewpointProvider);
+    final current = ref.read(viewpointProvider).point;
     _lat = TextEditingController(text: current?.lat.toStringAsFixed(6) ?? '');
     _lng = TextEditingController(text: current?.lng.toStringAsFixed(6) ?? '');
   }
@@ -49,14 +49,12 @@ class _DebugLocationSheetState extends ConsumerState<DebugLocationSheet> {
       setState(() => _error = '−90..90 / −180..180');
       return;
     }
-    ref.read(viewpointProvider.notifier).point = GeoPoint(lat, lng);
-    ref.read(viewedPlaceProvider.notifier).id = null;
+    ref.read(viewpointProvider.notifier).toDebug(GeoPoint(lat, lng));
     Navigator.of(context).pop();
   }
 
   void _clear() {
-    ref.read(viewpointProvider.notifier).point = null;
-    ref.read(viewedPlaceProvider.notifier).id = null;
+    ref.read(viewpointProvider.notifier).toDevice();
     Navigator.of(context).pop();
   }
 
@@ -64,7 +62,7 @@ class _DebugLocationSheetState extends ConsumerState<DebugLocationSheet> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final active = ref.watch(viewpointProvider) != null;
+    final active = ref.watch(viewpointProvider).isOverride;
 
     return Padding(
       padding: EdgeInsets.fromLTRB(

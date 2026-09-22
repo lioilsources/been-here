@@ -97,10 +97,11 @@ void main() {
     final container = ProviderScope.containerOf(
       tester.element(find.byType(Scaffold).first),
     );
-    container.read(viewpointProvider.notifier).point = const GeoPoint(
-      50.0756,
-      14.4379,
-    );
+    container
+        .read(viewpointProvider.notifier)
+        .toMapCentre(
+          const GeoPoint(50.0756, 14.4379),
+        );
     await tester.pump();
 
     expect(find.byType(CircularProgressIndicator), findsNothing);

@@ -75,7 +75,8 @@ class _HereScreenState extends ConsumerState<HereScreen> {
     // Opening a place points this screen at it. Say which one, and offer
     // the way back — without it the screen looks like it is simply wrong
     // about where the phone is.
-    final placeId = ref.watch(viewedPlaceProvider);
+    final viewpoint = ref.watch(viewpointProvider);
+    final placeId = viewpoint.placeId;
     final placeName = placeId == null
         ? null
         : ref.watch(placeLabelProvider(placeId)).value ??
@@ -98,12 +99,15 @@ class _HereScreenState extends ConsumerState<HereScreen> {
             IconButton(
               tooltip: l10n.hereBackToMe,
               icon: const Icon(Icons.my_location),
-              onPressed: () {
-                ref.read(viewpointProvider.notifier).point = null;
-                ref.read(viewedPlaceProvider.notifier).id = null;
-              },
+              onPressed: ref.read(viewpointProvider.notifier).toDevice,
             )
-          else if (ref.watch(viewpointProvider) != null)
+          else if (viewpoint.source == ViewpointSource.map)
+            IconButton(
+              tooltip: l10n.hereBackToMe,
+              icon: const Icon(Icons.my_location),
+              onPressed: ref.read(viewpointProvider.notifier).toDevice,
+            )
+          else if (viewpoint.isOverride)
             IconButton(
               tooltip: l10n.debugLocationActive,
               icon: const Icon(Icons.bug_report_outlined),

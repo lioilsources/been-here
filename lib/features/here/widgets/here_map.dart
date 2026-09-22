@@ -4,6 +4,7 @@ import 'package:been_here/app/providers.dart';
 import 'package:been_here/core/geo/geo_point.dart';
 import 'package:been_here/domain/settings/app_settings.dart';
 import 'package:been_here/features/common/osm_tiles.dart';
+import 'package:been_here/features/here/widgets/radius_slider.dart';
 import 'package:been_here/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -87,6 +88,7 @@ class HereMap extends StatefulWidget {
     super.key,
     this.interactive = true,
     this.centreIsPlace = false,
+    this.onCentreMoved,
   });
 
   final GeoPoint center;
@@ -99,18 +101,55 @@ class HereMap extends StatefulWidget {
   /// kilometres away is a small lie.
   final bool centreIsPlace;
 
+  /// Called when the user has dragged the map somewhere and let go.
+  ///
+  /// Dragging a map is a way of asking "and what about over there?", so the
+  /// screen follows: the circle, the dots and the timeline behind it all
+  /// move to the middle of wherever the map ended up.
+  final ValueChanged<GeoPoint>? onCentreMoved;
+
   @override
   State<HereMap> createState() => _HereMapState();
 }
 
 class _HereMapState extends State<HereMap> {
+  /// How long after the last pan to take the new middle seriously.
+  ///
+  /// Long enough that a flick and its settle count as one move, short enough
+  /// that letting go feels like it did something.
+  static const _settle = Duration(milliseconds: 350);
+
   final _controller = MapController();
   bool _ready = false;
 
+  Timer? _pending;
+
+  /// The last centre this map asked the screen to move to.
+  ///
+  /// When the request comes back as a new centre the camera is already
+  /// there, and moving it again would fight the finger that put it there.
+  GeoPoint? _published;
+
   @override
   void dispose() {
+    _pending?.cancel();
     _controller.dispose();
     super.dispose();
+  }
+
+  void _centreMoved(MapCamera camera) {
+    final moved = widget.onCentreMoved;
+    if (moved == null) return;
+
+    _pending?.cancel();
+    _pending = Timer(_settle, () {
+      final centre = GeoPoint(
+        camera.center.latitude,
+        camera.center.longitude,
+      );
+      _published = centre;
+      moved(centre);
+    });
   }
 
   /// A zoom that fits the search circle, near enough.
@@ -141,6 +180,11 @@ class _HereMapState extends State<HereMap> {
         old.radiusMeters == widget.radiusMeters) {
       return;
     }
+    // Our own pan coming back around. The camera is already there.
+    if (widget.center == _published &&
+        old.radiusMeters == widget.radiusMeters) {
+      return;
+    }
     if (_ready) _controller.move(_center, _zoom);
   }
 
@@ -157,6 +201,9 @@ class _HereMapState extends State<HereMap> {
         // Moving the camera before the map has been laid out throws, so the
         // first move waits for this.
         onMapReady: () => _ready = true,
+        onPositionChanged: (camera, hasGesture) {
+          if (hasGesture) _centreMoved(camera);
+        },
         interactionOptions: InteractionOptions(
           flags: widget.interactive
               ? InteractiveFlag.all
@@ -233,6 +280,7 @@ class HereMapScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final points = ref.watch(memoryPointsProvider).value ?? const <GeoPoint>[];
+    final radius = ref.watch(searchRadiusProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -245,11 +293,54 @@ class HereMapScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: HereMap(
-        center: center,
-        radiusMeters: radiusMeters,
-        points: points,
-        centreIsPlace: ref.watch(viewedPlaceProvider) != null,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: HereMap(
+              center: ref.watch(currentLocationProvider).value ?? center,
+              radiusMeters: radius,
+              points: points,
+              centreIsPlace: ref.watch(viewedPlaceProvider) != null,
+              onCentreMoved: ref.read(viewpointProvider.notifier).toMapCentre,
+            ),
+          ),
+          // The circle you are looking at, with the handle that sizes it
+          // and the count of what is inside. Without it, dragging the map
+          // looks like nothing happened until you go back to the timeline.
+          const Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: _MapControls(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The radius, and what is inside it, over the bottom of the map.
+///
+/// The same slider as the timeline's, because it is the same number: the
+/// circle drawn here is what that slider sets.
+class _MapControls extends ConsumerWidget {
+  const _MapControls();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final here = ref.watch(memoriesHereProvider).value;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface.withValues(alpha: 0.92),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: RadiusSlider(photoCount: here?.photoCount),
+        ),
       ),
     );
   }

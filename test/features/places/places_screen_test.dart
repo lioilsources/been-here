@@ -288,7 +288,7 @@ void main() {
       tester.element(find.byType(Scaffold).first),
     );
     expect(container.read(selectedTabProvider), 0);
-    expect(container.read(viewpointProvider), isNotNull);
+    expect(container.read(viewpointProvider).point, isNotNull);
     // And the screen knows which place it is looking at, not just where.
     expect(container.read(viewedPlaceProvider), isNotNull);
   });
@@ -316,7 +316,7 @@ void main() {
     final container = ProviderScope.containerOf(
       tester.element(find.byType(Scaffold).first),
     );
-    expect(container.read(viewpointProvider), isNull);
+    expect(container.read(viewpointProvider).point, isNull);
     expect(container.read(viewedPlaceProvider), isNull);
     expect(
       find.descendant(of: find.byType(AppBar), matching: find.text('Here')),

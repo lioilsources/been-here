@@ -275,6 +275,20 @@ else, capped at two thousand. A dense neighbourhood holds far more than a
 map can usefully show, and past a few thousand the dots stop being
 information and become a stain.
 
+The full-screen map pans, and panning it moves the whole screen: let go and
+the circle, the dots and the timeline behind all follow the middle of
+wherever the map ended up. Dragging a map is a way of asking "and what about
+over there?", so the app answers. It waits for the pan to settle — a flick
+and its glide are one move, not forty — and the map remembers the centre it
+asked for, so the answer coming back does not shove the camera out from
+under the finger that put it there. The radius slider is on that screen too:
+the circle drawn there is exactly what it sets.
+
+Where the screen is looking is one object rather than a coordinate and a
+pile of flags, because *why* it is looking there decides what the screen
+says: a place has a name and a way back, a dragged map has a way back, and a
+debug coordinate goes on saying it is a debug coordinate.
+
 With maps switched off the card becomes a single button that hands one
 coordinate to the phone's own maps app. That is a different thing from
 drawing tiles here: one jump the user asked for, to an app they already
