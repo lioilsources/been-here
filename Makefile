@@ -1,4 +1,4 @@
-.PHONY: help get gen l10n analyze format test bench check clean run-ios run-android
+.PHONY: help get gen l10n analyze format test bench check clean run-ios run-android install-ios
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
@@ -33,6 +33,9 @@ check: analyze test bench ## What CI runs (integration needs a device, so not he
 
 clean:
 	flutter clean
+
+install-ios: ## Release build onto a connected iPhone (handles the CI signing placeholder)
+	./tool/install_ios.sh
 
 run-ios:
 	flutter run -d iPhone

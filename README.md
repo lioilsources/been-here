@@ -54,6 +54,19 @@ drift tables or the `.arb` files.
 
 Targets iOS 15+ and Android 8+ (API 26). Bundle id `com.lioilsources.beenhere`.
 
+## Releasing
+
+Push a tag and both platforms build themselves:
+
+```sh
+git tag v0.1.0-alpha && git push origin v0.1.0-alpha
+```
+
+iOS goes to TestFlight, Android to Firebase App Distribution, and both attach
+their artifacts to a GitHub release. The signing material lives in the private
+`Distribution` repo; `docs/RELEASING.md` has the one-time setup and the local
+build story.
+
 ## Licence
 
 MIT — see [LICENSE](LICENSE). Take it, change it, ship it; keep the copyright
