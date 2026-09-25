@@ -1027,6 +1027,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'A place you know'**
   String get herePlaceFallbackTitle;
+
+  /// No description provided for @arrivalTestNearHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Too close to home to be news.'**
+  String get arrivalTestNearHome;
+
+  /// No description provided for @settingsHomeRadiusTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay quiet within'**
+  String get settingsHomeRadiusTitle;
+
+  /// No description provided for @settingsHomeRadiusValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{km, plural, =0{no distance — never quiet} =1{1 km of home} other{{km} km of home}}'**
+  String settingsHomeRadiusValue(num km);
+
+  /// No description provided for @settingsHomeRadiusBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Everyday life happens close to home, and that is where a phone commenting on it is least welcome. Places nearer than this are never watched.'**
+  String get settingsHomeRadiusBody;
+
+  /// No description provided for @settingsQuietTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Why it is quiet'**
+  String get settingsQuietTitle;
+
+  /// No description provided for @settingsQuietWatching.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Watching no places} =1{Watching 1 place} other{Watching {count} places}}'**
+  String settingsQuietWatching(num count);
+
+  /// Distance to the nearest watched place
+  ///
+  /// In en, this message translates to:
+  /// **'Nearest watched place: {distance}'**
+  String settingsQuietNearest(String distance);
+
+  /// No description provided for @settingsQuietNothingWatched.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing is being watched, so nothing can arrive.'**
+  String get settingsQuietNothingWatched;
+
+  /// When the app last notified
+  ///
+  /// In en, this message translates to:
+  /// **'Last notification: {when}'**
+  String settingsQuietLastNotified(String when);
+
+  /// No description provided for @settingsQuietNever.
+  ///
+  /// In en, this message translates to:
+  /// **'never'**
+  String get settingsQuietNever;
+
+  /// Why places are not being watched
+  ///
+  /// In en, this message translates to:
+  /// **'Of {total} places: {reasons}'**
+  String settingsQuietBreakdown(int total, String reasons);
+
+  /// No description provided for @settingsQuietReasonMuted.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} muted'**
+  String settingsQuietReasonMuted(Object count);
+
+  /// No description provided for @settingsQuietReasonNearHome.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} near home'**
+  String settingsQuietReasonNearHome(Object count);
+
+  /// No description provided for @settingsQuietReasonTooFewPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} with too few photos'**
+  String settingsQuietReasonTooFewPhotos(Object count);
+
+  /// No description provided for @settingsQuietReasonTooRecent.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} photographed too recently'**
+  String settingsQuietReasonTooRecent(Object count);
+
+  /// No description provided for @settingsQuietReasonPlaceCooldown.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} still cooling down'**
+  String settingsQuietReasonPlaceCooldown(Object count);
+
+  /// No description provided for @settingsQuietReasonEligible.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} worth watching'**
+  String settingsQuietReasonEligible(Object count);
 }
 
 class _AppLocalizationsDelegate

@@ -634,4 +634,95 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get herePlaceFallbackTitle => 'Místo, které znáš';
+
+  @override
+  String get arrivalTestNearHome => 'Moc blízko domovu, to není novinka.';
+
+  @override
+  String get settingsHomeRadiusTitle => 'Mlčet v okruhu';
+
+  @override
+  String settingsHomeRadiusValue(num km) {
+    String _temp0 = intl.Intl.pluralLogic(
+      km,
+      locale: localeName,
+      other: '$km km od domova',
+      few: '$km km od domova',
+      one: '1 km od domova',
+      zero: 'bez okruhu — nikdy nemlčet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settingsHomeRadiusBody =>
+      'Všední život se odehrává kolem domova a právě tam je komentující telefon nejmíň vítaný. Bližší místa se vůbec nehlídají.';
+
+  @override
+  String get settingsQuietTitle => 'Proč je ticho';
+
+  @override
+  String settingsQuietWatching(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Hlídá se $count míst',
+      few: 'Hlídají se $count místa',
+      one: 'Hlídá se 1 místo',
+      zero: 'Nehlídá se žádné místo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settingsQuietNearest(String distance) {
+    return 'Nejbližší hlídané místo: $distance';
+  }
+
+  @override
+  String get settingsQuietNothingWatched =>
+      'Nehlídá se nic, takže nemá co přijít.';
+
+  @override
+  String settingsQuietLastNotified(String when) {
+    return 'Poslední notifikace: $when';
+  }
+
+  @override
+  String get settingsQuietNever => 'nikdy';
+
+  @override
+  String settingsQuietBreakdown(int total, String reasons) {
+    return 'Z $total míst: $reasons';
+  }
+
+  @override
+  String settingsQuietReasonMuted(Object count) {
+    return '$count ztlumených';
+  }
+
+  @override
+  String settingsQuietReasonNearHome(Object count) {
+    return '$count blízko domova';
+  }
+
+  @override
+  String settingsQuietReasonTooFewPhotos(Object count) {
+    return '$count s málo fotkami';
+  }
+
+  @override
+  String settingsQuietReasonTooRecent(Object count) {
+    return '$count nafocených nedávno';
+  }
+
+  @override
+  String settingsQuietReasonPlaceCooldown(Object count) {
+    return '$count v prodlevě';
+  }
+
+  @override
+  String settingsQuietReasonEligible(Object count) {
+    return '$count ke hlídání';
+  }
 }

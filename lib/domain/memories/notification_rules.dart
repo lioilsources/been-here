@@ -1,4 +1,5 @@
 import 'package:been_here/core/geo/geo_point.dart';
+import 'package:been_here/core/geo/haversine.dart';
 import 'package:been_here/domain/places/mute_state.dart';
 import 'package:meta/meta.dart';
 
@@ -47,6 +48,7 @@ class NotificationRules {
     this.placeCooldown = const Duration(days: 30),
     this.globalCooldown = const Duration(days: 1),
     this.minimumPhotos = 3,
+    this.homeRadiusMeters = 25000,
   });
 
   /// How old the newest photo at a place must be.
@@ -66,6 +68,18 @@ class NotificationRules {
 
   /// Fewer photos than this is not a visit worth remembering.
   final int minimumPhotos;
+
+  /// How far from home a place has to be before arriving there is news.
+  ///
+  /// Everyday life happens close to home, and the places in it are the ones
+  /// you least want a phone to comment on — the shop, the school, the park
+  /// you cross twice a day. Auto-mute already catches the ones you have
+  /// photographed often; this catches the rest of the neighbourhood, the
+  /// places you happened to photograph three times four years ago and walk
+  /// past every week since.
+  ///
+  /// Zero turns it off.
+  final double homeRadiusMeters;
 }
 
 /// Why a place was passed over. Named rather than boolean so the reason can
@@ -79,6 +93,9 @@ enum NotificationVeto {
 
   /// This place notified not long ago.
   placeCooldown,
+
+  /// Close enough to home to be part of the everyday.
+  nearHome,
 
   /// Something else notified not long ago.
   dailyLimit,
@@ -116,8 +133,14 @@ NotificationVeto? monitoringVeto({
   required NotifiablePlace place,
   required DateTime now,
   NotificationRules rules = const NotificationRules(),
+  GeoPoint? home,
 }) {
   if (place.mute.isMuted) return NotificationVeto.muted;
+  if (home != null &&
+      rules.homeRadiusMeters > 0 &&
+      distanceMeters(home, place.center) < rules.homeRadiusMeters) {
+    return NotificationVeto.nearHome;
+  }
   if (place.photoCount < rules.minimumPhotos) {
     return NotificationVeto.tooFewPhotos;
   }
@@ -139,8 +162,14 @@ NotificationDecision decideNotification({
   required DateTime now,
   DateTime? lastNotificationAnywhere,
   NotificationRules rules = const NotificationRules(),
+  GeoPoint? home,
 }) {
-  final veto = monitoringVeto(place: place, now: now, rules: rules);
+  final veto = monitoringVeto(
+    place: place,
+    now: now,
+    rules: rules,
+    home: home,
+  );
   if (veto != null) return NotificationDecision.vetoed(veto);
 
   if (lastNotificationAnywhere != null &&

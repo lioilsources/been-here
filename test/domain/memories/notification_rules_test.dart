@@ -1,9 +1,16 @@
 import 'package:been_here/core/geo/geo_point.dart';
+import 'package:been_here/core/geo/haversine.dart';
 import 'package:been_here/domain/memories/notification_rules.dart';
 import 'package:been_here/domain/places/mute_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 final _now = DateTime.utc(2026, 9, 20, 14);
+
+const _prague = GeoPoint(50.0755, 14.4378);
+
+/// [km] north of Prague.
+GeoPoint _north(double km) =>
+    GeoPoint(_prague.lat + km * 1000 / metersPerDegreeLatitude, _prague.lng);
 
 NotifiablePlace _place({
   int id = 1,
@@ -11,9 +18,10 @@ NotifiablePlace _place({
   Duration lastPhoto = const Duration(days: 2191), // six years
   MuteState mute = MuteState.none,
   Duration? lastNotified,
+  GeoPoint center = _prague,
 }) => NotifiablePlace(
   placeId: id,
-  center: const GeoPoint(50.0755, 14.4378),
+  center: center,
   radiusMeters: 150,
   photoCount: photos,
   lastPhotoAt: _now.subtract(lastPhoto),
@@ -196,6 +204,72 @@ void main() {
           now: _now,
         ).shouldNotify,
         isTrue,
+      );
+    });
+  });
+
+  group('home is not news', () {
+    test('a place inside the home radius is not worth watching', () {
+      // The corner shop you photographed four years ago and have walked past
+      // twice a week since.
+      expect(
+        monitoringVeto(place: _place(), now: _now, home: _prague),
+        NotificationVeto.nearHome,
+      );
+    });
+
+    test('a place beyond it is', () {
+      expect(
+        monitoringVeto(
+          place: _place(center: _north(40)),
+          now: _now,
+          home: _prague,
+        ),
+        isNull,
+      );
+    });
+
+    test('the radius is a setting, and zero turns it off', () {
+      const off = NotificationRules(homeRadiusMeters: 0);
+      expect(
+        monitoringVeto(place: _place(), now: _now, home: _prague, rules: off),
+        isNull,
+      );
+
+      const wide = NotificationRules(homeRadiusMeters: 50000);
+      expect(
+        monitoringVeto(
+          place: _place(center: _north(40)),
+          now: _now,
+          home: _prague,
+          rules: wide,
+        ),
+        NotificationVeto.nearHome,
+      );
+    });
+
+    test('an index with no home at all still notifies', () {
+      // A library with no places yet, or one place: nothing to measure from.
+      expect(monitoringVeto(place: _place(), now: _now), isNull);
+    });
+
+    test('being muted is reported before being near home', () {
+      // Both are true of a home; the more specific decision is the one the
+      // user made.
+      expect(
+        monitoringVeto(
+          place: _place(mute: MuteState.userMuted),
+          now: _now,
+          home: _prague,
+        ),
+        NotificationVeto.muted,
+      );
+    });
+
+    test('an arrival close to home stays quiet', () {
+      expect(
+        decideNotification(place: _place(), now: _now, home: _prague),
+        const NotificationDecision.vetoed(NotificationVeto.nearHome),
       );
     });
   });

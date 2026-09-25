@@ -21,12 +21,15 @@ List<NotifiablePlace> selectRegions({
   required DateTime now,
   required int limit,
   NotificationRules rules = const NotificationRules(),
+  GeoPoint? home,
 }) {
   if (limit <= 0) return const [];
 
   final eligible = [
     for (final place in places)
-      if (monitoringVeto(place: place, now: now, rules: rules) == null) place,
+      if (monitoringVeto(place: place, now: now, rules: rules, home: home) ==
+          null)
+        place,
   ];
 
   // Nearest first, because the ones you could plausibly reach next are the

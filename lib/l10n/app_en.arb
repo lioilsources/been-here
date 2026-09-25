@@ -368,5 +368,49 @@
   "hereMapTitle": "Around here",
   "hereOpenInMaps": "Open in Maps",
   "hereBackToMe": "Back to where I am",
-  "herePlaceFallbackTitle": "A place you know"
+  "herePlaceFallbackTitle": "A place you know",
+  "arrivalTestNearHome": "Too close to home to be news.",
+  "settingsHomeRadiusTitle": "Stay quiet within",
+  "settingsHomeRadiusValue": "{km, plural, =0{no distance — never quiet} =1{1 km of home} other{{km} km of home}}",
+  "settingsHomeRadiusBody": "Everyday life happens close to home, and that is where a phone commenting on it is least welcome. Places nearer than this are never watched.",
+  "settingsQuietTitle": "Why it is quiet",
+  "settingsQuietWatching": "{count, plural, =0{Watching no places} =1{Watching 1 place} other{Watching {count} places}}",
+  "settingsQuietNearest": "Nearest watched place: {distance}",
+  "@settingsQuietNearest": {
+    "description": "Distance to the nearest watched place",
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsQuietNothingWatched": "Nothing is being watched, so nothing can arrive.",
+  "settingsQuietLastNotified": "Last notification: {when}",
+  "@settingsQuietLastNotified": {
+    "description": "When the app last notified",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsQuietNever": "never",
+  "settingsQuietBreakdown": "Of {total} places: {reasons}",
+  "@settingsQuietBreakdown": {
+    "description": "Why places are not being watched",
+    "placeholders": {
+      "total": {
+        "type": "int"
+      },
+      "reasons": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsQuietReasonMuted": "{count} muted",
+  "settingsQuietReasonNearHome": "{count} near home",
+  "settingsQuietReasonTooFewPhotos": "{count} with too few photos",
+  "settingsQuietReasonTooRecent": "{count} photographed too recently",
+  "settingsQuietReasonPlaceCooldown": "{count} still cooling down",
+  "settingsQuietReasonEligible": "{count} worth watching"
 }

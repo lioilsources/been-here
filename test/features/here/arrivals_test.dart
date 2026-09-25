@@ -1,6 +1,7 @@
 import 'package:been_here/app/app.dart';
 import 'package:been_here/app/providers.dart';
 import 'package:been_here/core/geo/geo_point.dart';
+import 'package:been_here/core/geo/haversine.dart';
 import 'package:been_here/data/db/database.dart';
 import 'package:been_here/data/location/fake_location_service.dart';
 import 'package:been_here/data/location/geofence_service.dart';
@@ -17,14 +18,33 @@ import '../../support/onboarded.dart';
 
 const _home = GeoPoint(50.0755, 14.4378);
 
-/// A library with one place worth remembering: plenty of photos, years old.
+/// Eighty kilometres north of home — far enough to be somewhere else.
+final _away = GeoPoint(_home.lat + 80000 / metersPerDegreeLatitude, _home.lng);
+
+/// Two places, years old: the one you live at, and one worth remembering.
+///
+/// Home has to be in here. Arrivals are only watched beyond the home radius,
+/// so a library with a single place is a library where the app correctly
+/// watches nothing — which makes for a test that proves the opposite of what
+/// it looks like.
 List<PhotoAsset> _library() => [
+  // Home: eight separate days, which is what makes it home.
   for (var i = 0; i < 8; i++)
     PhotoAsset(
-      id: 'old-$i',
+      id: 'home-$i',
       lat: _home.lat,
       lng: _home.lng,
-      takenAt: DateTime.utc(2019, 7, 4, 10 + i),
+      takenAt: DateTime.utc(2019, 7, 4 + i, 10),
+      width: 100,
+      height: 100,
+    ),
+  // One afternoon somewhere else, long ago.
+  for (var i = 0; i < 4; i++)
+    PhotoAsset(
+      id: 'away-$i',
+      lat: _away.lat,
+      lng: _away.lng,
+      takenAt: DateTime.utc(2019, 8, 17, 12 + i),
       width: 100,
       height: 100,
     ),
@@ -218,7 +238,11 @@ void main() {
       await tester.pumpWidget(app());
       await settle(tester, frames: 60);
 
-      final place = (await db.placesDao.all()).first;
+      // The one that is watched, which is the one a notification can be
+      // about: home never speaks.
+      final place = (await db.placesDao.all()).firstWhere(
+        (p) => (p.centerLat - _away.lat).abs() < 0.01,
+      );
       notifications.tap(place.id);
       await settle(tester, frames: 40);
 

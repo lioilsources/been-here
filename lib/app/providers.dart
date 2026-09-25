@@ -397,6 +397,14 @@ class SettingsController extends AsyncNotifier<AppSettings> {
     ref.invalidateSelf();
   }
 
+  Future<void> setHomeRadiusKm(int km) async {
+    await ref.read(settingsStoreProvider).setHomeRadiusKm(km);
+    ref.invalidateSelf();
+    // What is worth watching just changed.
+    final here = await ref.read(currentLocationProvider.future);
+    if (here != null) await ref.read(regionSyncProvider).syncRegions(here);
+  }
+
   Future<void> setOnboardingSeen({required bool seen}) async {
     await ref.read(settingsStoreProvider).setOnboardingSeen(seen: seen);
     ref.invalidateSelf();
@@ -578,6 +586,81 @@ Future<NotificationDecision> testArrival(
   );
   return service.onArrival(placeId);
 }
+
+/// Why nothing is arriving.
+///
+/// "No notifications ever" has a dozen innocent explanations and one
+/// alarming one, and from the outside they look identical. This counts them:
+/// how many places the system is actually watching, and what stopped the
+/// rest.
+@immutable
+class ArrivalDiagnosis {
+  const ArrivalDiagnosis({
+    required this.totalPlaces,
+    required this.watching,
+    required this.vetoes,
+    this.nearestWatchedMeters,
+    this.lastNotifiedAt,
+  });
+
+  final int totalPlaces;
+
+  /// Places the system is monitoring right now, as it reports them — not as
+  /// the app believes it registered them.
+  final int watching;
+
+  /// How many places each veto accounts for. Eligible places are the ones
+  /// missing from here.
+  final Map<NotificationVeto, int> vetoes;
+
+  final double? nearestWatchedMeters;
+  final DateTime? lastNotifiedAt;
+
+  int get eligible =>
+      totalPlaces - vetoes.values.fold(0, (sum, count) => sum + count);
+}
+
+final arrivalDiagnosisProvider = FutureProvider<ArrivalDiagnosis>((ref) async {
+  // Recounted whenever the places or the thresholds change.
+  ref.watch(placesProvider);
+  final rules = ref.watch(notificationRulesProvider);
+
+  final dao = ref.watch(databaseProvider).placesDao;
+  final places = await dao.notifiable();
+  final home = await dao.home();
+  final now = DateTime.now();
+
+  final vetoes = <NotificationVeto, int>{};
+  for (final place in places) {
+    final veto = monitoringVeto(
+      place: place,
+      now: now,
+      rules: rules,
+      home: home,
+    );
+    if (veto != null) vetoes[veto] = (vetoes[veto] ?? 0) + 1;
+  }
+
+  final watched = await ref.watch(geofenceServiceProvider).registeredPlaceIds();
+  final here = await ref.watch(currentLocationProvider.future);
+
+  double? nearest;
+  if (here != null && watched.isNotEmpty) {
+    for (final place in places) {
+      if (!watched.contains(place.placeId)) continue;
+      final metres = distanceMeters(here, place.center);
+      if (nearest == null || metres < nearest) nearest = metres;
+    }
+  }
+
+  return ArrivalDiagnosis(
+    totalPlaces: places.length,
+    watching: watched.length,
+    vetoes: vetoes,
+    nearestWatchedMeters: nearest,
+    lastNotifiedAt: await dao.lastNotifiedAnywhere(),
+  );
+});
 
 /// Whether the app can be woken on arrival at all.
 final arrivalsAvailableProvider = FutureProvider<bool>((ref) {

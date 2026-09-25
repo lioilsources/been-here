@@ -220,6 +220,39 @@ An arrival re-checks every rule rather than trusting the registration: a
 place can be muted, or photographed again, between being registered and being
 entered.
 
+### Home is not news
+
+Arrivals are watched only beyond a radius around home — 25 km by default,
+adjustable from zero to a hundred. Everyday life happens close to home, and
+that is exactly where a phone commenting on it is least welcome: the corner
+shop you photographed four years ago and have walked past twice a week
+since is not a memory, it is a commute.
+
+Auto-mute already catches the places you photograph *often*. This catches
+the rest of the neighbourhood, which auto-mute never sees, and it does it
+before the region is registered — so the twenty slots iOS allows go to
+places you might actually be surprised to arrive at.
+
+Home is not a setting. It is the place with the most separate days in the
+index, ties broken by photo count: the index has already answered "where do
+you live" in the only unit that matters here. That also means a library with
+one place has no watched places at all, which is correct and looks exactly
+like a bug — hence the report below.
+
+### Why it is quiet
+
+Every threshold in Settings makes the app quieter, and their combined effect
+is invisible: you turn three dials, nothing happens for a week, and there is
+no way to tell a well-tuned app from a broken one. So Settings counts it
+out: how many places the system is watching *as the system reports them*,
+how far the nearest one is, when the last notification was, and what stopped
+the rest — so many muted, so many near home, so many photographed too
+recently.
+
+It reads the registered regions back from the platform rather than trusting
+what the app believes it registered, because the interesting failure is
+exactly the one where those two disagree.
+
 ### The background isolate
 
 The arrival callback runs in an isolate the system starts, with none of the

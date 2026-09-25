@@ -352,5 +352,6 @@ String _arrivalOutcome(AppLocalizations l10n, NotificationDecision decision) =>
       NotificationVeto.tooFewPhotos => l10n.arrivalTestTooFewPhotos,
       NotificationVeto.tooRecent => l10n.arrivalTestTooRecent,
       NotificationVeto.placeCooldown => l10n.arrivalTestPlaceCooldown,
+      NotificationVeto.nearHome => l10n.arrivalTestNearHome,
       NotificationVeto.dailyLimit => l10n.arrivalTestDailyLimit,
     };

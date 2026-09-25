@@ -1,11 +1,14 @@
 import 'dart:async';
 
 import 'package:been_here/app/providers.dart';
+import 'package:been_here/domain/memories/notification_rules.dart';
 import 'package:been_here/domain/settings/app_settings.dart';
+import 'package:been_here/features/common/format.dart';
 import 'package:been_here/features/here/arrivals_sheet.dart';
 import 'package:been_here/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 /// The few things the user gets to decide. Phase 6 fills it out.
 class SettingsScreen extends ConsumerWidget {
@@ -85,6 +88,24 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           _ThresholdSlider(
+            title: l10n.settingsHomeRadiusTitle,
+            value: settings.homeRadiusKm.toDouble(),
+            min: 0,
+            max: 100,
+            label: (v) => l10n.settingsHomeRadiusValue(v.round()),
+            onChanged: (v) =>
+                ref.read(settingsProvider.notifier).setHomeRadiusKm(v.round()),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 4),
+            child: Text(
+              l10n.settingsHomeRadiusBody,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          _ThresholdSlider(
             title: l10n.settingsMemoryAgeTitle,
             value: settings.memoryAgeDays.toDouble(),
             min: 1,
@@ -113,6 +134,8 @@ class SettingsScreen extends ConsumerWidget {
                 .read(settingsProvider.notifier)
                 .setDailyLimitHours(v.round()),
           ),
+
+          const _QuietReport(),
 
           const Divider(height: 32),
           _Section(title: l10n.settingsIndexTitle),
@@ -176,6 +199,87 @@ class _Section extends StatelessWidget {
       ),
     ),
   );
+}
+
+/// What the rules are doing with the places, in numbers.
+///
+/// Every threshold on this screen makes the app quieter, and their combined
+/// effect is invisible: you turn three dials and then nothing happens for a
+/// week, with no way to tell a well-tuned app from a broken one. This says
+/// which it is.
+class _QuietReport extends ConsumerWidget {
+  const _QuietReport();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final report = ref.watch(arrivalDiagnosisProvider).value;
+    if (report == null || report.totalPlaces == 0) {
+      return const SizedBox.shrink();
+    }
+
+    final reasons = <String>[
+      if (report.eligible > 0)
+        l10n.settingsQuietReasonEligible(report.eligible),
+      for (final entry in report.vetoes.entries)
+        switch (entry.key) {
+          NotificationVeto.muted => l10n.settingsQuietReasonMuted(entry.value),
+          NotificationVeto.nearHome => l10n.settingsQuietReasonNearHome(
+            entry.value,
+          ),
+          NotificationVeto.tooFewPhotos => l10n.settingsQuietReasonTooFewPhotos(
+            entry.value,
+          ),
+          NotificationVeto.tooRecent => l10n.settingsQuietReasonTooRecent(
+            entry.value,
+          ),
+          NotificationVeto.placeCooldown =>
+            l10n.settingsQuietReasonPlaceCooldown(entry.value),
+          // Never a reason not to *watch* a place; only not to speak.
+          NotificationVeto.dailyLimit => '',
+        },
+    ]..removeWhere((reason) => reason.isEmpty);
+
+    final lines = <String>[
+      l10n.settingsQuietWatching(report.watching),
+      if (report.watching == 0)
+        l10n.settingsQuietNothingWatched
+      else if (report.nearestWatchedMeters != null)
+        l10n.settingsQuietNearest(
+          formatDistance(l10n, report.nearestWatchedMeters!),
+        ),
+      l10n.settingsQuietBreakdown(report.totalPlaces, reasons.join(', ')),
+      l10n.settingsQuietLastNotified(
+        report.lastNotifiedAt == null
+            ? l10n.settingsQuietNever
+            : DateFormat.yMMMMd(
+                Localizations.localeOf(context).toLanguageTag(),
+              ).format(report.lastNotifiedAt!.toLocal()),
+      ),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.settingsQuietTitle,
+            style: theme.textTheme.titleSmall,
+          ),
+          const SizedBox(height: 4),
+          for (final line in lines)
+            Text(
+              line,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
 }
 
 class _VersionRow extends ConsumerWidget {

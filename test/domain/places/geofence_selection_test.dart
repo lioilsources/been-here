@@ -234,4 +234,45 @@ void main() {
       expect(selectionChanged(const [], const []), isFalse);
     });
   });
+
+  group('the neighbourhood does not get a slot', () {
+    test('places inside the home radius are skipped', () {
+      // ids 1..60 sit 1..60 km north of Prague, so a 25 km home radius
+      // should hand back the ones past it, nearest first.
+      final places = [for (var i = 1; i <= 60; i++) _place(id: i)];
+
+      final chosen = selectRegions(
+        places: places,
+        from: _prague,
+        now: _now,
+        limit: 20,
+        home: _prague,
+      );
+
+      expect(chosen.length, 20);
+      // Nothing inside the radius, and still nearest-first outside it.
+      // (Place 25 sits on the boundary, which is why this asks the distance
+      // rather than the id.)
+      for (final place in chosen) {
+        expect(
+          distanceMeters(_prague, place.center),
+          greaterThanOrEqualTo(25000),
+        );
+      }
+      expect(chosen.first.placeId, lessThanOrEqualTo(26));
+    });
+
+    test('without a home every place is fair game', () {
+      final places = [for (var i = 1; i <= 60; i++) _place(id: i)];
+
+      final chosen = selectRegions(
+        places: places,
+        from: _prague,
+        now: _now,
+        limit: 20,
+      );
+
+      expect(chosen.first.placeId, 1);
+    });
+  });
 }

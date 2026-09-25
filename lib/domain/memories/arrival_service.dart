@@ -69,6 +69,8 @@ class RegionSyncService {
       now: clock(),
       limit: geofence.regionLimit,
       rules: rules,
+      // Everyday places do not deserve one of the twenty slots.
+      home: await places.home(),
     );
 
     if (!selectionChanged(_registered, selection)) return _registered;
@@ -129,6 +131,7 @@ class ArrivalService {
       now: now,
       lastNotificationAnywhere: await places.lastNotifiedAnywhere(),
       rules: rules,
+      home: await places.home(),
     );
 
     if (!decision.shouldNotify) {

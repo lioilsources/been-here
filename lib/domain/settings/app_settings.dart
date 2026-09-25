@@ -14,6 +14,7 @@ class AppSettings {
     this.dailyLimitHours = 24,
     this.mapEnabled = false,
     this.onboardingSeen = false,
+    this.homeRadiusKm = 25,
   });
 
   /// Distinct days after which a place is muted automatically.
@@ -44,6 +45,11 @@ class AppSettings {
   /// place, this continues for as long as the map is open.
   final bool mapEnabled;
 
+  /// How far from home a place has to be before it is worth watching.
+  ///
+  /// Zero means every place counts, however close to the front door.
+  final int homeRadiusKm;
+
   /// Whether the three intro screens have been through once.
   ///
   /// Lives with the settings because it is one more thing the preferences
@@ -56,6 +62,7 @@ class AppSettings {
     minimumAge: Duration(days: memoryAgeDays),
     placeCooldown: Duration(days: placeCooldownDays),
     globalCooldown: Duration(hours: dailyLimitHours),
+    homeRadiusMeters: homeRadiusKm * 1000,
   );
 
   AppSettings copyWith({
@@ -66,6 +73,7 @@ class AppSettings {
     int? dailyLimitHours,
     bool? mapEnabled,
     bool? onboardingSeen,
+    int? homeRadiusKm,
   }) => AppSettings(
     autoMuteDays: autoMuteDays ?? this.autoMuteDays,
     placeNamesEnabled: placeNamesEnabled ?? this.placeNamesEnabled,
@@ -74,6 +82,7 @@ class AppSettings {
     dailyLimitHours: dailyLimitHours ?? this.dailyLimitHours,
     mapEnabled: mapEnabled ?? this.mapEnabled,
     onboardingSeen: onboardingSeen ?? this.onboardingSeen,
+    homeRadiusKm: homeRadiusKm ?? this.homeRadiusKm,
   );
 
   @override
@@ -85,7 +94,8 @@ class AppSettings {
       other.placeCooldownDays == placeCooldownDays &&
       other.dailyLimitHours == dailyLimitHours &&
       other.mapEnabled == mapEnabled &&
-      other.onboardingSeen == onboardingSeen;
+      other.onboardingSeen == onboardingSeen &&
+      other.homeRadiusKm == homeRadiusKm;
 
   @override
   int get hashCode => Object.hash(
@@ -96,6 +106,7 @@ class AppSettings {
     dailyLimitHours,
     mapEnabled,
     onboardingSeen,
+    homeRadiusKm,
   );
 
   @override
@@ -116,6 +127,7 @@ class SettingsStore {
   static const String _dailyLimit = 'daily_limit_hours';
   static const String _map = 'map_enabled';
   static const String _onboarding = 'onboarding_seen';
+  static const String _homeRadius = 'home_radius_km';
 
   final PreferencesDao dao;
 
@@ -135,6 +147,8 @@ class SettingsStore {
           int.tryParse(values[_dailyLimit] ?? '') ?? defaults.dailyLimitHours,
       mapEnabled: values[_map] == 'true',
       onboardingSeen: values[_onboarding] == 'true',
+      homeRadiusKm:
+          int.tryParse(values[_homeRadius] ?? '') ?? defaults.homeRadiusKm,
     );
   }
 
@@ -158,4 +172,7 @@ class SettingsStore {
 
   Future<void> setOnboardingSeen({required bool seen}) =>
       dao.write(_onboarding, '$seen');
+
+  Future<void> setHomeRadiusKm(int km) =>
+      dao.write(_homeRadius, '${km.clamp(0, 500)}');
 }

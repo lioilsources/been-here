@@ -13,6 +13,8 @@ import 'package:flutter_test/flutter_test.dart';
 const _prague = GeoPoint(50.0755, 14.4378);
 final _now = DateTime.utc(2026, 9, 20, 14);
 
+const _noHomeRule = NotificationRules(homeRadiusMeters: 0);
+
 GeoPoint _north(double meters) =>
     GeoPoint(_prague.lat + meters / metersPerDegreeLatitude, _prague.lng);
 
@@ -35,15 +37,21 @@ void main() {
     db = AppDatabase.withExecutor(NativeDatabase.memory());
     geofence = FakeGeofenceService();
     notifications = FakeNotificationService();
+    // The home rule is off for everything below: these tests are about the
+    // other thresholds, and with one place in the database that place is
+    // home by definition, which would veto every one of them. It has its own
+    // group at the bottom.
     arrivals = ArrivalService(
       places: db.placesDao,
       notifications: notifications,
       compose: _compose,
+      rules: _noHomeRule,
       clock: () => _now,
     );
     regions = RegionSyncService(
       places: db.placesDao,
       geofence: geofence,
+      rules: _noHomeRule,
       clock: () => _now,
     );
   });
@@ -60,6 +68,7 @@ void main() {
     MuteState mute = MuteState.none,
     Duration? lastNotified,
     String? name,
+    int days = 4,
   }) {
     final center = at ?? _prague;
     return db.placesDao.insertPlace(
@@ -68,7 +77,7 @@ void main() {
         centerLng: center.lng,
         radiusM: 150,
         photoCount: Value(photos),
-        distinctDays: const Value(4),
+        distinctDays: Value(days),
         firstAt: 0,
         lastAt: _now.subtract(lastPhoto).millisecondsSinceEpoch ~/ 1000,
         mute: Value(mute),
@@ -256,6 +265,71 @@ void main() {
 
       expect((await tomorrow.onArrival(other)).shouldNotify, isTrue);
       expect(notifications.shown, hasLength(2));
+    });
+  });
+
+  group('home', () {
+    /// The same services, with the rule the app actually ships with.
+    late ArrivalService withHomeRule;
+    late RegionSyncService regionsWithHomeRule;
+
+    setUp(() {
+      withHomeRule = ArrivalService(
+        places: db.placesDao,
+        notifications: notifications,
+        compose: _compose,
+        clock: () => _now,
+      );
+      regionsWithHomeRule = RegionSyncService(
+        places: db.placesDao,
+        geofence: geofence,
+        clock: () => _now,
+      );
+    });
+
+    /// Home is wherever you have been on the most separate days.
+    Future<int> addHome() => addPlace(days: 400);
+
+    test('the place you are at most often is home', () async {
+      await addPlace(at: _north(40000), days: 12);
+      final home = await addHome();
+
+      final place = await db.placesDao.byId(home);
+      expect(
+        await db.placesDao.home(),
+        GeoPoint(place!.centerLat, place.centerLng),
+      );
+    });
+
+    test('arriving somewhere near home stays quiet', () async {
+      await addHome();
+      // Two kilometres away: a different place, the same neighbourhood.
+      final corner = await addPlace(at: _north(2000), days: 3);
+
+      final decision = await withHomeRule.onArrival(corner);
+
+      expect(decision.veto, NotificationVeto.nearHome);
+      expect(notifications.shown, isEmpty);
+    });
+
+    test('arriving far from home still speaks', () async {
+      await addHome();
+      final away = await addPlace(at: _north(80000), days: 3);
+
+      final decision = await withHomeRule.onArrival(away);
+
+      expect(decision.shouldNotify, isTrue);
+      expect(notifications.shown, hasLength(1));
+    });
+
+    test('the neighbourhood does not take up region slots', () async {
+      await addHome();
+      await addPlace(at: _north(3000), days: 2);
+      final away = await addPlace(at: _north(60000), days: 2);
+
+      final watched = await regionsWithHomeRule.syncRegions(_prague);
+
+      expect(watched.map((p) => p.placeId), [away]);
     });
   });
 }

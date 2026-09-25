@@ -135,6 +135,24 @@ class PlacesDao extends DatabaseAccessor<AppDatabase> with _$PlacesDaoMixin {
     return [for (final row in rows) _toNotifiable(row)];
   }
 
+  /// Home: the place you are at on more days than any other.
+  ///
+  /// Not a setting, and deliberately so — "where do you live" is a question
+  /// the index has already answered, in the only unit that matters here:
+  /// number of separate days with a photo. Ties go to the one with more
+  /// photos.
+  Future<GeoPoint?> home() async {
+    final row =
+        await (select(places)
+              ..orderBy([
+                (p) => OrderingTerm.desc(p.distinctDays),
+                (p) => OrderingTerm.desc(p.photoCount),
+              ])
+              ..limit(1))
+            .getSingleOrNull();
+    return row == null ? null : GeoPoint(row.centerLat, row.centerLng);
+  }
+
   Future<NotifiablePlace?> notifiableById(int id) async {
     final row = await byId(id);
     return row == null ? null : _toNotifiable(row);

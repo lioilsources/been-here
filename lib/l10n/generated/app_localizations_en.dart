@@ -626,4 +626,93 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get herePlaceFallbackTitle => 'A place you know';
+
+  @override
+  String get arrivalTestNearHome => 'Too close to home to be news.';
+
+  @override
+  String get settingsHomeRadiusTitle => 'Stay quiet within';
+
+  @override
+  String settingsHomeRadiusValue(num km) {
+    String _temp0 = intl.Intl.pluralLogic(
+      km,
+      locale: localeName,
+      other: '$km km of home',
+      one: '1 km of home',
+      zero: 'no distance — never quiet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settingsHomeRadiusBody =>
+      'Everyday life happens close to home, and that is where a phone commenting on it is least welcome. Places nearer than this are never watched.';
+
+  @override
+  String get settingsQuietTitle => 'Why it is quiet';
+
+  @override
+  String settingsQuietWatching(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Watching $count places',
+      one: 'Watching 1 place',
+      zero: 'Watching no places',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settingsQuietNearest(String distance) {
+    return 'Nearest watched place: $distance';
+  }
+
+  @override
+  String get settingsQuietNothingWatched =>
+      'Nothing is being watched, so nothing can arrive.';
+
+  @override
+  String settingsQuietLastNotified(String when) {
+    return 'Last notification: $when';
+  }
+
+  @override
+  String get settingsQuietNever => 'never';
+
+  @override
+  String settingsQuietBreakdown(int total, String reasons) {
+    return 'Of $total places: $reasons';
+  }
+
+  @override
+  String settingsQuietReasonMuted(Object count) {
+    return '$count muted';
+  }
+
+  @override
+  String settingsQuietReasonNearHome(Object count) {
+    return '$count near home';
+  }
+
+  @override
+  String settingsQuietReasonTooFewPhotos(Object count) {
+    return '$count with too few photos';
+  }
+
+  @override
+  String settingsQuietReasonTooRecent(Object count) {
+    return '$count photographed too recently';
+  }
+
+  @override
+  String settingsQuietReasonPlaceCooldown(Object count) {
+    return '$count still cooling down';
+  }
+
+  @override
+  String settingsQuietReasonEligible(Object count) {
+    return '$count worth watching';
+  }
 }

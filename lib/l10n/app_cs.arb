@@ -306,5 +306,22 @@
   "hereMapTitle": "Okolí",
   "hereOpenInMaps": "Otevřít v Mapách",
   "hereBackToMe": "Zpátky ke mně",
-  "herePlaceFallbackTitle": "Místo, které znáš"
+  "herePlaceFallbackTitle": "Místo, které znáš",
+  "arrivalTestNearHome": "Moc blízko domovu, to není novinka.",
+  "settingsHomeRadiusTitle": "Mlčet v okruhu",
+  "settingsHomeRadiusValue": "{km, plural, =0{bez okruhu — nikdy nemlčet} =1{1 km od domova} few{{km} km od domova} other{{km} km od domova}}",
+  "settingsHomeRadiusBody": "Všední život se odehrává kolem domova a právě tam je komentující telefon nejmíň vítaný. Bližší místa se vůbec nehlídají.",
+  "settingsQuietTitle": "Proč je ticho",
+  "settingsQuietWatching": "{count, plural, =0{Nehlídá se žádné místo} =1{Hlídá se 1 místo} few{Hlídají se {count} místa} other{Hlídá se {count} míst}}",
+  "settingsQuietNearest": "Nejbližší hlídané místo: {distance}",
+  "settingsQuietNothingWatched": "Nehlídá se nic, takže nemá co přijít.",
+  "settingsQuietLastNotified": "Poslední notifikace: {when}",
+  "settingsQuietNever": "nikdy",
+  "settingsQuietBreakdown": "Z {total} míst: {reasons}",
+  "settingsQuietReasonMuted": "{count} ztlumených",
+  "settingsQuietReasonNearHome": "{count} blízko domova",
+  "settingsQuietReasonTooFewPhotos": "{count} s málo fotkami",
+  "settingsQuietReasonTooRecent": "{count} nafocených nedávno",
+  "settingsQuietReasonPlaceCooldown": "{count} v prodlevě",
+  "settingsQuietReasonEligible": "{count} ke hlídání"
 }
