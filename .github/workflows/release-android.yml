@@ -14,6 +14,13 @@ jobs:
     name: Build & Release Android
     runs-on: ubuntu-latest
 
+    # Lifted to the job so the Firebase step can ask whether it is set up:
+    # the `secrets` context is not one of the ones a step's `if` may read,
+    # and using it there does not fail the step — it fails the whole file to
+    # parse, which is a far quieter way to lose a workflow.
+    env:
+      FIREBASE_APP_ID: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -85,7 +92,7 @@ jobs:
       # the APK are already published above, and a release must not go red
       # over a distribution channel that hasn't been configured yet.
       - name: Upload to Firebase App Distribution
-        if: ${{ secrets.FIREBASE_ANDROID_APP_ID != '' }}
+        if: env.FIREBASE_APP_ID != ''
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
