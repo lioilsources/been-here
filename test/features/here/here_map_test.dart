@@ -1,6 +1,7 @@
 import 'package:been_here/app/app.dart';
 import 'package:been_here/app/providers.dart';
 import 'package:been_here/core/geo/geo_point.dart';
+import 'package:been_here/core/geo/map_scale.dart';
 import 'package:been_here/data/db/database.dart';
 import 'package:been_here/data/location/fake_location_service.dart';
 import 'package:been_here/data/photos/fake_photo_library.dart';
@@ -23,6 +24,22 @@ const _berlin = GeoPoint(52.5251, 13.3694);
 MapCamera _cameraOf(WidgetTester tester) =>
     MapCamera.of(tester.element(find.byType(CircleLayer).first));
 
+/// The full-screen map's camera.
+///
+/// Scoped, because the card's map is still alive under the pushed route and
+/// is the one a bare `find.byType` reaches first — with a viewport a third
+/// the size, which makes every number look wrong in an interesting way.
+MapCamera _screenCameraOf(WidgetTester tester) => MapCamera.of(
+  tester.element(
+    find
+        .descendant(
+          of: find.byType(HereMapScreen),
+          matching: find.byType(CircleLayer),
+        )
+        .first,
+  ),
+);
+
 List<PhotoAsset> _photos() => [
   for (var i = 0; i < 4; i++)
     PhotoAsset(
@@ -34,6 +51,25 @@ List<PhotoAsset> _photos() => [
       height: 3024,
     ),
 ];
+
+/// Double tap, hold, and drag [dy] pixels — negative is up the screen.
+Future<void> _doubleTapDrag(WidgetTester tester, {required double dy}) async {
+  final map = tester.getCenter(find.byType(FlutterMap).last);
+
+  await tester.tapAt(map);
+  await tester.pump(const Duration(milliseconds: 60));
+
+  final gesture = await tester.startGesture(map);
+  await tester.pump(const Duration(milliseconds: 16));
+  for (var i = 0; i < 10; i++) {
+    await gesture.moveBy(Offset(0, dy / 10));
+    await tester.pump(const Duration(milliseconds: 16));
+  }
+  await gesture.up();
+  for (var i = 0; i < 40; i++) {
+    await tester.pump(const Duration(milliseconds: 20));
+  }
+}
 
 void main() {
   late AppDatabase db;
@@ -205,6 +241,106 @@ void main() {
     await settle(tester);
 
     expect(container.read(searchRadiusProvider), greaterThan(before));
+  });
+
+  testWidgets('the map follows the radius, in fractions', (tester) async {
+    await SettingsStore(db.preferencesDao).setMapEnabled(enabled: true);
+
+    await tester.pumpWidget(app());
+    await settle(tester);
+    await tester.tap(find.byType(HereMapCard));
+    await settle(tester);
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(HereMapScreen)),
+    );
+    final before = _screenCameraOf(tester).zoom;
+
+    // A nudge, not a doubling: the old stepwise zoom ignored anything
+    // smaller than a whole tile level, which made the slider feel dead.
+    container.read(searchRadiusProvider.notifier).meters = 700;
+    await settle(tester);
+
+    final after = _screenCameraOf(tester).zoom;
+    expect(after, lessThan(before));
+    expect(before - after, closeTo(0.485, 0.05));
+  });
+
+  testWidgets('double tap and drag up widens the range', (tester) async {
+    await SettingsStore(db.preferencesDao).setMapEnabled(enabled: true);
+
+    await tester.pumpWidget(app());
+    await settle(tester);
+    await tester.tap(find.byType(HereMapCard));
+    await settle(tester);
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(HereMapScreen)),
+    );
+    final before = container.read(searchRadiusProvider);
+
+    await _doubleTapDrag(tester, dy: -100);
+
+    // Up means "show me more ground". The platform's own double-tap-drag
+    // does this the other way round, which is why it is switched off.
+    final after = container.read(searchRadiusProvider);
+    expect(after, greaterThan(before));
+    expect(after / before, closeTo(1.41, 0.05));
+
+    // And the map went with it: the circle stays the size it was on screen.
+    expect(
+      _screenCameraOf(tester).zoom,
+      closeTo(
+        zoomForRadius(
+          radiusMeters: after,
+          latitude: _prague.lat,
+          viewportPixels: _screenCameraOf(
+            tester,
+          ).nonRotatedSize.shortestSide,
+        ),
+        0.01,
+      ),
+    );
+  });
+
+  testWidgets('double tap and drag down tightens it', (tester) async {
+    await SettingsStore(db.preferencesDao).setMapEnabled(enabled: true);
+
+    await tester.pumpWidget(app());
+    await settle(tester);
+    await tester.tap(find.byType(HereMapCard));
+    await settle(tester);
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(HereMapScreen)),
+    );
+    final before = container.read(searchRadiusProvider);
+
+    await _doubleTapDrag(tester, dy: 100);
+
+    expect(container.read(searchRadiusProvider), lessThan(before));
+  });
+
+  testWidgets('a single drag still pans, and leaves the range alone', (
+    tester,
+  ) async {
+    await SettingsStore(db.preferencesDao).setMapEnabled(enabled: true);
+
+    await tester.pumpWidget(app());
+    await settle(tester);
+    await tester.tap(find.byType(HereMapCard));
+    await settle(tester);
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(HereMapScreen)),
+    );
+    final before = container.read(searchRadiusProvider);
+
+    await tester.drag(find.byType(FlutterMap), const Offset(-60, -40));
+    await settle(tester);
+
+    expect(container.read(searchRadiusProvider), before);
+    expect(container.read(viewpointProvider).source, ViewpointSource.map);
   });
 
   testWidgets('an empty place has no map at all', (tester) async {

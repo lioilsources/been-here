@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:been_here/app/providers.dart';
 import 'package:been_here/core/geo/geo_point.dart';
+import 'package:been_here/core/geo/map_scale.dart';
 import 'package:been_here/domain/settings/app_settings.dart';
 import 'package:been_here/features/common/osm_tiles.dart';
 import 'package:been_here/features/here/widgets/radius_slider.dart';
@@ -89,6 +91,7 @@ class HereMap extends StatefulWidget {
     this.interactive = true,
     this.centreIsPlace = false,
     this.onCentreMoved,
+    this.onRadiusChanged,
   });
 
   final GeoPoint center;
@@ -100,6 +103,13 @@ class HereMap extends StatefulWidget {
   /// where the phone is. A "you are here" crosshair on a place two thousand
   /// kilometres away is a small lie.
   final bool centreIsPlace;
+
+  /// Called when the user has zoomed the map — by pinch, or by the
+  /// double-tap-and-drag that phones have meant "zoom" for a decade.
+  ///
+  /// The circle and the view are two halves of one number, so zooming is
+  /// another way of setting the radius and the caller treats it as one.
+  final ValueChanged<double>? onRadiusChanged;
 
   /// Called when the user has dragged the map somewhere and let go.
   ///
@@ -123,6 +133,7 @@ class _HereMapState extends State<HereMap> {
   bool _ready = false;
 
   Timer? _pending;
+  Timer? _pendingZoom;
 
   /// The last centre this map asked the screen to move to.
   ///
@@ -133,6 +144,7 @@ class _HereMapState extends State<HereMap> {
   @override
   void dispose() {
     _pending?.cancel();
+    _pendingZoom?.cancel();
     _controller.dispose();
     super.dispose();
   }
@@ -152,17 +164,58 @@ class _HereMapState extends State<HereMap> {
     });
   }
 
-  /// A zoom that fits the search circle, near enough.
-  ///
-  /// The tile grid doubles its scale every level, and one tile is roughly
-  /// 40 075 km wide at the equator divided by 2^zoom — so this is that,
-  /// solved for the diameter on screen.
-  double get _zoom {
-    final span = widget.radiusMeters * 2.4;
-    for (var zoom = 18.0; zoom > 2; zoom--) {
-      if (40075016 / (1 << zoom.toInt()) > span) return zoom;
-    }
-    return 2;
+  /// The shorter side of the map in logical pixels, known once it has been
+  /// laid out.
+  double _viewport = 400;
+
+  /// The radius this map last asked the screen for, so its own echo can be
+  /// told from someone else moving the slider.
+  double? _publishedRadius;
+
+  // Double tap, hold, drag: up widens the view, down tightens it. The
+  // platform gesture does the same thing with the opposite sign, so it is
+  // switched off in the interaction flags and done here instead — a control
+  // that moves the wrong way is worse than no control.
+  static const double _pixelsPerDoubling = 200;
+  static const Duration _doubleTapWindow = Duration(milliseconds: 300);
+
+  Duration? _lastTapUp;
+  Offset? _lastTapPosition;
+
+  /// Set while a double-tap-drag is in progress. The map's own gestures are
+  /// disabled for the duration, or it would pan under the same finger.
+  bool _sizing = false;
+  double _sizingFromY = 0;
+  double _sizingFromRadius = 0;
+
+  /// The zoom at which the circle fills the view.
+  double get _zoom => zoomForRadius(
+    radiusMeters: widget.radiusMeters,
+    latitude: widget.center.lat,
+    viewportPixels: _viewport,
+  );
+
+  /// The same relation read backwards: the view the user just zoomed to is
+  /// a radius, and setting it is what makes pinching turn the dial.
+  void _zoomed(MapCamera camera) {
+    final changed = widget.onRadiusChanged;
+    if (changed == null) return;
+
+    // A pan is not a zoom. Panning north changes the metres a pixel covers,
+    // so reading the radius back off the camera after every gesture would
+    // otherwise nudge the range by centimetres for no reason at all.
+    if ((camera.zoom - _zoom).abs() < 0.01) return;
+
+    _pendingZoom?.cancel();
+    _pendingZoom = Timer(_settle, () {
+      final radius = radiusForZoom(
+        zoom: camera.zoom,
+        latitude: camera.center.latitude,
+        viewportPixels: _viewport,
+      );
+      _publishedRadius = radius;
+      changed(radius);
+    });
   }
 
   LatLng get _center => LatLng(widget.center.lat, widget.center.lng);
@@ -176,23 +229,81 @@ class _HereMapState extends State<HereMap> {
   @override
   void didUpdateWidget(HereMap old) {
     super.didUpdateWidget(old);
-    if (old.center == widget.center &&
-        old.radiusMeters == widget.radiusMeters) {
-      return;
-    }
-    // Our own pan coming back around. The camera is already there.
-    if (widget.center == _published &&
-        old.radiusMeters == widget.radiusMeters) {
-      return;
-    }
+    final movedCentre = old.center != widget.center;
+    final movedRadius = old.radiusMeters != widget.radiusMeters;
+    if (!movedCentre && !movedRadius) return;
+
+    // Our own gestures coming back around. The camera is already there, and
+    // moving it again would shove it out from under the finger.
+    if (!movedRadius && widget.center == _published) return;
+    if (!movedCentre && widget.radiusMeters == _publishedRadius) return;
+
     if (_ready) _controller.move(_center, _zoom);
+  }
+
+  bool get _canResize => widget.interactive && widget.onRadiusChanged != null;
+
+  void _pointerDown(PointerDownEvent event) {
+    if (!_canResize) return;
+
+    final lastUp = _lastTapUp;
+    final lastAt = _lastTapPosition;
+    final soonEnough =
+        lastUp != null && event.timeStamp - lastUp < _doubleTapWindow;
+    final closeEnough =
+        lastAt != null && (event.localPosition - lastAt).distance < 44;
+
+    if (soonEnough && closeEnough) {
+      setState(() {
+        _sizing = true;
+        _sizingFromY = event.localPosition.dy;
+        _sizingFromRadius = widget.radiusMeters;
+      });
+    }
+    _lastTapPosition = event.localPosition;
+  }
+
+  void _pointerMove(PointerMoveEvent event) {
+    if (!_sizing) return;
+
+    // Up is negative on screen and means "show me more ground".
+    final travelled = event.localPosition.dy - _sizingFromY;
+    final radius =
+        _sizingFromRadius *
+        math.pow(2, travelled / -_pixelsPerDoubling).toDouble();
+
+    // No guard: this gesture is the radius moving, so the camera *should*
+    // follow it back. That is the whole point — the circle stays the same
+    // size on screen and the ground under it changes.
+    widget.onRadiusChanged?.call(radius);
+  }
+
+  void _pointerUp(PointerUpEvent event) {
+    _lastTapUp = event.timeStamp;
+    if (_sizing) setState(() => _sizing = false);
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final here = _center;
+    // The zoom depends on how large the map is on screen, which is only
+    // known once it has been laid out.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        _viewport = constraints.biggest.shortestSide;
+        return Listener(
+          onPointerDown: _pointerDown,
+          onPointerMove: _pointerMove,
+          onPointerUp: _pointerUp,
+          onPointerCancel: (_) {
+            if (_sizing) setState(() => _sizing = false);
+          },
+          child: _map(Theme.of(context), _center),
+        );
+      },
+    );
+  }
 
+  Widget _map(ThemeData theme, LatLng here) {
     return FlutterMap(
       mapController: _controller,
       options: MapOptions(
@@ -202,12 +313,20 @@ class _HereMapState extends State<HereMap> {
         // first move waits for this.
         onMapReady: () => _ready = true,
         onPositionChanged: (camera, hasGesture) {
-          if (hasGesture) _centreMoved(camera);
+          if (!hasGesture) return;
+          _centreMoved(camera);
+          _zoomed(camera);
         },
         interactionOptions: InteractionOptions(
-          flags: widget.interactive
-              ? InteractiveFlag.all
-              : InteractiveFlag.none,
+          flags: switch ((interactive: widget.interactive, sizing: _sizing)) {
+            // While the radius is being dragged the map holds still.
+            (interactive: _, sizing: true) => InteractiveFlag.none,
+            (interactive: false, sizing: _) => InteractiveFlag.none,
+            // Everything except the platform's own double-tap-drag, which
+            // zooms the opposite way round from the one above.
+            (interactive: true, sizing: false) =>
+              InteractiveFlag.all & ~InteractiveFlag.doubleTapDragZoom,
+          },
         ),
       ),
       children: [
@@ -302,6 +421,10 @@ class HereMapScreen extends ConsumerWidget {
               points: points,
               centreIsPlace: ref.watch(viewedPlaceProvider) != null,
               onCentreMoved: ref.read(viewpointProvider.notifier).toMapCentre,
+              // Pinching or double-tap-dragging the map is the same request
+              // as dragging the slider below it.
+              onRadiusChanged: (metres) =>
+                  ref.read(searchRadiusProvider.notifier).meters = metres,
             ),
           ),
           // The circle you are looking at, with the handle that sizes it

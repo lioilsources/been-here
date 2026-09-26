@@ -303,6 +303,24 @@ it *is* the radius the slider just set, with a dot per photo inside it. It
 does not pan — a map that scrolls inside a scrolling list fights it for
 every drag — and a tap opens one that does.
 
+The radius and the map's zoom are two views of one number
+(`core/geo/map_scale.dart`): the circle always covers the same fraction of
+the shorter side of the view, so moving the slider moves the map and zooming
+the map moves the slider. The zoom is fractional — rounding to tile levels
+means the map only answers every second or third nudge of the radius, and a
+control that ignores most of what you do with it reads as broken rather than
+coarse.
+
+Double tap, hold and drag sets the radius directly: up for more ground, down
+for less. flutter_map has that gesture and gives it the opposite sign, so it
+is switched off in the interaction flags and done here instead, with the
+map's own gestures disabled while the finger is down. The two directions
+need different treatment on the way back, too: a pinch has already moved the
+camera to where the user wants it, so the radius follows without touching
+the camera; a double-tap-drag moves the radius, and the camera follows that.
+A pan moves neither — panning north changes how many metres a pixel covers,
+which would otherwise nudge the range by centimetres after every drag.
+
 The dots come from a query that returns two doubles per photo and nothing
 else, capped at two thousand. A dense neighbourhood holds far more than a
 map can usefully show, and past a few thousand the dots stop being
