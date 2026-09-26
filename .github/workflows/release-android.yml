@@ -81,7 +81,11 @@ jobs:
           draft: false
           prerelease: true
 
+      # Skipped rather than failed while Firebase isn't set up: the AAB and
+      # the APK are already published above, and a release must not go red
+      # over a distribution channel that hasn't been configured yet.
       - name: Upload to Firebase App Distribution
+        if: ${{ secrets.FIREBASE_ANDROID_APP_ID != '' }}
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
