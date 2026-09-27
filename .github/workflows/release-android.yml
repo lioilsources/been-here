@@ -34,6 +34,13 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
+          # Pinned to what the project is developed and tested against. On
+          # `stable` the runner quietly moved to a newer SDK than any local
+          # machine, and the first thing that happened was the analyser
+          # failing on a lint that does not exist here — while the release
+          # workflows went on building the shipped IPA with an SDK nothing
+          # had been tested on. Upgrading is a decision, not a Tuesday.
+          flutter-version: '3.44.4'
           channel: stable
           cache: true
 
