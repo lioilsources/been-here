@@ -15,7 +15,8 @@ const double circleViewportFraction = 0.72;
 const double minMapZoom = 2;
 const double maxMapZoom = 19;
 
-double _metresPerPixel({required double latitude, required double zoom}) =>
+/// How much ground one logical pixel covers at [zoom] and [latitude].
+double metresPerPixel({required double latitude, required double zoom}) =>
     equatorMetresPerPixel *
     math.cos(latitude * math.pi / 180) /
     math.pow(2, zoom);
@@ -37,7 +38,7 @@ double zoomForRadius({
 
   // metresPerPixel has to be: diameter / the pixels we want it to cover.
   final wanted = radiusMeters * 2 / (viewportPixels * fraction);
-  final atZoomZero = _metresPerPixel(latitude: latitude, zoom: 0);
+  final atZoomZero = metresPerPixel(latitude: latitude, zoom: 0);
   final zoom = math.log(atZoomZero / wanted) / math.ln2;
 
   return zoom.clamp(minMapZoom, maxMapZoom);
@@ -52,6 +53,6 @@ double radiusForZoom({
   required double viewportPixels,
   double fraction = circleViewportFraction,
 }) {
-  final perPixel = _metresPerPixel(latitude: latitude, zoom: zoom);
+  final perPixel = metresPerPixel(latitude: latitude, zoom: zoom);
   return perPixel * viewportPixels * fraction / 2;
 }

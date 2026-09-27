@@ -15,6 +15,7 @@ import 'package:been_here/domain/indexing/index_progress.dart';
 import 'package:been_here/domain/indexing/indexer_service.dart';
 import 'package:been_here/domain/indexing/library_sync.dart';
 import 'package:been_here/domain/memories/arrival_service.dart';
+import 'package:been_here/domain/memories/map_photo.dart';
 import 'package:been_here/domain/memories/memories_service.dart';
 import 'package:been_here/domain/memories/memory.dart';
 import 'package:been_here/domain/memories/notification_rules.dart';
@@ -275,7 +276,7 @@ final memoriesHereProvider = FutureProvider<MemoriesHere?>((ref) async {
 });
 
 /// Where the photos in the current radius are. Only ever read by the map.
-final memoryPointsProvider = FutureProvider<List<GeoPoint>>((ref) async {
+final memoryPointsProvider = FutureProvider<List<MapPhoto>>((ref) async {
   final center = await ref.watch(currentLocationProvider.future);
   if (center == null) return const [];
 

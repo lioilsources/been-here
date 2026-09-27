@@ -7,6 +7,7 @@ import 'package:been_here/data/location/fake_location_service.dart';
 import 'package:been_here/data/photos/fake_photo_library.dart';
 import 'package:been_here/data/photos/photo_library.dart';
 import 'package:been_here/domain/settings/app_settings.dart';
+import 'package:been_here/features/here/photo_detail_screen.dart';
 import 'package:been_here/features/here/widgets/here_map.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
@@ -341,6 +342,58 @@ void main() {
 
     expect(container.read(searchRadiusProvider), before);
     expect(container.read(viewpointProvider).source, ViewpointSource.map);
+  });
+
+  testWidgets('tapping a dot opens that photo', (tester) async {
+    await SettingsStore(db.preferencesDao).setMapEnabled(enabled: true);
+
+    await tester.pumpWidget(app());
+    await settle(tester);
+    await tester.tap(find.byType(HereMapCard));
+    await settle(tester);
+
+    // The four photos sit 22 m apart going north, and the map is centred on
+    // the first of them.
+    await tester.tapAt(tester.getCenter(find.byType(FlutterMap).last));
+    await settle(tester);
+
+    expect(find.byType(PhotoDetailScreen), findsOneWidget);
+    // The oldest photo of the visit, which is the one under the tap — not
+    // simply whichever photo the screen opens on by default.
+    expect(find.text('1 of 4'), findsOneWidget);
+  });
+
+  testWidgets('a different dot opens a different photo', (tester) async {
+    await SettingsStore(db.preferencesDao).setMapEnabled(enabled: true);
+
+    await tester.pumpWidget(app());
+    await settle(tester);
+    await tester.tap(find.byType(HereMapCard));
+    await settle(tester);
+
+    // Two dots north of the middle one: a later photo of the same visit.
+    final map = tester.getCenter(find.byType(FlutterMap).last);
+    await tester.tapAt(map + const Offset(0, -40));
+    await settle(tester);
+
+    expect(find.byType(PhotoDetailScreen), findsOneWidget);
+    expect(find.text('1 of 4'), findsNothing);
+  });
+
+  testWidgets('tapping empty map opens nothing', (tester) async {
+    await SettingsStore(db.preferencesDao).setMapEnabled(enabled: true);
+
+    await tester.pumpWidget(app());
+    await settle(tester);
+    await tester.tap(find.byType(HereMapCard));
+    await settle(tester);
+
+    // Far from any photo: a map is also something you just look at.
+    final map = tester.getCenter(find.byType(FlutterMap).last);
+    await tester.tapAt(map + const Offset(0, -140));
+    await settle(tester);
+
+    expect(find.byType(PhotoDetailScreen), findsNothing);
   });
 
   testWidgets('an empty place has no map at all', (tester) async {

@@ -22,12 +22,20 @@ class PhotoDetailScreen extends ConsumerStatefulWidget {
     required this.radiusMeters,
     super.key,
     this.initialIndex = 0,
+    this.initialAssetId,
   });
 
   final Visit visit;
   final GeoPoint center;
   final double radiusMeters;
   final int initialIndex;
+
+  /// Open on this photo, wherever it turns out to be in the visit.
+  ///
+  /// A tap on the map knows which photo it hit but not where that sits in
+  /// the visit — the visit's photos are only fetched once this screen is
+  /// up. So the index is resolved when the list arrives.
+  final String? initialAssetId;
 
   @override
   ConsumerState<PhotoDetailScreen> createState() => _PhotoDetailScreenState();
@@ -38,6 +46,25 @@ class _PhotoDetailScreenState extends ConsumerState<PhotoDetailScreen> {
     initialPage: widget.initialIndex,
   );
   late int _index = widget.initialIndex;
+
+  /// Cleared once the photo it names has been found and jumped to.
+  late String? _wanted = widget.initialAssetId;
+
+  /// Jumps to the photo the caller asked for, once it is known where it is.
+  void _settleOnWanted(List<Memory> photos) {
+    final wanted = _wanted;
+    if (wanted == null) return;
+
+    final index = photos.indexWhere((photo) => photo.assetId == wanted);
+    if (index < 0) return;
+
+    _wanted = null;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_controller.hasClients) return;
+      _controller.jumpToPage(index);
+      setState(() => _index = index);
+    });
+  }
 
   @override
   void dispose() {
@@ -96,6 +123,8 @@ class _PhotoDetailScreenState extends ConsumerState<PhotoDetailScreen> {
                 ),
               );
             }
+            _settleOnWanted(list);
+
             return Column(
               children: [
                 Expanded(

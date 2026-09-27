@@ -321,10 +321,26 @@ the camera; a double-tap-drag moves the radius, and the camera follows that.
 A pan moves neither — panning north changes how many metres a pixel covers,
 which would otherwise nudge the range by centimetres after every drag.
 
-The dots come from a query that returns two doubles per photo and nothing
-else, capped at two thousand. A dense neighbourhood holds far more than a
-map can usefully show, and past a few thousand the dots stop being
-information and become a stain.
+The dots come from a query that returns four columns per photo — where,
+which and when — capped at eight hundred. A dense neighbourhood holds far
+more than a map can usefully show, and past a few thousand the dots stop
+being information and become a stain. Everything that query carries is paid
+for eight hundred times, which is why the sizes and distances the rest of
+the app wants are not in it.
+
+They are drawn in a pink that no map tile is. The tiles are a picture of the
+world — green parks, beige streets, blue water — and the app's own amber
+sits right in the middle of that range, which is how the first version
+managed to be invisible on exactly the backgrounds it had to be seen on.
+
+Tapping one opens that photo, inside the visit it belongs to, so swiping on
+walks the same afternoon. The dots stay circles rather than becoming
+markers: a marker is a widget, and the tap is hit-tested against the list
+instead, with a tolerance of a thumb's width in pixels converted to metres
+at the current zoom — so it stays a thumb's width however far out the map
+is. Which photo a tap hit is known before the visit's photos have been
+loaded, so the detail screen takes an asset id and settles on it when the
+list arrives.
 
 The full-screen map pans, and panning it moves the whole screen: let go and
 the circle, the dots and the timeline behind all follow the middle of

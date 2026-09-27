@@ -74,12 +74,15 @@ class MemoriesDao extends DatabaseAccessor<AppDatabase>
     return [for (final row in rows) row.read<int>('taken_at')];
   }
 
-  /// Where the photos inside the circle are, and nothing else.
+  /// Where the photos inside the circle are, and which photos they are.
   ///
-  /// Two doubles per photo: a map needs no asset ids, no sizes and no dates,
-  /// and this is the one query that can be asked for thousands of rows at
-  /// once. Newest first, so a [limit] keeps the most recent ones.
-  Future<List<({double lat, double lng})>> pointsWithin({
+  /// Four columns per photo, no sizes and no distances: this is the one
+  /// query that can be asked for a thousand rows at once, and everything it
+  /// carries is paid for a thousand times. The id and the time are in
+  /// because a dot you cannot open is decoration. Newest first, so a [limit]
+  /// keeps the most recent ones.
+  Future<List<({String assetId, double lat, double lng, int takenAt})>>
+  pointsWithin({
     required List<BoundingBox> boxes,
     required UnitVector center,
     required double chordSquared,
@@ -88,14 +91,19 @@ class MemoriesDao extends DatabaseAccessor<AppDatabase>
     if (boxes.isEmpty) return const [];
     final circle = _circle(boxes, center, chordSquared);
     final rows = await customSelect(
-      'SELECT lat, lng FROM photos WHERE ${circle.where} '
+      'SELECT asset_id, lat, lng, taken_at FROM photos WHERE ${circle.where} '
       'ORDER BY taken_at DESC LIMIT ?',
       variables: [...circle.variables, Variable.withInt(limit)],
       readsFrom: {photos},
     ).get();
     return [
       for (final row in rows)
-        (lat: row.read<double>('lat'), lng: row.read<double>('lng')),
+        (
+          assetId: row.read<String>('asset_id'),
+          lat: row.read<double>('lat'),
+          lng: row.read<double>('lng'),
+          takenAt: row.read<int>('taken_at'),
+        ),
     ];
   }
 

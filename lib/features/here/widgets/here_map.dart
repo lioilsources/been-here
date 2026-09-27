@@ -3,16 +3,24 @@ import 'dart:math' as math;
 
 import 'package:been_here/app/providers.dart';
 import 'package:been_here/core/geo/geo_point.dart';
+import 'package:been_here/core/geo/haversine.dart';
 import 'package:been_here/core/geo/map_scale.dart';
+import 'package:been_here/domain/memories/map_photo.dart';
 import 'package:been_here/domain/settings/app_settings.dart';
 import 'package:been_here/features/common/osm_tiles.dart';
+import 'package:been_here/features/here/photo_detail_screen.dart';
 import 'package:been_here/features/here/widgets/radius_slider.dart';
 import 'package:been_here/l10n/generated/app_localizations.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+/// A pink that no map tile is: parks are green, roads beige, water blue,
+/// and the app's own amber is somewhere between a motorway and a building.
+const Color _photoDot = Color(0xFFE5006D);
 
 /// Where you are, how far the app is looking, and where the photos were
 /// taken — the shape of the visit list, as a picture.
@@ -33,7 +41,7 @@ class HereMapCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider).value ?? const AppSettings();
-    final points = ref.watch(memoryPointsProvider).value ?? const <GeoPoint>[];
+    final points = ref.watch(memoryPointsProvider).value ?? const <MapPhoto>[];
     final atPlace = ref.watch(viewedPlaceProvider) != null;
 
     if (!settings.mapEnabled) {
@@ -92,17 +100,21 @@ class HereMap extends StatefulWidget {
     this.centreIsPlace = false,
     this.onCentreMoved,
     this.onRadiusChanged,
+    this.onPhotoTapped,
   });
 
   final GeoPoint center;
   final double radiusMeters;
-  final List<GeoPoint> points;
+  final List<MapPhoto> points;
   final bool interactive;
 
   /// Whether the middle of the circle is a place being looked at rather than
   /// where the phone is. A "you are here" crosshair on a place two thousand
   /// kilometres away is a small lie.
   final bool centreIsPlace;
+
+  /// Called when a photo's dot is tapped.
+  final ValueChanged<MapPhoto>? onPhotoTapped;
 
   /// Called when the user has zoomed the map — by pinch, or by the
   /// double-tap-and-drag that phones have meant "zoom" for a decade.
@@ -243,6 +255,36 @@ class _HereMapState extends State<HereMap> {
 
   bool get _canResize => widget.interactive && widget.onRadiusChanged != null;
 
+  /// The photo nearest the tap, if the tap was close enough to a dot.
+  ///
+  /// Hit-tested here rather than by making every dot a widget: the tolerance
+  /// is a thumb's width in pixels, converted to metres at the current zoom,
+  /// so it stays a thumb's width however far out the map is.
+  void _tapped(LatLng where) {
+    final tapped = widget.onPhotoTapped;
+    if (tapped == null || widget.points.isEmpty) return;
+
+    final tolerance =
+        metresPerPixel(
+          latitude: where.latitude,
+          zoom: _controller.camera.zoom,
+        ) *
+        22;
+
+    final at = GeoPoint(where.latitude, where.longitude);
+    MapPhoto? best;
+    var bestDistance = double.infinity;
+    for (final photo in widget.points) {
+      final metres = distanceMeters(at, photo.point);
+      if (metres < bestDistance) {
+        bestDistance = metres;
+        best = photo;
+      }
+    }
+
+    if (best != null && bestDistance <= tolerance) tapped(best);
+  }
+
   void _pointerDown(PointerDownEvent event) {
     if (!_canResize) return;
 
@@ -312,6 +354,7 @@ class _HereMapState extends State<HereMap> {
         // Moving the camera before the map has been laid out throws, so the
         // first move waits for this.
         onMapReady: () => _ready = true,
+        onTap: (_, latLng) => _tapped(latLng),
         onPositionChanged: (camera, hasGesture) {
           if (!hasGesture) return;
           _centreMoved(camera);
@@ -343,13 +386,19 @@ class _HereMapState extends State<HereMap> {
             ),
             // One dot per photo. Circles rather than markers: a marker is a
             // widget, and a thousand widgets is a different kind of app.
-            for (final point in widget.points)
+            //
+            // The colour is fixed rather than taken from the theme. The map
+            // underneath is a picture of the world — greens for parks,
+            // beiges and greys for streets, blue for water — and the app's
+            // own amber sits right in the middle of that range. This does
+            // not, on purpose.
+            for (final photo in widget.points)
               CircleMarker(
-                point: LatLng(point.lat, point.lng),
-                radius: 3.5,
-                color: theme.colorScheme.tertiary.withValues(alpha: 0.85),
-                borderColor: Colors.white70,
-                borderStrokeWidth: 0.5,
+                point: LatLng(photo.point.lat, photo.point.lng),
+                radius: 4.5,
+                color: _photoDot,
+                borderColor: Colors.white,
+                borderStrokeWidth: 1.2,
               ),
           ],
         ),
@@ -398,7 +447,7 @@ class HereMapScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final points = ref.watch(memoryPointsProvider).value ?? const <GeoPoint>[];
+    final points = ref.watch(memoryPointsProvider).value ?? const <MapPhoto>[];
     final radius = ref.watch(searchRadiusProvider);
 
     return Scaffold(
@@ -425,6 +474,7 @@ class HereMapScreen extends ConsumerWidget {
               // as dragging the slider below it.
               onRadiusChanged: (metres) =>
                   ref.read(searchRadiusProvider.notifier).meters = metres,
+              onPhotoTapped: (photo) => _openPhoto(context, ref, photo),
             ),
           ),
           // The circle you are looking at, with the handle that sizes it
@@ -440,6 +490,37 @@ class HereMapScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// Opens the tapped dot's photo, inside the visit it belongs to.
+///
+/// A dot is a photo, and the natural thing to do with a photo is look at it
+/// — but a photo on its own is thinner than what the rest of the app shows,
+/// so this opens the visit around it and lands on the one that was tapped.
+/// Swiping from there walks the same afternoon.
+void _openPhoto(BuildContext context, WidgetRef ref, MapPhoto photo) {
+  final here = ref.read(memoriesHereProvider).value;
+  if (here == null) return;
+
+  final visit = here.visits.firstWhereOrNull(
+    (v) =>
+        !photo.takenAt.isBefore(v.startedAt) &&
+        !photo.takenAt.isAfter(v.endedAt),
+  );
+  if (visit == null) return;
+
+  unawaited(
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => PhotoDetailScreen(
+          visit: visit,
+          center: here.center,
+          radiusMeters: here.radiusMeters,
+          initialAssetId: photo.assetId,
+        ),
+      ),
+    ),
+  );
 }
 
 /// The radius, and what is inside it, over the bottom of the map.

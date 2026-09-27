@@ -409,7 +409,7 @@ void main() {
 
       expect(points, hasLength(2));
       expect(
-        points.every((p) => distanceMeters(p, _prague) <= 500),
+        points.every((p) => distanceMeters(p.point, _prague) <= 500),
         isTrue,
       );
     });
