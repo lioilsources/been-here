@@ -2,7 +2,7 @@ name: been_here
 description: "Been Here — your photos from the place you just arrived at. Everything stays on device."
 publish_to: 'none'
 
-version: 0.1.0+1
+version: 0.1.1+1
 
 environment:
   sdk: ^3.12.2
