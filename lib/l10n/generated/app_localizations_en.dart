@@ -715,4 +715,72 @@ class AppLocalizationsEn extends AppLocalizations {
   String settingsQuietReasonEligible(Object count) {
     return '$count worth watching';
   }
+
+  @override
+  String get ageSemanticLabel => 'Photo age';
+
+  @override
+  String get ageStopNow => 'now';
+
+  @override
+  String get ageStopDay => '1 day';
+
+  @override
+  String get ageStop3Days => '3 days';
+
+  @override
+  String get ageStopWeek => '1 week';
+
+  @override
+  String get ageStop2Weeks => '2 weeks';
+
+  @override
+  String get ageStopMonth => '1 month';
+
+  @override
+  String get ageStop3Months => '3 months';
+
+  @override
+  String get ageStop6Months => '6 months';
+
+  @override
+  String get ageStopYear => '1 year';
+
+  @override
+  String get ageStop2Years => '2 years';
+
+  @override
+  String get ageStop5Years => '5 years';
+
+  @override
+  String get ageStop10Years => '10 years';
+
+  @override
+  String get ageStopAll => 'all';
+
+  @override
+  String get ageWindowAll => 'All photos';
+
+  @override
+  String ageWindowNewerThan(String stop) {
+    return 'Up to $stop old';
+  }
+
+  @override
+  String ageWindowOlderThan(String stop) {
+    return 'Older than $stop';
+  }
+
+  @override
+  String ageWindowBetween(String newest, String oldest) {
+    return '$newest to $oldest old';
+  }
+
+  @override
+  String get ageWindowReset => 'Reset';
+
+  @override
+  String mapDotCountCapped(int count) {
+    return '$count+ photos';
+  }
 }

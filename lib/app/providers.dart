@@ -14,6 +14,7 @@ import 'package:been_here/data/photos/photo_manager_library.dart';
 import 'package:been_here/domain/indexing/index_progress.dart';
 import 'package:been_here/domain/indexing/indexer_service.dart';
 import 'package:been_here/domain/indexing/library_sync.dart';
+import 'package:been_here/domain/memories/age_window.dart';
 import 'package:been_here/domain/memories/arrival_service.dart';
 import 'package:been_here/domain/memories/map_photo.dart';
 import 'package:been_here/domain/memories/memories_service.dart';
@@ -275,22 +276,60 @@ final memoriesHereProvider = FutureProvider<MemoriesHere?>((ref) async {
       .near(center, radiusMeters: ref.watch(searchRadiusProvider));
 });
 
+/// How old a photo may be to get a dot on the map.
+///
+/// Kept in preferences, unlike the radius. The radius belongs to where you
+/// are standing; how far back you want to see is taste, and setting it
+/// again after every launch would be a chore.
+///
+/// Only the map reads it. The timeline still shows every visit, because
+/// "last year, five years ago" is the whole point of the app.
+class MapAgeWindow extends AsyncNotifier<AgeWindow> {
+  static const preferenceKey = 'map_age_window';
+
+  @override
+  Future<AgeWindow> build() async {
+    final values = await ref.watch(databaseProvider).preferencesDao.readAll();
+    return AgeWindow.decode(values[preferenceKey]) ?? AgeWindow.defaults;
+  }
+
+  Future<void> set(AgeWindow window) async {
+    // At once, so the slider does not snap back while the write lands.
+    state = AsyncData(window);
+    await ref
+        .read(databaseProvider)
+        .preferencesDao
+        .write(preferenceKey, window.encode());
+  }
+}
+
+final mapAgeWindowProvider = AsyncNotifierProvider<MapAgeWindow, AgeWindow>(
+  MapAgeWindow.new,
+);
+
+/// The most dots the map asks for.
+///
+/// Fewer than the query would allow: these are redrawn while the radius
+/// slider moves, and at a dot every three pixels nobody can tell eight
+/// hundred from two thousand.
+const int mapPointLimit = 800;
+
 /// Where the photos in the current radius are. Only ever read by the map.
 final memoryPointsProvider = FutureProvider<List<MapPhoto>>((ref) async {
   final center = await ref.watch(currentLocationProvider.future);
   if (center == null) return const [];
 
   ref.watch(indexGenerationProvider);
+  final window = await ref.watch(mapAgeWindowProvider.future);
 
   return ref
       .watch(memoriesServiceProvider)
       .pointsNear(
         center,
         radiusMeters: ref.watch(searchRadiusProvider),
-        // Fewer than the query would allow: these are redrawn while the
-        // radius slider moves, and at a dot every three pixels nobody can
-        // tell eight hundred from two thousand.
-        limit: 800,
+        limit: mapPointLimit,
+        window: window,
+        now: DateTime.now(),
       );
 });
 

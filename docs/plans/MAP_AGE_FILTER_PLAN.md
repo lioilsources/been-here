@@ -4,6 +4,18 @@ Zadání od uživatele: na mapě nechci vidět tečky všech fotek z celé histo
 Chci slider se dvěma úchyty, který říká „od kdy do kdy": třeba *posledních
 14 dní*, nebo *14 dní zpátky, ale ne starší než 2 roky*.
 
+> **Stav: implementováno.** Odchylky od plánu níže:
+> - Sémantika `RangeSlider` **není** v `MergeSemantics`. Sloučení ponechá
+>   jen hodnotu prvního úchytu. Jméno je na kontejneru a každý úchyt se čte
+>   zvlášť. Ovládání čtečkou (`increase`/`decrease`) volá jen `onChanged`,
+>   takže se ukládá hned, ne až v `onChangeEnd`.
+> - České popisky: „Mladší než {x}", „Starší než {x}", „Staré {x} až {y}",
+>   „Všechny fotky". Anglicky „Up to {x} old", „Older than {x}",
+>   „{x} to {y} old", „All photos". Zarážky jsou v 1. pádě, takže stačí jeden
+>   klíč na zarážku.
+> - Tlačítko návratu k výchozímu je textové („Výchozí" / „Reset").
+> - `AgeWindow.clamp` je `factory` konstruktor (vyžaduje lint).
+
 Tento dokument je plán pro implementaci. Předpokládá čtenáře (model nebo
 člověka), který repozitář ještě neviděl. Před začátkem si přečti
 `docs/ARCHITECTURE.md` (vrstvy, pravidla importů, `test/architecture_test.dart`)

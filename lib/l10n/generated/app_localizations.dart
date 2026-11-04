@@ -1129,6 +1129,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} worth watching'**
   String settingsQuietReasonEligible(Object count);
+
+  /// Screen reader name of the photo age range slider on the map
+  ///
+  /// In en, this message translates to:
+  /// **'Photo age'**
+  String get ageSemanticLabel;
+
+  /// Photo age slider stop: no lower bound on age, photos up to this moment
+  ///
+  /// In en, this message translates to:
+  /// **'now'**
+  String get ageStopNow;
+
+  /// No description provided for @ageStopDay.
+  ///
+  /// In en, this message translates to:
+  /// **'1 day'**
+  String get ageStopDay;
+
+  /// No description provided for @ageStop3Days.
+  ///
+  /// In en, this message translates to:
+  /// **'3 days'**
+  String get ageStop3Days;
+
+  /// No description provided for @ageStopWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'1 week'**
+  String get ageStopWeek;
+
+  /// No description provided for @ageStop2Weeks.
+  ///
+  /// In en, this message translates to:
+  /// **'2 weeks'**
+  String get ageStop2Weeks;
+
+  /// No description provided for @ageStopMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'1 month'**
+  String get ageStopMonth;
+
+  /// No description provided for @ageStop3Months.
+  ///
+  /// In en, this message translates to:
+  /// **'3 months'**
+  String get ageStop3Months;
+
+  /// No description provided for @ageStop6Months.
+  ///
+  /// In en, this message translates to:
+  /// **'6 months'**
+  String get ageStop6Months;
+
+  /// No description provided for @ageStopYear.
+  ///
+  /// In en, this message translates to:
+  /// **'1 year'**
+  String get ageStopYear;
+
+  /// No description provided for @ageStop2Years.
+  ///
+  /// In en, this message translates to:
+  /// **'2 years'**
+  String get ageStop2Years;
+
+  /// No description provided for @ageStop5Years.
+  ///
+  /// In en, this message translates to:
+  /// **'5 years'**
+  String get ageStop5Years;
+
+  /// No description provided for @ageStop10Years.
+  ///
+  /// In en, this message translates to:
+  /// **'10 years'**
+  String get ageStop10Years;
+
+  /// Photo age slider stop: no upper bound on age, every photo ever
+  ///
+  /// In en, this message translates to:
+  /// **'all'**
+  String get ageStopAll;
+
+  /// Label of the photo age slider when it lets every photo through
+  ///
+  /// In en, this message translates to:
+  /// **'All photos'**
+  String get ageWindowAll;
+
+  /// Label of the photo age slider when it reaches up to now, e.g. 'Up to 2 years old'
+  ///
+  /// In en, this message translates to:
+  /// **'Up to {stop} old'**
+  String ageWindowNewerThan(String stop);
+
+  /// Label of the photo age slider when it reaches back to the first photo, e.g. 'Older than 2 weeks'
+  ///
+  /// In en, this message translates to:
+  /// **'Older than {stop}'**
+  String ageWindowOlderThan(String stop);
+
+  /// Label of the photo age slider when both ends are bounded, e.g. '2 weeks to 2 years old'
+  ///
+  /// In en, this message translates to:
+  /// **'{newest} to {oldest} old'**
+  String ageWindowBetween(String newest, String oldest);
+
+  /// Button that puts the photo age slider back to its default
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get ageWindowReset;
+
+  /// How many dots the map shows, when it hit its limit and there are more
+  ///
+  /// In en, this message translates to:
+  /// **'{count}+ photos'**
+  String mapDotCountCapped(int count);
 }
 
 class _AppLocalizationsDelegate

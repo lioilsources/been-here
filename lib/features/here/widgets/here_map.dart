@@ -5,10 +5,13 @@ import 'package:been_here/app/providers.dart';
 import 'package:been_here/core/geo/geo_point.dart';
 import 'package:been_here/core/geo/haversine.dart';
 import 'package:been_here/core/geo/map_scale.dart';
+import 'package:been_here/domain/memories/age_window.dart';
 import 'package:been_here/domain/memories/map_photo.dart';
 import 'package:been_here/domain/settings/app_settings.dart';
+import 'package:been_here/features/common/format.dart';
 import 'package:been_here/features/common/osm_tiles.dart';
 import 'package:been_here/features/here/photo_detail_screen.dart';
+import 'package:been_here/features/here/widgets/age_slider.dart';
 import 'package:been_here/features/here/widgets/radius_slider.dart';
 import 'package:been_here/l10n/generated/app_localizations.dart';
 import 'package:collection/collection.dart';
@@ -43,6 +46,7 @@ class HereMapCard extends ConsumerWidget {
     final settings = ref.watch(settingsProvider).value ?? const AppSettings();
     final points = ref.watch(memoryPointsProvider).value ?? const <MapPhoto>[];
     final atPlace = ref.watch(viewedPlaceProvider) != null;
+    final window = ref.watch(mapAgeWindowProvider).value ?? AgeWindow.defaults;
 
     if (!settings.mapEnabled) {
       return _OpenInMapsRow(center: center);
@@ -67,6 +71,15 @@ class HereMapCard extends ConsumerWidget {
                   interactive: false,
                 ),
               ),
+              // The card has no controls, so when the full map has been told
+              // to hide some dots, say so — otherwise a card with fewer dots
+              // than the timeline below it just looks wrong.
+              if (!window.isDefault)
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: _AgeWindowBadge(window: window),
+                ),
               Positioned.fill(
                 child: Material(
                   color: Colors.transparent,
@@ -523,10 +536,12 @@ void _openPhoto(BuildContext context, WidgetRef ref, MapPhoto photo) {
   );
 }
 
-/// The radius, and what is inside it, over the bottom of the map.
+/// The radius, the age of the dots, and what is inside them, over the bottom
+/// of the map.
 ///
-/// The same slider as the timeline's, because it is the same number: the
-/// circle drawn here is what that slider sets.
+/// The same radius slider as the timeline's, because it is the same number:
+/// the circle drawn here is what that slider sets. The age slider is only
+/// here — it filters the dots, not the timeline.
 class _MapControls extends ConsumerWidget {
   const _MapControls();
 
@@ -542,8 +557,54 @@ class _MapControls extends ConsumerWidget {
       child: SafeArea(
         top: false,
         child: Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: RadiusSlider(photoCount: here?.photoCount),
+          padding: const EdgeInsets.only(bottom: 4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RadiusSlider(photoCount: here?.photoCount),
+              // Under the radius, because both decide which dots are drawn:
+              // that one says where, this one says when.
+              const AgeSlider(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Which ages the dots on the card are limited to.
+class _AgeWindowBadge extends StatelessWidget {
+  const _AgeWindowBadge({required this.window});
+
+  final AgeWindow window;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface.withValues(alpha: 0.9),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.schedule,
+              size: 14,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              formatAgeWindow(l10n, window),
+              style: theme.textTheme.labelSmall,
+            ),
+          ],
         ),
       ),
     );

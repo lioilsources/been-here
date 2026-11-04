@@ -725,4 +725,72 @@ class AppLocalizationsCs extends AppLocalizations {
   String settingsQuietReasonEligible(Object count) {
     return '$count ke hlídání';
   }
+
+  @override
+  String get ageSemanticLabel => 'Stáří fotek';
+
+  @override
+  String get ageStopNow => 'teď';
+
+  @override
+  String get ageStopDay => '1 den';
+
+  @override
+  String get ageStop3Days => '3 dny';
+
+  @override
+  String get ageStopWeek => 'týden';
+
+  @override
+  String get ageStop2Weeks => '2 týdny';
+
+  @override
+  String get ageStopMonth => 'měsíc';
+
+  @override
+  String get ageStop3Months => '3 měsíce';
+
+  @override
+  String get ageStop6Months => 'půl roku';
+
+  @override
+  String get ageStopYear => 'rok';
+
+  @override
+  String get ageStop2Years => '2 roky';
+
+  @override
+  String get ageStop5Years => '5 let';
+
+  @override
+  String get ageStop10Years => '10 let';
+
+  @override
+  String get ageStopAll => 'vše';
+
+  @override
+  String get ageWindowAll => 'Všechny fotky';
+
+  @override
+  String ageWindowNewerThan(String stop) {
+    return 'Mladší než $stop';
+  }
+
+  @override
+  String ageWindowOlderThan(String stop) {
+    return 'Starší než $stop';
+  }
+
+  @override
+  String ageWindowBetween(String newest, String oldest) {
+    return 'Staré $newest až $oldest';
+  }
+
+  @override
+  String get ageWindowReset => 'Výchozí';
+
+  @override
+  String mapDotCountCapped(int count) {
+    return '$count+ fotek';
+  }
 }

@@ -323,5 +323,32 @@
   "settingsQuietReasonTooFewPhotos": "{count} s málo fotkami",
   "settingsQuietReasonTooRecent": "{count} nafocených nedávno",
   "settingsQuietReasonPlaceCooldown": "{count} v prodlevě",
-  "settingsQuietReasonEligible": "{count} ke hlídání"
+  "settingsQuietReasonEligible": "{count} ke hlídání",
+  "ageSemanticLabel": "Stáří fotek",
+  "ageStopNow": "teď",
+  "ageStopDay": "1 den",
+  "ageStop3Days": "3 dny",
+  "ageStopWeek": "týden",
+  "ageStop2Weeks": "2 týdny",
+  "ageStopMonth": "měsíc",
+  "ageStop3Months": "3 měsíce",
+  "ageStop6Months": "půl roku",
+  "ageStopYear": "rok",
+  "ageStop2Years": "2 roky",
+  "ageStop5Years": "5 let",
+  "ageStop10Years": "10 let",
+  "ageStopAll": "vše",
+  "ageWindowAll": "Všechny fotky",
+  "ageWindowNewerThan": "Mladší než {stop}",
+  "ageWindowOlderThan": "Starší než {stop}",
+  "ageWindowBetween": "Staré {newest} až {oldest}",
+  "ageWindowReset": "Výchozí",
+  "mapDotCountCapped": "{count}+ fotek",
+  "@mapDotCountCapped": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

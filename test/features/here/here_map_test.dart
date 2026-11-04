@@ -6,6 +6,7 @@ import 'package:been_here/data/db/database.dart';
 import 'package:been_here/data/location/fake_location_service.dart';
 import 'package:been_here/data/photos/fake_photo_library.dart';
 import 'package:been_here/data/photos/photo_library.dart';
+import 'package:been_here/domain/memories/age_window.dart';
 import 'package:been_here/domain/settings/app_settings.dart';
 import 'package:been_here/features/here/photo_detail_screen.dart';
 import 'package:been_here/features/here/widgets/here_map.dart';
@@ -95,6 +96,13 @@ void main() {
   setUp(() async {
     db = AppDatabase.withExecutor(NativeDatabase.memory());
     await markOnboarded(db);
+    // The fixtures are from 2019, older than the map shows by default.
+    // These tests are about the map, not about which ages it draws, so they
+    // look at every photo; the age filter has its own tests at the end.
+    await db.preferencesDao.write(
+      MapAgeWindow.preferenceKey,
+      AgeWindow.all.encode(),
+    );
     library = FakePhotoLibrary(assets: _photos());
     location = FakeLocationService(at: _prague);
   });
@@ -405,5 +413,203 @@ void main() {
 
     // Nothing here to draw; the empty state says so instead.
     expect(find.byType(HereMapCard), findsNothing);
+  });
+
+  group('how old the dots are', () {
+    DateTime daysAgo(int days) =>
+        DateTime.now().toUtc().subtract(Duration(days: days));
+
+    /// One photo from this week and one from years ago, side by side.
+    List<PhotoAsset> recentAndOld() => [
+      PhotoAsset(
+        id: 'this-week',
+        lat: _prague.lat,
+        lng: _prague.lng,
+        takenAt: daysAgo(3),
+        width: 4032,
+        height: 3024,
+      ),
+      PhotoAsset(
+        id: 'years-ago',
+        lat: _prague.lat + 0.0004,
+        lng: _prague.lng,
+        takenAt: daysAgo(1100),
+        width: 4032,
+        height: 3024,
+      ),
+    ];
+
+    /// Dots on the card's map: every circle but the radius.
+    int dotsOnCard(WidgetTester tester) =>
+        tester
+            .widget<CircleLayer>(find.byType(CircleLayer).first)
+            .circles
+            .length -
+        1;
+
+    setUp(() async {
+      await db.preferencesDao.remove(MapAgeWindow.preferenceKey);
+      await SettingsStore(db.preferencesDao).setMapEnabled(enabled: true);
+      library = FakePhotoLibrary(assets: recentAndOld());
+    });
+
+    testWidgets('the map leaves out what is older than two years', (
+      tester,
+    ) async {
+      await tester.pumpWidget(app());
+      await settle(tester);
+
+      expect(dotsOnCard(tester), 1);
+
+      // The timeline still has both: "five years ago" is the whole point of
+      // the app, and the filter is only for the map.
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(HereMapCard)),
+      );
+      expect(container.read(memoriesHereProvider).value!.photoCount, 2);
+    });
+
+    testWidgets('everything brings the old dots back', (tester) async {
+      await tester.pumpWidget(app());
+      await settle(tester);
+
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(HereMapCard)),
+      );
+      await container.read(mapAgeWindowProvider.notifier).set(AgeWindow.all);
+      await settle(tester);
+
+      expect(dotsOnCard(tester), 2);
+    });
+
+    testWidgets('a young end hides the newest dots', (tester) async {
+      await tester.pumpWidget(app());
+      await settle(tester);
+
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(HereMapCard)),
+      );
+      // Two weeks back, to everything.
+      await container
+          .read(mapAgeWindowProvider.notifier)
+          .set(const AgeWindow(newest: 4, oldest: AgeWindow.unbounded));
+      await settle(tester);
+
+      expect(dotsOnCard(tester), 1);
+      final dot = tester
+          .widget<CircleLayer>(find.byType(CircleLayer).first)
+          .circles
+          .last;
+      expect(dot.point.latitude, closeTo(_prague.lat + 0.0004, 1e-9));
+    });
+
+    testWidgets('the card says when it is not showing the default', (
+      tester,
+    ) async {
+      await tester.pumpWidget(app());
+      await settle(tester);
+
+      // The default needs no explaining.
+      expect(find.text('Up to 2 years old'), findsNothing);
+
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(HereMapCard)),
+      );
+      await container
+          .read(mapAgeWindowProvider.notifier)
+          .set(const AgeWindow(newest: 4, oldest: 9));
+      await settle(tester);
+
+      expect(find.text('2 weeks to 2 years old'), findsOneWidget);
+    });
+
+    testWidgets('the full map has the age slider, starting at two years', (
+      tester,
+    ) async {
+      await tester.pumpWidget(app());
+      await settle(tester);
+      await tester.tap(find.byType(HereMapCard));
+      await settle(tester);
+
+      expect(find.byType(RangeSlider), findsOneWidget);
+      expect(find.text('Up to 2 years old'), findsOneWidget);
+      // No reset to offer while it is at the default.
+      expect(find.text('Reset'), findsNothing);
+    });
+
+    testWidgets('dragging the old end out to everything is remembered', (
+      tester,
+    ) async {
+      await tester.pumpWidget(app());
+      await settle(tester);
+      await tester.tap(find.byType(HereMapCard));
+      await settle(tester);
+
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(HereMapScreen)),
+      );
+
+      // The old thumb sits at "2 years", three quarters of the way along.
+      final track = tester.getRect(find.byType(RangeSlider));
+      final thumb = Offset(
+        track.left + 24 + (track.width - 48) * 9 / AgeWindow.unbounded,
+        track.center.dy,
+      );
+      await tester.dragFrom(thumb, Offset(track.width, 0));
+      await settle(tester);
+
+      expect(container.read(mapAgeWindowProvider).value, AgeWindow.all);
+      expect(find.text('All photos'), findsOneWidget);
+
+      // Kept, so the next launch starts where this one left off.
+      final saved = await tester.runAsync(db.preferencesDao.readAll);
+      expect(
+        AgeWindow.decode(saved![MapAgeWindow.preferenceKey]),
+        AgeWindow.all,
+      );
+
+      // And the way back to the default is right there.
+      await tester.tap(find.text('Reset'));
+      await settle(tester);
+      expect(container.read(mapAgeWindowProvider).value, AgeWindow.defaults);
+    });
+
+    testWidgets('the thumbs cannot meet', (tester) async {
+      await tester.pumpWidget(app());
+      await settle(tester);
+      await tester.tap(find.byType(HereMapCard));
+      await settle(tester);
+
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(HereMapScreen)),
+      );
+
+      // Drag "now" right across to the far end, past the other thumb.
+      final track = tester.getRect(find.byType(RangeSlider));
+      await tester.dragFrom(
+        Offset(track.left + 24, track.center.dy),
+        Offset(track.width, 0),
+      );
+      await settle(tester);
+
+      final window = container.read(mapAgeWindowProvider).value!;
+      expect(window.oldest, greaterThan(window.newest));
+    });
+
+    testWidgets('a saved window is where the slider starts', (tester) async {
+      await db.preferencesDao.write(
+        MapAgeWindow.preferenceKey,
+        const AgeWindow(newest: 3, oldest: 8).encode(),
+      );
+
+      await tester.pumpWidget(app());
+      await settle(tester);
+      await tester.tap(find.byType(HereMapCard));
+      await settle(tester);
+
+      final slider = tester.widget<RangeSlider>(find.byType(RangeSlider));
+      expect(slider.values, const RangeValues(3, 8));
+      expect(find.text('1 week to 1 year old'), findsWidgets);
+    });
   });
 }

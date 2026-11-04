@@ -6,6 +6,7 @@ import 'package:been_here/core/geo/haversine.dart';
 import 'package:been_here/core/geo/unit_vector.dart';
 import 'package:been_here/core/time/local_day.dart';
 import 'package:been_here/data/db/database.dart';
+import 'package:been_here/domain/memories/age_window.dart';
 import 'package:been_here/domain/memories/memories_service.dart';
 // drift exports isNull/isNotNull expression helpers that collide with
 // matcher's.
@@ -432,6 +433,63 @@ void main() {
 
     test('an empty index draws nothing', () async {
       expect(await service.pointsNear(_prague, radiusMeters: 500), isEmpty);
+    });
+  });
+
+  group('points for the map, by age', () {
+    final now = DateTime.utc(2026, 11, 4, 12);
+    DateTime daysAgo(int days) => now.subtract(Duration(days: days));
+
+    Future<Set<String>> idsIn(AgeWindow? window) async {
+      final points = await service.pointsNear(
+        _prague,
+        radiusMeters: 500,
+        window: window,
+        now: now,
+      );
+      return {for (final p in points) p.assetId};
+    }
+
+    setUp(() async {
+      await insert(_prague, daysAgo(3), id: 'this-week');
+      await insert(_prague, daysAgo(100), id: 'this-year');
+      await insert(_prague, daysAgo(1000), id: 'years-ago');
+    });
+
+    test('without a window every age is drawn', () async {
+      expect(await idsIn(null), {'this-week', 'this-year', 'years-ago'});
+    });
+
+    test('everything is the same as no window', () async {
+      expect(await idsIn(AgeWindow.all), {
+        'this-week',
+        'this-year',
+        'years-ago',
+      });
+    });
+
+    test('the default leaves out what is older than two years', () async {
+      expect(await idsIn(AgeWindow.defaults), {'this-week', 'this-year'});
+    });
+
+    test('a young end leaves out the most recent', () async {
+      // Two weeks back, nothing older than two years.
+      expect(await idsIn(const AgeWindow(newest: 4, oldest: 9)), {
+        'this-year',
+      });
+    });
+
+    test('the last week is only the last week', () async {
+      expect(await idsIn(const AgeWindow(newest: 0, oldest: 3)), {
+        'this-week',
+      });
+    });
+
+    test('the window and the circle both apply', () async {
+      await insert(north(_prague, 3000), daysAgo(2), id: 'far-and-new');
+      expect(await idsIn(const AgeWindow(newest: 0, oldest: 3)), {
+        'this-week',
+      });
     });
   });
 }

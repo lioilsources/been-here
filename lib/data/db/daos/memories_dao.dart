@@ -81,19 +81,32 @@ class MemoriesDao extends DatabaseAccessor<AppDatabase>
   /// carries is paid for a thousand times. The id and the time are in
   /// because a dot you cannot open is decoration. Newest first, so a [limit]
   /// keeps the most recent ones.
+  ///
+  /// [fromTakenAt] and [toTakenAt] bound the capture time, unix seconds UTC,
+  /// both inclusive — the same as [photosWithin]. They are what keeps a map
+  /// to the stretch of time someone asked about.
   Future<List<({String assetId, double lat, double lng, int takenAt})>>
   pointsWithin({
     required List<BoundingBox> boxes,
     required UnitVector center,
     required double chordSquared,
+    int? fromTakenAt,
+    int? toTakenAt,
     int limit = 2000,
   }) async {
     if (boxes.isEmpty) return const [];
     final circle = _circle(boxes, center, chordSquared);
     final rows = await customSelect(
-      'SELECT asset_id, lat, lng, taken_at FROM photos WHERE ${circle.where} '
-      'ORDER BY taken_at DESC LIMIT ?',
-      variables: [...circle.variables, Variable.withInt(limit)],
+      'SELECT asset_id, lat, lng, taken_at FROM photos WHERE ${circle.where}'
+      '${fromTakenAt == null ? '' : ' AND taken_at >= ?'}'
+      '${toTakenAt == null ? '' : ' AND taken_at <= ?'}'
+      ' ORDER BY taken_at DESC LIMIT ?',
+      variables: [
+        ...circle.variables,
+        if (fromTakenAt != null) Variable.withInt(fromTakenAt),
+        if (toTakenAt != null) Variable.withInt(toTakenAt),
+        Variable.withInt(limit),
+      ],
       readsFrom: {photos},
     ).get();
     return [

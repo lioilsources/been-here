@@ -1,3 +1,4 @@
+import 'package:been_here/domain/memories/age_window.dart';
 import 'package:been_here/domain/memories/relative_age.dart';
 import 'package:been_here/l10n/generated/app_localizations.dart';
 
@@ -26,3 +27,36 @@ String formatRelativeAge(AppLocalizations l10n, RelativeAge age) =>
       AgeUnit.months => l10n.ageMonthsAgo(age.amount),
       AgeUnit.years => l10n.ageYearsAgo(age.amount),
     };
+
+/// One stop on the photo age slider, by its index into [AgeWindow.stops].
+String formatAgeStop(AppLocalizations l10n, int index) => switch (index) {
+  0 => l10n.ageStopNow,
+  1 => l10n.ageStopDay,
+  2 => l10n.ageStop3Days,
+  3 => l10n.ageStopWeek,
+  4 => l10n.ageStop2Weeks,
+  5 => l10n.ageStopMonth,
+  6 => l10n.ageStop3Months,
+  7 => l10n.ageStop6Months,
+  8 => l10n.ageStopYear,
+  9 => l10n.ageStop2Years,
+  10 => l10n.ageStop5Years,
+  11 => l10n.ageStop10Years,
+  _ => l10n.ageStopAll,
+};
+
+/// The age window as a sentence: "Up to 2 years old", "2 weeks to 2 years
+/// old", "Older than 1 year", "All photos".
+String formatAgeWindow(AppLocalizations l10n, AgeWindow window) {
+  if (window.isAll) return l10n.ageWindowAll;
+  if (window.newest == 0) {
+    return l10n.ageWindowNewerThan(formatAgeStop(l10n, window.oldest));
+  }
+  if (window.oldest == AgeWindow.unbounded) {
+    return l10n.ageWindowOlderThan(formatAgeStop(l10n, window.newest));
+  }
+  return l10n.ageWindowBetween(
+    formatAgeStop(l10n, window.newest),
+    formatAgeStop(l10n, window.oldest),
+  );
+}

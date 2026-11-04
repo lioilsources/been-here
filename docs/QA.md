@@ -181,3 +181,26 @@ and value as a screen reader sees them; the timeline at double text size.
 - [ ] Icon and splash look right on device, in light and dark.
 - [ ] "Show the intro again" brings it back.
 - [ ] TestFlight build installs and launches on a clean device.
+
+## Map — age of the dots
+
+Covered by tests: which dots each window keeps, the default of two years,
+the timeline ignoring the filter, the label on the card, the window surviving
+a restart, the thumbs never meeting, the slider's name and values as a screen
+reader sees them, a screen reader's step being kept, and both sliders at
+double text size.
+
+- [ ] On the full map the age slider sits under the radius, reading
+      "Up to 2 years old".
+- [ ] Dragging the old thumb to "all" brings back the old dots; dragging it
+      back hides them. The count on the right follows.
+- [ ] Moving "now" to "2 weeks" hides the last fortnight's dots.
+- [ ] The thumbs cannot be dragged past each other.
+- [ ] The window is still set after killing and relaunching the app.
+- [ ] With a window that is not the default, the card on Here says so, and
+      tapping it opens the full map with the same window.
+- [ ] The timeline under the card does not change with the window.
+- [ ] Czech and English, dark mode, largest text: the controls leave most of
+      the map visible (iPhone SE included).
+- [ ] VoiceOver and TalkBack read "Photo age" and each thumb as a span of
+      time, and a swipe up or down moves it.

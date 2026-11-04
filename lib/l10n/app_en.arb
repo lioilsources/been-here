@@ -412,5 +412,75 @@
   "settingsQuietReasonTooFewPhotos": "{count} with too few photos",
   "settingsQuietReasonTooRecent": "{count} photographed too recently",
   "settingsQuietReasonPlaceCooldown": "{count} still cooling down",
-  "settingsQuietReasonEligible": "{count} worth watching"
+  "settingsQuietReasonEligible": "{count} worth watching",
+  "ageSemanticLabel": "Photo age",
+  "@ageSemanticLabel": {
+    "description": "Screen reader name of the photo age range slider on the map"
+  },
+  "ageStopNow": "now",
+  "@ageStopNow": {
+    "description": "Photo age slider stop: no lower bound on age, photos up to this moment"
+  },
+  "ageStopDay": "1 day",
+  "ageStop3Days": "3 days",
+  "ageStopWeek": "1 week",
+  "ageStop2Weeks": "2 weeks",
+  "ageStopMonth": "1 month",
+  "ageStop3Months": "3 months",
+  "ageStop6Months": "6 months",
+  "ageStopYear": "1 year",
+  "ageStop2Years": "2 years",
+  "ageStop5Years": "5 years",
+  "ageStop10Years": "10 years",
+  "ageStopAll": "all",
+  "@ageStopAll": {
+    "description": "Photo age slider stop: no upper bound on age, every photo ever"
+  },
+  "ageWindowAll": "All photos",
+  "@ageWindowAll": {
+    "description": "Label of the photo age slider when it lets every photo through"
+  },
+  "ageWindowNewerThan": "Up to {stop} old",
+  "@ageWindowNewerThan": {
+    "description": "Label of the photo age slider when it reaches up to now, e.g. 'Up to 2 years old'",
+    "placeholders": {
+      "stop": {
+        "type": "String"
+      }
+    }
+  },
+  "ageWindowOlderThan": "Older than {stop}",
+  "@ageWindowOlderThan": {
+    "description": "Label of the photo age slider when it reaches back to the first photo, e.g. 'Older than 2 weeks'",
+    "placeholders": {
+      "stop": {
+        "type": "String"
+      }
+    }
+  },
+  "ageWindowBetween": "{newest} to {oldest} old",
+  "@ageWindowBetween": {
+    "description": "Label of the photo age slider when both ends are bounded, e.g. '2 weeks to 2 years old'",
+    "placeholders": {
+      "newest": {
+        "type": "String"
+      },
+      "oldest": {
+        "type": "String"
+      }
+    }
+  },
+  "ageWindowReset": "Reset",
+  "@ageWindowReset": {
+    "description": "Button that puts the photo age slider back to its default"
+  },
+  "mapDotCountCapped": "{count}+ photos",
+  "@mapDotCountCapped": {
+    "description": "How many dots the map shows, when it hit its limit and there are more",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

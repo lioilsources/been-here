@@ -4,6 +4,7 @@ import 'package:been_here/core/geo/haversine.dart';
 import 'package:been_here/core/geo/unit_vector.dart';
 import 'package:been_here/core/time/local_day.dart';
 import 'package:been_here/data/db/daos/memories_dao.dart';
+import 'package:been_here/domain/memories/age_window.dart';
 import 'package:been_here/domain/memories/map_photo.dart';
 import 'package:been_here/domain/memories/memory.dart';
 import 'package:been_here/domain/memories/visit.dart';
@@ -85,16 +86,24 @@ class MemoriesService {
   /// Capped, because a dense city block holds more photos than a map can
   /// usefully show dots for — and past a few thousand the dots stop being
   /// information and start being a stain.
+  ///
+  /// [window] keeps only photos of a certain age, as of [now]. Without one
+  /// every photo counts, whenever it was taken.
   Future<List<MapPhoto>> pointsNear(
     GeoPoint center, {
     required double radiusMeters,
     int limit = 2000,
+    AgeWindow? window,
+    DateTime? now,
   }) async {
     final query = _Circle(center, radiusMeters);
+    final bounds = window?.bounds(now ?? DateTime.now());
     final points = await dao.pointsWithin(
       boxes: query.boxes,
       center: query.center,
       chordSquared: query.chordSquared,
+      fromTakenAt: bounds?.from,
+      toTakenAt: bounds?.to,
       limit: limit,
     );
     return [

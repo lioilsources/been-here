@@ -351,6 +351,33 @@ asked for, so the answer coming back does not shove the camera out from
 under the finger that put it there. The radius slider is on that screen too:
 the circle drawn there is exactly what it sets.
 
+Under the radius sits a second slider with two thumbs: how old a photo may
+be to get a dot (`domain/memories/age_window.dart`). Every photo ever taken
+in a neighbourhood is a picture that says nothing, and the question the map
+is usually asked is narrower — the last two weeks, or a fortnight back but
+nothing older than two years. The default is the last two years.
+
+- **Steps, not a continuous track.** Thirteen stops from "now" to
+  "everything", each a span a person would say out loud. The label reads as a
+  sentence, and the dots are queried once per step instead of once per pixel.
+  The provider is written when the finger lets go, not while it drags.
+- **The map only.** The timeline, the count by the radius, the nearest
+  memory and the arrivals all ignore it. "Five years ago" is the line the app
+  exists for, and a filter that quietly removed it from the list would break
+  that. The card on the Here screen has no controls, so when the window is
+  not the default it carries a small label saying what it is — otherwise a
+  card with fewer dots than the list under it looks wrong.
+- **Kept, unlike the radius.** The radius belongs to where you are standing.
+  How far back you want to look is taste, so it is a row in `preferences`
+  and survives a restart.
+- **Elapsed days, not calendar days.** "Two weeks" on a map of dots does not
+  need to know where midnight was.
+- **Not merged for a screen reader.** The radius slider merges its name and
+  value into one node. A range cannot: merging keeps only the first thumb's
+  value, so the name goes on a container and each thumb is read inside it.
+  A screen reader's increase and decrease arrive with no "let go", so those
+  are kept immediately rather than waiting for one.
+
 Where the screen is looking is one object rather than a coordinate and a
 pile of flags, because *why* it is looking there decides what the screen
 says: a place has a name and a way back, a dragged map has a way back, and a

@@ -5,8 +5,12 @@ import 'package:been_here/data/db/database.dart';
 import 'package:been_here/data/location/fake_location_service.dart';
 import 'package:been_here/data/photos/fake_photo_library.dart';
 import 'package:been_here/data/photos/photo_library.dart';
+import 'package:been_here/domain/memories/age_window.dart';
+import 'package:been_here/domain/settings/app_settings.dart';
+import 'package:been_here/features/here/widgets/here_map.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -105,5 +109,98 @@ void main() {
     // tester.takeException() would hand it back here.
     expect(tester.takeException(), isNull);
     expect(find.byType(Slider), findsOneWidget);
+  });
+
+  group('the full map', () {
+    Future<void> openMap(WidgetTester tester) async {
+      await SettingsStore(db.preferencesDao).setMapEnabled(enabled: true);
+      await tester.pumpWidget(app());
+      await settle(tester);
+      await tester.tap(find.byType(HereMapCard));
+      await settle(tester);
+    }
+
+    testWidgets('the age slider says what it is, in words', (tester) async {
+      final handle = tester.ensureSemantics();
+      await openMap(tester);
+
+      final semantics = tester
+          .getSemantics(find.byType(RangeSlider))
+          .getSemanticsData();
+      expect(semantics.label, contains('Photo age'));
+
+      // The thumbs read as spans of time, not as the stop's index.
+      final spoken = <String>[];
+      bool collect(SemanticsNode node) {
+        spoken.add(node.getSemanticsData().value);
+        node.visitChildren(collect);
+        return true;
+      }
+
+      tester.getSemantics(find.byType(RangeSlider)).visitChildren(collect);
+
+      final all = [semantics.value, ...spoken].join(' | ');
+      expect(all, contains('2 years'));
+      expect(all, isNot(contains('9')));
+
+      handle.dispose();
+    });
+
+    testWidgets('a screen reader can move a thumb, and it is kept', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await openMap(tester);
+
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(HereMapScreen)),
+      );
+
+      // The old thumb, the one reading "2 years".
+      SemanticsNode? oldThumb;
+      bool find2Years(SemanticsNode node) {
+        if (node.getSemanticsData().value == '2 years') oldThumb = node;
+        node.visitChildren(find2Years);
+        return true;
+      }
+
+      tester.getSemantics(find.byType(RangeSlider)).visitChildren(find2Years);
+      expect(oldThumb, isNotNull);
+
+      oldThumb!.owner!.performAction(oldThumb!.id, SemanticsAction.increase);
+      await settle(tester);
+
+      // One step further back: two years becomes five. Swipes have no
+      // "let go", so this must not wait for one.
+      expect(
+        container.read(mapAgeWindowProvider).value,
+        const AgeWindow(newest: 0, oldest: 10),
+      );
+
+      handle.dispose();
+    });
+
+    testWidgets('both sliders fit at the largest text size', (tester) async {
+      tester.platformDispatcher.textScaleFactorTestValue = 2;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+      await openMap(tester);
+
+      expect(tester.takeException(), isNull);
+      expect(find.byType(Slider), findsWidgets);
+      expect(find.byType(RangeSlider), findsOneWidget);
+
+      // The controls must leave most of the map to look at.
+      final screen = tester.getSize(find.byType(HereMapScreen));
+      final controls = tester.getRect(
+        find
+            .ancestor(
+              of: find.byType(RangeSlider),
+              matching: find.byType(DecoratedBox),
+            )
+            .first,
+      );
+      expect(controls.height / screen.height, lessThan(0.5));
+    });
   });
 }
