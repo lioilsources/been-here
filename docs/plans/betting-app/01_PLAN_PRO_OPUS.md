@@ -49,6 +49,9 @@ každá brána níže odkazuje na námitku, kterou má vyvrátit.
    metrika, kterou můžeme uživateli dát, a je to jádro retence.
 5. **Nastavení** — moje sázkovky, moje ligy, práh hrany, Kelly frakce,
    limity (denní strop na počet doporučení; vyplý „night mode“ 00–06).
+6. **Oblíbený tým** — kádr, lavička, pětky a dvojice, trenéři, historie,
+   stadiony a doma/venku. Fanouškovská vrstva; co z ní smí do modelu, je
+   v `06_DETAIL_TYMU.md`.
 
 ### Co appka nikdy nedělá
 
@@ -233,7 +236,8 @@ spočítané všechny trhy; snapshoty kurzů bez děr přes 24 h.
 
 ### Fáze 5 — Appka MVP (4 týdny)
 
-Obrazovky 1, 2, 3, 5 ze sekce 1. Deník ručně (obrazovka 4) bez OCR.
+Obrazovky 1, 2, 3, 5 ze sekce 1 a zjednodušený Oblíbený tým (Přehled,
+Kádr, Trenér; `06_DETAIL_TYMU.md` §7). Deník ručně (obrazovka 4) bez OCR.
 Lokalizace cs/en. Věková brána 18+, povinné upozornění podle § 5j zákona
 o regulaci reklamy (text „Ministerstvo financí varuje: Účastí na hazardní
 hře může vzniknout závislost“ + kontakt na pomoc) na každé obrazovce
@@ -247,7 +251,9 @@ licence (test).
 
 CLV zpětná vazba uživateli, rozpad podle trhů, „kolik tě stojí emoce“
 (rozdíl mezi tím, co vsadil, a tím, co by vsadil podle modelu). Limity a
-„ticho“ (bez doporučení) jako funkce, ne jako omluva.
+„ticho“ (bez doporučení) jako funkce, ne jako omluva. Plný Oblíbený tým:
+pětky a brankářské dvojice, historie a trofeje, stadiony a tour, grafy
+(`06_DETAIL_TYMU.md` §2.3–2.6).
 
 Akceptace: retence D30 u testovací skupiny > 40 %. Jinak se produkt
 nemonetizuje, ale přepracuje.

@@ -12,6 +12,7 @@ Kdyby se do toho šlo, dostane vlastní repo (viz plán, fáze 0).
 | `02_PROVIDERI_A_FIT.md` | Co nabízejí Tipsport, Fortuna, Betano, Sazkabet, globální sázkovky, e‑sports, krypto sázkovky, predikční trhy a „A/B rulety“ — a jak k nim appka sedí. | Zakladatel |
 | `03_OPONENTURA.md` | Proč to nemůže fungovat. Dvanáct námitek, ke každé „co by muselo platit, aby padla“. | Zakladatel, před investicí času |
 | `04_SWOT_KONKURENCE.md` | SWOT jednotlivých konkurenčních platforem a kde v tom je mezera. | Zakladatel |
+| `06_DETAIL_TYMU.md` | Specifikace obrazovky oblíbeného týmu: kádr, lavička, pětky a dvojice, trenéři, historie, stadiony, doma/venku; co z toho smí do modelu. | Opus |
 | `05_APIFY_SCRAPERY.md` | Co nabízí Apify Store a MCP: scrapery sázkovek, agregátorů kurzů a sestav, ceny, právní rámec a co to mění v plánu. | Opus / zakladatel |
 
 ## Myšlenka v jednom odstavci
