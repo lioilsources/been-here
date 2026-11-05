@@ -160,7 +160,7 @@ Pravidla:
 | Zranění/tresty | Sportmonks injuries (Growth+) | Ruční kurace pro Extraligu v MVP, NHL z veřejných zdrojů | |
 | Kurzy CZ sázkovek | Odds‑API.io (Tipsport od 12/2025; Fortuna ověřit), jinak **nic** — scraping Tipsportu/Fortuny je porušení podmínek a křehké | stejné | Nejdřív ověřit pokrytí přímo dotazem na `/bookmakers`. Toto je kritická závislost; bez ní appka neumí „kurz u tvé sázkovky“ |
 | Referenční kurzy | OddsPapi nebo Odds‑API.io: Pinnacle, Betfair, bet365 | stejné | |
-| Historie kurzů pro backtest | Odds‑API.io historical, football‑data.co.uk (zdarma, uzavírací kurzy top lig od 2000) | Trefík archiv? ověřit licenci | |
+| Historie kurzů pro backtest | Odds‑API.io historical, football‑data.co.uk (zdarma, uzavírací kurzy top lig od 2000), Apify: OddsPortal (otevírací i uzavírací kurzy, 20 sezon, všechny trhy) a Flashscore (xG od 2023/24) scrapery, viz `05_APIFY_SCRAPERY.md` | OddsPortal přes Apify má i hokej | Apify jen pro jednorázový výzkumný sběr, ne pro produkci |
 
 Rozpočet na data v MVP: 300–500 €/měs. Před prvním předplatitelem.
 
@@ -279,7 +279,9 @@ trhy a krypto sázkovky **ne**, dokud se nezmění regulace (viz 02).
 - Když se poskytovatel dat ukáže jako nepoužitelný (pokrytí, cena, ToS),
   nepřecházej potichu na scraping. Zapiš, zastav fázi, navrhni alternativu.
 - Kód modelu je v Pythonu; ne Dart. Appka model nikdy nepočítá.
-- Scraping sázkových kanceláří je mimo. Tečka.
+- Scraping webů sázkových kanceláří je mimo. Tečka. Čtení agregátorů
+  (OddsPortal, Flashscore, Sofascore) přes Apify je dovolené jen pro
+  výzkumná data do backtestu ve fázích 1–3; pravidla v `05_APIFY_SCRAPERY.md`.
 
 ## 7. Rozpočet času a peněz
 
