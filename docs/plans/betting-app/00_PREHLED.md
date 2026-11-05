@@ -13,6 +13,7 @@ Kdyby se do toho šlo, dostane vlastní repo (viz plán, fáze 0).
 | `03_OPONENTURA.md` | Proč to nemůže fungovat. Dvanáct námitek, ke každé „co by muselo platit, aby padla“. | Zakladatel, před investicí času |
 | `04_SWOT_KONKURENCE.md` | SWOT jednotlivých konkurenčních platforem a kde v tom je mezera. | Zakladatel |
 | `06_DETAIL_TYMU.md` | Specifikace obrazovky oblíbeného týmu: kádr, lavička, pětky a dvojice, trenéři, historie, stadiony, doma/venku; co z toho smí do modelu. | Opus |
+| `07_SROVNANI_TYMU.md` | Specifikace side‑by‑side srovnání dvou týmů v den zápasu: bloky metrik, pravidla pro zvýraznění výhody, karty „Co rozhoduje“ z dekompozice modelu. | Opus |
 | `05_APIFY_SCRAPERY.md` | Co nabízí Apify Store a MCP: scrapery sázkovek, agregátorů kurzů a sestav, ceny, právní rámec a co to mění v plánu. | Opus / zakladatel |
 
 ## Myšlenka v jednom odstavci

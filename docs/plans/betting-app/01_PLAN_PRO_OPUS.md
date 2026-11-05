@@ -32,6 +32,8 @@ každá brána níže odkazuje na námitku, kterou má vyvrátit.
    posledních 10 zápasů (výkon, ne výsledek), pod ní tři ikony: kdo chybí a
    kolik procent „síly“ to je, kdo ho nahradí a kolik jí vrátí, hloubka
    lavičky. Vpravo náš odhad: 1X2, očekávané góly, rozdělení skóre.
+   Druhá záložka **Srovnání**: oba týmy vedle sebe, bloky metrik a karty
+   „Co rozhoduje“ z dekompozice odhadu; pravidla v `07_SROVNANI_TYMU.md`.
 2. **Trhy** — tabulka: trh, náš odhad pravděpodobnosti, kurz u každé
    uživatelovy sázkovky, implikovaná pravděpodobnost po odečtení marže,
    hrana (edge) v procentních bodech, doporučená velikost (frakční Kelly,
@@ -207,7 +209,9 @@ složky zůstávají.
 
 ### Fáze 3 — Trhy, kalibrace, hokej (3 týdny)
 
-Rozdělení skóre → všechny trhy z 0. Kalibrace per trh. Hokejový model na
+Rozdělení skóre → všechny trhy z 0. Kalibrace per trh. Dekompozice
+příspěvků vstupů k odhadu (`contributions`, `07_SROVNANI_TYMU.md` §4) jako
+součást výstupu modelu; slouží i ablacím. Hokejový model na
 NHL (data jsou) s ověřením na Extralize (data jsou horší; pokud nejsou,
 Extraliga odchází z MVP, ne naopak).
 
@@ -236,8 +240,9 @@ spočítané všechny trhy; snapshoty kurzů bez děr přes 24 h.
 
 ### Fáze 5 — Appka MVP (4 týdny)
 
-Obrazovky 1, 2, 3, 5 ze sekce 1 a zjednodušený Oblíbený tým (Přehled,
-Kádr, Trenér; `06_DETAIL_TYMU.md` §7). Deník ručně (obrazovka 4) bez OCR.
+Obrazovky 1 (včetně záložky Srovnání v rozsahu `07_SROVNANI_TYMU.md` §7),
+2, 3, 5 ze sekce 1 a zjednodušený Oblíbený tým (Přehled, Kádr, Trenér;
+`06_DETAIL_TYMU.md` §7). Deník ručně (obrazovka 4) bez OCR.
 Lokalizace cs/en. Věková brána 18+, povinné upozornění podle § 5j zákona
 o regulaci reklamy (text „Ministerstvo financí varuje: Účastí na hazardní
 hře může vzniknout závislost“ + kontakt na pomoc) na každé obrazovce
