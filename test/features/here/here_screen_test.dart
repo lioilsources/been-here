@@ -27,7 +27,11 @@ List<PhotoAsset> _photosAt(
   required int daysAgo,
   String prefix = 'p',
 }) {
-  final now = DateTime.utc(2026, 9, 20, 12);
+  // Relative to the real clock: the screen ages photos against now, so a
+  // fixed date here made the expected wording rot as the calendar moved on.
+  // Midday, so the hour offsets below never tip a photo into another day.
+  final today = DateTime.now();
+  final now = DateTime(today.year, today.month, today.day, 12);
   return [
     for (var i = 0; i < count; i++)
       PhotoAsset(
