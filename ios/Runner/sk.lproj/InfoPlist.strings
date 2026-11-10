@@ -1,0 +1,5 @@
+"NSCameraUsageDescription" = "Been Here zobrazuje starú fotku cez hľadáčik, aby si o rokoch mohol nafotiť ten istý záber znova. Fotoaparát sa používa len počas fotenia tej fotky.";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "S polohou na pozadí si Been Here všimne, že si dorazil na miesto, kde si pred rokmi fotil, a raz ti to povie, bez toho aby si otváral aplikáciu. Telefón sleduje malý počet miest, kde si bol, a aplikáciu zobudí len vtedy, keď do niektorého vstúpiš — nič o tvojej polohe sa nikam neposiela.";
+"NSLocationWhenInUseUsageDescription" = "Been Here porovnáva, kde si, s miestami, kde boli urobené tvoje fotky, aby ti mohla ukázať tvoje vlastné snímky miesta, na ktoré si práve dorazil. Tvoja poloha sa používa na tomto zariadení a nikdy sa nikam neposiela.";
+"NSPhotoLibraryAddUsageDescription" = "Fotka urobená v Been Here sa uloží do tvojej vlastnej knižnice fotiek, vedľa snímky, na ktorú odpovedá.";
+"NSPhotoLibraryUsageDescription" = "Been Here číta, kde a kedy boli urobené tvoje fotky, aby ti mohla ukázať tvoje vlastné snímky miesta, keď sa k nemu vrátiš. Tvoje fotky a ich poloha zostávajú na tomto zariadení.";

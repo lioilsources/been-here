@@ -1,0 +1,5 @@
+"NSCameraUsageDescription" = "Been Here 會在取景器上疊加一張舊照片，讓你多年後能再拍同樣的畫面。相機僅在你拍攝那張照片時使用。";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "開啟背景定位後，Been Here 能察覺你抵達了多年前拍過照的地方，並在你不開啟 App 的情況下提醒一次。你的手機只監控少數你去過的地點，只有你進入其中一處時才會喚醒 App — 你的位置資訊絕不會被傳送到任何地方。";
+"NSLocationWhenInUseUsageDescription" = "Been Here 會將你的位置與照片拍攝地點比對，以便向你展示你剛抵達的地方的、你自己的照片。你的位置僅在此裝置上使用，絕不會傳送到任何地方。";
+"NSPhotoLibraryAddUsageDescription" = "你在 Been Here 中拍攝的照片會儲存到你自己的照片圖庫，緊鄰它所回應的那張照片。";
+"NSPhotoLibraryUsageDescription" = "Been Here 會讀取你的照片拍攝於何處、何時，以便在你回到某個地方時向你展示你自己的照片。你的照片及其位置資訊保留在此裝置上。";

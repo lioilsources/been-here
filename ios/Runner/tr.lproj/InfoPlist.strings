@@ -1,0 +1,5 @@
+"NSCameraUsageDescription" = "Been Here, eski bir fotoğrafı vizörün üzerinde göstererek yıllar sonra aynı kareyi yeniden çekmeni sağlar. Kamera yalnızca o fotoğrafı çekerken kullanılır.";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "Arka planda konumla Been Here, yıllar önce fotoğraf çektiğin bir yere vardığını fark edebilir ve uygulamayı açmana gerek kalmadan bunu bir kez söyler. Telefonun bulunduğun az sayıda yeri izler ve uygulamayı yalnızca birine girdiğinde uyandırır — konumunla ilgili hiçbir şey hiçbir yere gönderilmez.";
+"NSLocationWhenInUseUsageDescription" = "Been Here, bulunduğun yeri fotoğraflarının çekildiği yerlerle karşılaştırır; böylece az önce vardığın yerin kendi görüntülerini sana gösterebilir. Konumun bu cihazda kullanılır ve hiçbir yere gönderilmez.";
+"NSPhotoLibraryAddUsageDescription" = "Been Here'da çektiğin fotoğraf, yanıt verdiği görüntünün yanında kendi fotoğraf kitaplığına kaydedilir.";
+"NSPhotoLibraryUsageDescription" = "Been Here, fotoğraflarının nerede ve ne zaman çekildiğini okur; böylece bir yere geri döndüğünde o yerin kendi görüntülerini sana gösterebilir. Fotoğrafların ve konumları bu cihazda kalır.";

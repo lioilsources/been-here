@@ -1,0 +1,5 @@
+"NSCameraUsageDescription" = "Been Here はファインダーに古い写真を重ねて表示し、何年も後に同じ構図でもう一度撮影できるようにします。カメラはその写真を撮っている間だけ使用されます。";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "バックグラウンドの位置情報を使うと、何年も前に撮影した場所に着いたことを Been Here が察知し、アプリを開かなくても一度だけお知らせします。お使いの電話は、訪れたことのある少数の場所を監視し、そのいずれかに入ったときだけアプリを起動します。位置情報がどこかに送信されることはありません。";
+"NSLocationWhenInUseUsageDescription" = "Been Here は現在地と写真が撮影された場所を照合し、到着したばかりの場所のご自身の写真を表示します。位置情報はこのデバイス上でのみ使用され、どこにも送信されません。";
+"NSPhotoLibraryAddUsageDescription" = "Been Here で撮影した写真は、それが応える元の写真の隣に、お客様自身のフォトライブラリへ保存されます。";
+"NSPhotoLibraryUsageDescription" = "Been Here は写真がいつどこで撮影されたかを読み取り、その場所へ戻ったときにご自身の写真を表示します。写真とその位置情報はこのデバイスから出ません。";
