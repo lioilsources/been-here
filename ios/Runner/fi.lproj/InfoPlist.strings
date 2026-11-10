@@ -1,0 +1,5 @@
+"NSCameraUsageDescription" = "Been Here näyttää vanhan valokuvan etsimen päällä, jotta voit ottaa saman kuvan uudelleen vuosien kuluttua. Kameraa käytetään vain sen kuvan ottamisen ajan.";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "Taustasijainnin avulla Been Here huomaa, kun saavut paikkaan, jossa olet kuvannut vuosia sitten, ja kertoo siitä kerran avaamatta sovellusta. Puhelimesi seuraa pientä määrää paikkoja, joissa olet käynyt, ja herättää sovelluksen vain, kun astut yhteen niistä — mitään sijainnistasi ei lähetetä minnekään.";
+"NSLocationWhenInUseUsageDescription" = "Been Here vertaa sijaintiasi paikkoihin, joissa kuvasi on otettu, jotta se voi näyttää omat kuvasi paikasta, johon juuri saavuit. Sijaintiasi käytetään tällä laitteella, eikä sitä lähetetä minnekään.";
+"NSPhotoLibraryAddUsageDescription" = "Been Heressä ottamasi kuva tallennetaan omaan kuvakirjastoosi sen kuvan viereen, johon se vastaa.";
+"NSPhotoLibraryUsageDescription" = "Been Here lukee, missä ja milloin kuvasi on otettu, jotta se voi näyttää omat kuvasi paikasta, kun palaat sinne. Kuvasi ja niiden sijainnit pysyvät tällä laitteella.";

@@ -1,0 +1,5 @@
+"NSCameraUsageDescription" = "Been Here viser et gammelt foto oven på søgeren, så du kan tage det samme billede igen år senere. Kameraet bruges kun, mens du tager det foto.";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "Med baggrundsplacering kan Been Here opdage, når du ankommer et sted, hvor du har fotograferet for år siden, og sige det én gang, uden at du åbner appen. Din telefon overvåger et lille antal steder, du har været, og vækker kun appen, når du går ind i et af dem — intet om din placering bliver sendt nogen steder hen.";
+"NSLocationWhenInUseUsageDescription" = "Been Here sammenligner, hvor du er, med hvor dine fotos er taget, så den kan vise dig dine egne billeder af det sted, du lige er ankommet til. Din placering bruges på denne enhed og sendes aldrig nogen steder hen.";
+"NSPhotoLibraryAddUsageDescription" = "Et foto, du tager i Been Here, gemmes i dit eget fotobibliotek ved siden af det billede, det svarer på.";
+"NSPhotoLibraryUsageDescription" = "Been Here læser, hvor og hvornår dine fotos er taget, så den kan vise dig dine egne billeder af et sted, når du vender tilbage til det. Dine fotos og deres placeringer bliver på denne enhed.";

@@ -1,0 +1,5 @@
+"NSCameraUsageDescription" = "Been Here는 뷰파인더 위에 오래된 사진을 보여 주어 몇 년 뒤에 같은 구도로 다시 찍을 수 있게 합니다. 카메라는 그 사진을 찍는 동안에만 사용됩니다.";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "백그라운드 위치를 사용하면, 몇 년 전에 사진을 찍었던 곳에 도착했을 때 Been Here가 이를 알아채고 앱을 열지 않아도 한 번 알려 줍니다. 전화기는 가 본 적 있는 몇몇 장소만 감시하다가 그중 한 곳에 들어설 때만 앱을 깨웁니다. 위치에 관한 정보는 어디로도 전송되지 않습니다.";
+"NSLocationWhenInUseUsageDescription" = "Been Here는 현재 위치를 사진이 촬영된 장소와 비교하여, 방금 도착한 장소에서 찍은 내 사진을 보여 줍니다. 위치는 이 기기에서만 사용되며 어디로도 전송되지 않습니다.";
+"NSPhotoLibraryAddUsageDescription" = "Been Here에서 찍은 사진은 그 사진이 답하는 원본 사진 옆에, 내 사진 보관함에 저장됩니다.";
+"NSPhotoLibraryUsageDescription" = "Been Here는 사진이 어디서 언제 촬영되었는지 읽어, 그 장소로 돌아왔을 때 내 사진을 보여 줍니다. 사진과 위치 정보는 이 기기에 남습니다.";
