@@ -62,7 +62,7 @@ gh secret set FIREBASE_SERVICE_ACCOUNT_KEY --repo lioilsources/been-here < servi
 
 ```sh
 export BW_SESSION=$(bw unlock --raw)
-/Volumes/YOTTA/Dev/Distribution/scripts/setup-gh-secrets.sh \
+$DEV_ROOT/Distribution/scripts/setup-gh-secrets.sh \
   --repo lioilsources/been-here --app BeenHere
 ```
 
