@@ -27,7 +27,7 @@ jobs:
           # failing on a lint that does not exist here — while the release
           # workflows went on building the shipped IPA with an SDK nothing
           # had been tested on. Upgrading is a decision, not a Tuesday.
-          flutter-version: '3.44.4'
+          flutter-version: '3.50.x'
           channel: stable
           cache: true
 
